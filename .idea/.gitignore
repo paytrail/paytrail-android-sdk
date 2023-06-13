@@ -1,0 +1,24 @@
+# Default ignored files
+*.iml
+
+/workspace.xml
+/shelf/
+/caches
+/libraries
+/inspectionProfiles
+/modules.xml
+/workspace.xml
+/navEditor.xml
+/assetWizardSettings.xml
+/deploymentTargetDropDown.xml
+/dbnavigator.xml
+/misc.xml
+/tasks.xml
+/gradle.xml
+/assetWizardSettings.xml
+/dictionaries
+/libraries
+/jarRepositories.xml
+
+# Comment next line if keeping position of elements in Navigation Editor is relevant for you
+/navEditor.xml

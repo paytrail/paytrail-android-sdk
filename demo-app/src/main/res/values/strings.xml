@@ -1,0 +1,5 @@
+<resources xmlns:xliff="urn:oasis:names:tc:xliff:document:1.2">
+    <string name="app_name">Paytrail SDK</string>
+    <string name="shopping_cart_screen_title">Shopping cart (<xliff:g id="shopping_cart_row_count" example="3">%1$s</xliff:g>)</string>
+    <string name="shopping_cart_button_pay">Pay</string>
+</resources>
