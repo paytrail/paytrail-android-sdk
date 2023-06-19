@@ -89,10 +89,17 @@ jobs:
           path: ./**/build/reports/tests/**
       # TODO: Split the unit test report to separate workflows when publishing the SDK.
       # See https://github.com/dorny/test-reporter#recommended-setup-for-public-repositoriesg
-      - name: Test Report
+      - name: Test Report (debug)
         uses: dorny/test-reporter@v1
         if: always()
         with:
-          name: Unit Test Results
-          path: ./**/build/test-results/testDebugUnitTest/*.xml'
+          name: Unit Test Results (debug)
+          path: '*/build/test-results/testDebugUnitTest/*.xml'
+          reporter: java-junit
+      - name: Test Report (release)
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: Unit Test Results (release)
+          path: '*/build/test-results/testReleaseUnitTest/*.xml'
           reporter: java-junit
