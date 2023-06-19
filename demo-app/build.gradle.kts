@@ -51,6 +51,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.7"
@@ -92,6 +93,12 @@ dependencies {
     debugImplementation(libs.ui.test.manifest)
 
     implementation(project(":payment-sdk"))
+
+    debugImplementation(libs.flipper)
+    debugImplementation(libs.soloader)
+    debugImplementation(libs.flipper.network.plugin)
+
+    releaseImplementation(libs.flipper.noop)
 }
 
 // Workaround from https://stackoverflow.com/a/75158443 for issue

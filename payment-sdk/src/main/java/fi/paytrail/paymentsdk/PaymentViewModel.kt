@@ -1,6 +1,5 @@
 package fi.paytrail.paymentsdk
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -39,10 +38,10 @@ class PaymentViewModel(
 ) : ViewModel() {
 
     private val api by lazy {
-        with(ApiClient(merchantAccount = merchantAccount)) {
-            setLogger { Log.i("OkHttp", it) }
-            createService(PaymentsApi::class.java)
-        }
+        ApiClient(
+            merchantAccount = merchantAccount,
+            okHttpClientBuilder = PaytrailBaseOkHttpClient.baseClient?.newBuilder()
+        ).createService(PaymentsApi::class.java)
     }
 
     // TODO: Add mechanism to trigger retrying the createPayment request?

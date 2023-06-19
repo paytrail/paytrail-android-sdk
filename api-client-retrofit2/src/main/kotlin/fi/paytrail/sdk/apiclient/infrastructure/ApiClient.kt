@@ -5,7 +5,6 @@ import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.Serializer.kotlinxSerializationJson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
-import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
@@ -14,7 +13,6 @@ class ApiClient(
     private val okHttpClientBuilder: OkHttpClient.Builder? = null,
     private val merchantAccount: MerchantAccount,
 ) {
-    var logger: ((String) -> Unit)? = null
 
     private val retrofitBuilder: Retrofit.Builder by lazy {
         Retrofit.Builder()
@@ -28,21 +26,11 @@ class ApiClient(
     }
 
     private val defaultClientBuilder: OkHttpClient.Builder by lazy {
-        OkHttpClient()
-            .newBuilder()
-            .addInterceptor(
-                HttpLoggingInterceptor { message -> logger?.invoke(message) }
-                    .apply { level = HttpLoggingInterceptor.Level.BODY },
-            )
+        OkHttpClient().newBuilder()
     }
 
     init {
         normalizeBaseUrl()
-    }
-
-    fun setLogger(logger: (String) -> Unit): ApiClient {
-        this.logger = logger
-        return this
     }
 
     fun <S> createService(serviceClass: Class<S>): S {
