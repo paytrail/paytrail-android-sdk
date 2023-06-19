@@ -37,7 +37,7 @@ fun PaymentResultView(paymentResult: PaytrailPaymentResult?, onHide: () -> Unit)
 private fun PaymentResultView(
     status: PaytrailPaymentResult.Status?,
     transactionId: String?,
-    onHide: () -> Unit
+    onHide: () -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -55,14 +55,15 @@ private fun PaymentResultView(
             Text(
                 text = stringResource(
                     R.string.payment_status_view_status,
-                    status ?: ""
-                )
+                    status ?: "",
+                ),
             )
             Text(
                 text = stringResource(
                     R.string.payment_status_view_transaction_id,
-                    transactionId ?: ""
-                ), fontSize = 10.sp
+                    transactionId ?: "",
+                ),
+                fontSize = 10.sp,
             )
         }
 
@@ -76,14 +77,13 @@ private fun PaymentResultView(
     }
 }
 
-
 @Preview
 @Composable
 fun PreviewPaymentResultViewSuccess() {
     PaymentResultView(
         status = PaytrailPaymentResult.Status.Ok,
         transactionId = "841fe3cc-8d82-4f2e-ae67-fc1e10be10a2",
-        onHide = {}
+        onHide = {},
     )
 }
 
@@ -93,6 +93,6 @@ fun PreviewPaymentResultViewFailure() {
     PaymentResultView(
         status = PaytrailPaymentResult.Status.Fail,
         transactionId = "841fe3cc-8d82-4f2e-ae67-fc1e10be10a2",
-        onHide = {}
+        onHide = {},
     )
 }

@@ -9,5 +9,4 @@ object PaytrailBaseOkHttpClient {
     fun install(baseClient: OkHttpClient) {
         PaytrailBaseOkHttpClient.baseClient = baseClient
     }
-
 }

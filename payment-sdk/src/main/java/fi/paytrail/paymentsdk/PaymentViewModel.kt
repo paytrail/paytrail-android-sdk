@@ -40,7 +40,7 @@ class PaymentViewModel(
     private val api by lazy {
         ApiClient(
             merchantAccount = merchantAccount,
-            okHttpClientBuilder = PaytrailBaseOkHttpClient.baseClient?.newBuilder()
+            okHttpClientBuilder = PaytrailBaseOkHttpClient.baseClient?.newBuilder(),
         ).createService(PaymentsApi::class.java)
     }
 

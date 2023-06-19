@@ -1,4 +1,4 @@
-package fi.paytrail.demo;
+package fi.paytrail.demo
 
 import android.app.Application
 import android.util.Log
@@ -14,7 +14,6 @@ import dagger.hilt.android.HiltAndroidApp
 import fi.paytrail.paymentsdk.PaytrailBaseOkHttpClient
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
-
 
 @HiltAndroidApp
 class DemoApp : Application() {
@@ -38,11 +37,10 @@ class DemoApp : Application() {
                 OkHttpClient.Builder()
                     .addNetworkInterceptor(FlipperOkhttpInterceptor(networkFlipperPlugin))
                     .addInterceptor(httpLogger)
-                    .build()
+                    .build(),
             )
 
             client.start()
         }
     }
-
 }
