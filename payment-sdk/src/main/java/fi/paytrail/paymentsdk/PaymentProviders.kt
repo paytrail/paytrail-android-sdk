@@ -95,15 +95,11 @@ private fun PaymentProvider(
     item: PaymentMethod,
     onClick: () -> Unit = {},
 ) {
-    val context = LocalContext.current
     Surface(
         modifier = modifier.size(width = 100.dp, height = 64.dp),
         shape = RoundedCornerShape(6.dp),
         border = BorderStroke(width = 1.dp, color = Color.Black),
-        onClick = {
-            context.toast("Start ${item.name} payment")
-            onClick()
-        },
+        onClick = onClick,
     ) {
         Column(
             modifier = Modifier

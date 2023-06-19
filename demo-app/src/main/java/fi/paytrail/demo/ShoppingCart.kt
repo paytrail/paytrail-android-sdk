@@ -134,8 +134,6 @@ private fun PayButton(
     enabled: Boolean,
     onClick: () -> Unit,
 ) {
-    val context = LocalContext.current
-
     Button(
         modifier = Modifier
             .widthIn(min = 80.dp)
