@@ -74,7 +74,6 @@ material3 = { group = "androidx.compose.material3", name = "material3" }
 appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 hilt-navigation-compose = { group = "androidx.hilt", name = "hilt-navigation-compose", version.ref = "hilt-navigation-compose" }
-jlleitschuh-ktlint = { group = "org.jlleitschuh.gradle", name = "ktlint-gradle", version.ref="jlleitschuh-ktlint" }
 
 # DI
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }

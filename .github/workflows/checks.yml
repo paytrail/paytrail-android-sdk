@@ -70,7 +70,7 @@ jobs:
           java-version-file: .java-version
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest testReleaseUnitTest --info
-      - name: Upload Test Results to Artifacts
+      - name: Upload Test Reports to Artifacts
         uses: actions/upload-artifact@v3
         if: always()
         with:
