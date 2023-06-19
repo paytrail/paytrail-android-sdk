@@ -1,19 +1,14 @@
 package fi.paytrail.demo
 
+import FlipperInitializer
 import android.app.Application
 import android.util.Log
-import com.facebook.flipper.android.AndroidFlipperClient
-import com.facebook.flipper.android.utils.FlipperUtils
-import com.facebook.flipper.plugins.crashreporter.CrashReporterPlugin
-import com.facebook.flipper.plugins.inspector.DescriptorMapping
-import com.facebook.flipper.plugins.inspector.InspectorFlipperPlugin
-import com.facebook.flipper.plugins.network.FlipperOkhttpInterceptor
-import com.facebook.flipper.plugins.network.NetworkFlipperPlugin
-import com.facebook.soloader.SoLoader
 import dagger.hilt.android.HiltAndroidApp
 import fi.paytrail.paymentsdk.PaytrailBaseOkHttpClient
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
+import okhttp3.logging.HttpLoggingInterceptor.Level.BODY
 
 @HiltAndroidApp
 class DemoApp : Application() {
@@ -21,26 +16,20 @@ class DemoApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        SoLoader.init(this, false)
-        if (BuildConfig.DEBUG && FlipperUtils.shouldEnableFlipper(this)) {
-            val client = AndroidFlipperClient.getInstance(this)
-            client.addPlugin(InspectorFlipperPlugin(this, DescriptorMapping.withDefaults()))
-            client.addPlugin(CrashReporterPlugin.getInstance())
+        val okHttpClientBuilder = OkHttpClient.Builder()
 
-            val networkFlipperPlugin = NetworkFlipperPlugin()
-            client.addPlugin(networkFlipperPlugin)
+        // Set up HTTP logging
+        val httpLogger = HttpLoggingInterceptor { Log.i("OkHttp", it) }
+        httpLogger.level = if (BuildConfig.DEBUG) BODY else BASIC
+        okHttpClientBuilder.addInterceptor(httpLogger)
 
-            // Set up Paytrail API with OkHttp client, which is able to log network requests.
-            val httpLogger = HttpLoggingInterceptor { Log.i("OkHttp", it) }
-            httpLogger.level = HttpLoggingInterceptor.Level.BODY
-            PaytrailBaseOkHttpClient.install(
-                OkHttpClient.Builder()
-                    .addNetworkInterceptor(FlipperOkhttpInterceptor(networkFlipperPlugin))
-                    .addInterceptor(httpLogger)
-                    .build(),
-            )
+        // Initialize Flipper
+        FlipperInitializer.initialize(applicationContext, okHttpClientBuilder)
 
-            client.start()
-        }
+        // Provide Paytrail SDK with OkHttp builder set up with logging plugins.
+        // SDK will set up a new client based on this client, if it has been installed.
+        PaytrailBaseOkHttpClient.install(okHttpClientBuilder.build())
+
     }
+
 }
