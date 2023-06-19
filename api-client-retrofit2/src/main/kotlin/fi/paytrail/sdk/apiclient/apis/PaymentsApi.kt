@@ -1,6 +1,6 @@
 package fi.paytrail.sdk.apiclient.apis
 
-import fi.paytrail.sdk.apiclient.infrastructure.CollectionFormats.*
+import fi.paytrail.sdk.apiclient.infrastructure.CollectionFormats.CSVParams
 import fi.paytrail.sdk.apiclient.models.ActivateInvoiceResponse
 import fi.paytrail.sdk.apiclient.models.BasePaymentMethodProvider
 import fi.paytrail.sdk.apiclient.models.GroupedPaymentProvidersResponse
@@ -9,9 +9,13 @@ import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import fi.paytrail.sdk.apiclient.models.PaymentRequestResponse
 import fi.paytrail.sdk.apiclient.models.Refund
 import fi.paytrail.sdk.apiclient.models.RefundResponse
-import kotlinx.serialization.SerialName
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.POST
+import retrofit2.http.Path
+import retrofit2.http.Query
 import java.util.UUID
 
 interface PaymentsApi {
@@ -54,40 +58,6 @@ interface PaymentsApi {
     ): Response<PaymentRequestResponse>
 
     /**
-     * enum for parameter groups
-     */
-    enum class Groups_getGroupedPaymentProviders(val value: String) {
-        @SerialName(value = "mobile")
-        Mobile("mobile"),
-
-        @SerialName(value = "bank")
-        Bank("bank"),
-
-        @SerialName(value = "creditcard")
-        Creditcard("creditcard"),
-
-        @SerialName(value = "credit")
-        Credit("credit"),
-
-        @SerialName(value = "other")
-        Other("other"),
-    }
-
-    /**
-     * enum for parameter language
-     */
-    enum class Language_getGroupedPaymentProviders(val value: String) {
-        @SerialName(value = "FI")
-        FI("FI"),
-
-        @SerialName(value = "SV")
-        SV("SV"),
-
-        @SerialName(value = "EN")
-        EN("EN"),
-    }
-
-    /**
      * List grouped merchant payment methods
      * Similar to the /merchants/payment-providers, but in addition of a flat list of providers, it returns payment group data containing localized names, icon URLs and grouped providers, and a localized text with a link to the terms of payment.
      * Responses:
@@ -104,9 +74,8 @@ interface PaymentsApi {
     suspend fun getGroupedPaymentProviders(
         @Query("amount") amount: Int? = null,
         @Query("groups") groups: CSVParams? = null,
-        @Query("language") language: Language_getGroupedPaymentProviders? = null,
+        @Query("language") language: Language? = null,
     ): Response<GroupedPaymentProvidersResponse>
-
 
     /**
      * Get a payment by Checkout transaction ID
@@ -127,26 +96,6 @@ interface PaymentsApi {
         @Path("transactionId") transactionId: UUID,
         @Header("checkout-transaction-id") checkoutTransactionId: UUID? = null,
     ): Response<Payment>
-
-    /**
-     * enum for parameter groups
-     */
-    enum class Groups_getPaymentProviders(val value: String) {
-        @SerialName(value = "mobile")
-        Mobile("mobile"),
-
-        @SerialName(value = "bank")
-        Bank("bank"),
-
-        @SerialName(value = "creditcard")
-        Creditcard("creditcard"),
-
-        @SerialName(value = "credit")
-        Credit("credit"),
-
-        @SerialName(value = "other")
-        Other("other"),
-    }
 
     /**
      * List merchant payment methods

@@ -1,36 +1,14 @@
 package fi.paytrail.sdk.apiclient.apis
 
-import fi.paytrail.sdk.apiclient.infrastructure.CollectionFormats.*
 import fi.paytrail.sdk.apiclient.models.PaymentReportBySettlementIdRequest
 import fi.paytrail.sdk.apiclient.models.PaymentReportRequest
 import fi.paytrail.sdk.apiclient.models.PaymentReportRequestResponse
-import kotlinx.serialization.SerialName
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface PaymentReportsApi {
-
-    /**
-     * enum for parameter checkoutAlgorithm
-     */
-    enum class CheckoutAlgorithm_requestPaymentReport(val value: kotlin.String) {
-        @SerialName(value = "sha256")
-        Sha256("sha256"),
-
-        @SerialName(value = "sha512")
-        Sha512("sha512"),
-    }
-
-    /**
-     * enum for parameter checkoutMethod
-     */
-    enum class CheckoutMethod_requestPaymentReport(val value: kotlin.String) {
-        @SerialName(value = "GET")
-        GET("GET"),
-
-        @SerialName(value = "POST")
-        POST("POST"),
-    }
 
     /**
      * Request a payment report
@@ -66,7 +44,7 @@ interface PaymentReportsApi {
      */
     @POST("settlements/{settlementId}/payments/report")
     suspend fun requestPaymentReportBySettlementId(
-        @Path("settlementId") settlementId: kotlin.String,
+        @Path("settlementId") settlementId: String,
         @Body paymentReportBySettlementIdRequest: PaymentReportBySettlementIdRequest,
     ): Response<PaymentReportRequestResponse>
 }

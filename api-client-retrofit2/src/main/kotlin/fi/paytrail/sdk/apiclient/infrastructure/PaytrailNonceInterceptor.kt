@@ -4,5 +4,5 @@ import java.util.UUID
 
 class PaytrailNonceInterceptor : HeaderInjectingInterceptor(
     "checkout-nonce",
-    { UUID.randomUUID().toString() }
+    { UUID.randomUUID().toString() },
 )

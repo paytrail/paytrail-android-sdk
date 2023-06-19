@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 fun LoadingPaymentMethods() {
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         CircularProgressIndicator()
     }

@@ -1,47 +1,13 @@
 package fi.paytrail.sdk.apiclient.apis
 
-import fi.paytrail.sdk.apiclient.infrastructure.CollectionFormats.*
+import fi.paytrail.sdk.apiclient.infrastructure.CollectionFormats.CSVParams
 import fi.paytrail.sdk.apiclient.models.BasePaymentMethodProvider
 import fi.paytrail.sdk.apiclient.models.GroupedPaymentProvidersResponse
-import kotlinx.serialization.SerialName
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.GET
+import retrofit2.http.Query
 
 interface ProvidersApi {
-
-    /**
-     * enum for parameter groups
-     */
-    enum class Groups_getGroupedPaymentProviders(val value: kotlin.String) {
-        @SerialName(value = "mobile")
-        Mobile("mobile"),
-
-        @SerialName(value = "bank")
-        Bank("bank"),
-
-        @SerialName(value = "creditcard")
-        Creditcard("creditcard"),
-
-        @SerialName(value = "credit")
-        Credit("credit"),
-
-        @SerialName(value = "other")
-        Other("other"),
-    }
-
-    /**
-     * enum for parameter language
-     */
-    enum class Language_getGroupedPaymentProviders(val value: kotlin.String) {
-        @SerialName(value = "FI")
-        FI("FI"),
-
-        @SerialName(value = "SV")
-        SV("SV"),
-
-        @SerialName(value = "EN")
-        EN("EN"),
-    }
 
     /**
      * List grouped merchant payment methods
@@ -58,30 +24,10 @@ interface ProvidersApi {
      */
     @GET("merchants/grouped-payment-providers")
     suspend fun getGroupedPaymentProviders(
-        @Query("amount") amount: kotlin.Int? = null,
+        @Query("amount") amount: Int? = null,
         @Query("groups") groups: CSVParams? = null,
-        @Query("language") language: Language_getGroupedPaymentProviders? = null
+        @Query("language") language: Language? = null,
     ): Response<GroupedPaymentProvidersResponse>
-
-    /**
-     * enum for parameter groups
-     */
-    enum class Groups_getPaymentProviders(val value: kotlin.String) {
-        @SerialName(value = "mobile")
-        Mobile("mobile"),
-
-        @SerialName(value = "bank")
-        Bank("bank"),
-
-        @SerialName(value = "creditcard")
-        Creditcard("creditcard"),
-
-        @SerialName(value = "credit")
-        Credit("credit"),
-
-        @SerialName(value = "other")
-        Other("other"),
-    }
 
     /**
      * List merchant payment methods
@@ -97,7 +43,7 @@ interface ProvidersApi {
      */
     @GET("merchants/payment-providers")
     suspend fun getPaymentProviders(
-        @Query("amount") amount: kotlin.Int? = null,
-        @Query("groups") groups: CSVParams? = null
-    ): Response<kotlin.collections.List<BasePaymentMethodProvider>>
+        @Query("amount") amount: Int? = null,
+        @Query("groups") groups: CSVParams? = null,
+    ): Response<List<BasePaymentMethodProvider>>
 }

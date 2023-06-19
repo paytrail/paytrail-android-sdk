@@ -5,5 +5,5 @@ import java.time.format.DateTimeFormatter
 
 class PaytrailCallTimestampInterceptor : HeaderInjectingInterceptor(
     "checkout-timestamp",
-    { DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now()) }
+    { DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now()) },
 )

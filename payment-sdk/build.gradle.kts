@@ -3,6 +3,13 @@ plugins {
     alias(libs.plugins.com.android.library)
     alias(libs.plugins.org.jetbrains.kotlin.android)
     alias(libs.plugins.org.jetbrains.kotlin.parcelize)
+    alias(libs.plugins.jlleitschuh.ktlint)
+}
+
+ktlint {
+    version.set(libs.versions.ktlint)
+    outputToConsole.set(true)
+    verbose.set(true)
 }
 
 android {
@@ -50,7 +57,6 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
 }
 
 dependencies {
@@ -82,5 +88,4 @@ dependencies {
     api(project(":api-client-retrofit2"))
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
-
 }

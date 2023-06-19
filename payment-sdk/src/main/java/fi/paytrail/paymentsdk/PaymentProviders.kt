@@ -38,7 +38,7 @@ import fi.paytrail.sdk.apiclient.models.PaymentMethodProvider
 @Composable
 fun PaymentProviders(
     modifier: Modifier = Modifier,
-    viewModel: PaymentViewModel
+    viewModel: PaymentViewModel,
 ) {
     val providers = viewModel.paymentProviderListing.observeAsState(emptyList()).value
 
@@ -60,7 +60,7 @@ private fun PaymentProviderListing(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         Spacer(modifier = Modifier.height(8.dp))
         for (group in groups) {
@@ -103,7 +103,7 @@ private fun PaymentProvider(
         onClick = {
             context.toast("Start ${item.name} payment")
             onClick()
-        }
+        },
     ) {
         Column(
             modifier = Modifier
@@ -142,9 +142,9 @@ private fun PreviewPaymentProvider() {
                 icon = "https://en.wikipedia.org/wiki/File:Duke_%28Java_mascot%29_waving.svg#/media/File:Duke_Wave.png",
                 group = PaymentMethodProvider.Group.Mobile,
                 url = "https://ecom.example.com",
-                parameters = emptyList()
-            )
-        )
+                parameters = emptyList(),
+            ),
+        ),
     )
 }
 
@@ -154,4 +154,3 @@ fun Context.toast(text: String) = Toast.makeText(this, text, Toast.LENGTH_SHORT)
 private fun NoPaymentProvidersAvailable(modifier: Modifier = Modifier) {
     Text(modifier = modifier, text = stringResource(R.string.no_payment_providers_available))
 }
-

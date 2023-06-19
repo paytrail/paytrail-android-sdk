@@ -43,8 +43,7 @@ data class PaytrailPaymentResult(
         transactionId = redirectUri.getQueryParameter("checkout-transaction-id")!!,
         status = Status.fromQueryParamString(redirectUri.getQueryParameter("checkout-status")!!),
         provider = redirectUri.getQueryParameter("checkout-provider")!!,
-        signature = redirectUri.getQueryParameter("signature")!!
-
+        signature = redirectUri.getQueryParameter("signature")!!,
 
     )
 
@@ -53,7 +52,8 @@ data class PaytrailPaymentResult(
         Ok("ok"),
         Fail("fail"),
         Pending("pending"),
-        Delayed("delayed");
+        Delayed("delayed"),
+        ;
 
         companion object {
             fun fromQueryParamString(s: String): Status = values().first { it.s == s }
@@ -91,7 +91,7 @@ fun PaytrailPayment(
     PaytrailPayment(
         modifier = modifier,
         viewModel = viewModel,
-        onPaymentResult = onPaymentResult
+        onPaymentResult = onPaymentResult,
     )
 }
 
@@ -112,7 +112,7 @@ internal fun PaytrailPayment(
             PaytrailPaymentStatus.SHOW_PAYMENT_PROVIDERS -> PaymentProviders(viewModel = viewModel)
             PaytrailPaymentStatus.PAYMENT_IN_PROGRESS -> PaymentWebView(
                 viewModel = viewModel,
-                onPaymentResult = onPaymentResult
+                onPaymentResult = onPaymentResult,
             )
 
             PaytrailPaymentStatus.PAYMENT_ERROR -> TODO()
@@ -121,4 +121,3 @@ internal fun PaytrailPayment(
         }
     }
 }
-

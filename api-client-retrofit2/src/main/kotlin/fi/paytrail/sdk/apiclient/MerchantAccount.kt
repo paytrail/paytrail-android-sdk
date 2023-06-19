@@ -7,6 +7,7 @@ data class MerchantAccount(
 
     companion object {
         private val UNDEFINED = MerchantAccount(0, "")
+
         // XXX: Remove default MerchantAccount, and require it always as parameter to payment flow?
         var default: MerchantAccount = UNDEFINED
             get() {

@@ -1,10 +1,10 @@
 package fi.paytrail.sdk.apiclient.apis
 
-import fi.paytrail.sdk.apiclient.infrastructure.CollectionFormats.*
 import fi.paytrail.sdk.apiclient.models.SettlementIdItem
-import kotlinx.serialization.SerialName
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.GET
+import retrofit2.http.Header
+import retrofit2.http.Query
 
 interface SettlementsApi {
 
@@ -29,8 +29,8 @@ interface SettlementsApi {
     suspend fun listSettlementIds(
         @Query("startDate") startDate: java.time.LocalDate? = null,
         @Query("endDate") endDate: java.time.LocalDate? = null,
-        @Query("bankReference") bankReference: kotlin.String? = null,
-        @Query("limit") limit: kotlin.Int? = null,
-        @Header("submerchant") submerchant: kotlin.Int? = null,
-    ): Response<kotlin.collections.List<SettlementIdItem>>
+        @Query("bankReference") bankReference: String? = null,
+        @Query("limit") limit: Int? = null,
+        @Header("submerchant") submerchant: Int? = null,
+    ): Response<List<SettlementIdItem>>
 }

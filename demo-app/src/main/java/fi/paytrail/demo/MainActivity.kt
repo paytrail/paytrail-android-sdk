@@ -42,7 +42,7 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     val merchantAccount: MerchantAccount = MerchantAccount(
         375917,
-        "SAIPPUAKAUPPIAS"
+        "SAIPPUAKAUPPIAS",
     )
 
     @Inject
@@ -61,11 +61,10 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     Column(modifier = Modifier.fillMaxSize()) {
-
                         AnimatedVisibility(visible = shouldShowStatus(paymentResult)) {
                             PaymentResultView(
                                 paymentResult = paymentResult,
-                                onHide = { paymentResult = null }
+                                onHide = { paymentResult = null },
                             )
                         }
 
@@ -102,7 +101,7 @@ class MainActivity : ComponentActivity() {
             composable("shopping_cart") {
                 ShoppingCart(
                     modifier = Modifier.fillMaxSize(),
-                    viewModel = hiltViewModel()
+                    viewModel = hiltViewModel(),
                 ) { navController.navigate("payment") }
             }
             composable("payment") {
@@ -121,15 +120,16 @@ class MainActivity : ComponentActivity() {
                             PaytrailPaymentResult.Status.Ok, PaytrailPaymentResult.Status.Fail -> {
                                 navController.popBackStack(
                                     route = "shopping_cart",
-                                    inclusive = false
+                                    inclusive = false,
                                 )
                                 onPaymentResult(it)
                             }
 
-                            else -> { /* navigate out of payment only when result is ok or fail */
+                            else -> {
+                                // navigate out of payment only when result is ok or fail
                             }
                         }
-                    }
+                    },
                 )
             }
         }
@@ -147,21 +147,21 @@ class MainActivity : ComponentActivity() {
                         PaytrailPaymentResult.Status.Ok -> Color.Green
                         PaytrailPaymentResult.Status.Fail -> Color.Red
                         else -> Color.Gray
-                    }
+                    },
                 )
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
-
             Column(modifier = Modifier.weight(1f)) {
                 Text(text = "Payment status: ${resultToShow?.status}")
                 Text(text = "Transaction id: ${resultToShow?.transactionId}", fontSize = 10.sp)
             }
 
-            Icon(modifier = Modifier
-                .clickable { onHide() }
-                .padding(start = 16.dp),
+            Icon(
+                modifier = Modifier
+                    .clickable { onHide() }
+                    .padding(start = 16.dp),
                 painter = painterResource(id = R.drawable.close),
-                contentDescription = "Close"
+                contentDescription = "Close",
             )
         }
     }

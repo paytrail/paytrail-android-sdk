@@ -7,6 +7,13 @@ plugins {
     alias(libs.plugins.hilt.android.plugin)
     alias(libs.plugins.org.jetbrains.kotlin.kapt)
     alias(libs.plugins.org.jetbrains.kotlin.parcelize)
+    alias(libs.plugins.jlleitschuh.ktlint)
+}
+
+ktlint {
+    version.set(libs.versions.ktlint)
+    outputToConsole.set(true)
+    verbose.set(true)
 }
 
 android {

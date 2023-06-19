@@ -1,12 +1,13 @@
 package fi.paytrail.sdk.apiclient.apis
 
-import fi.paytrail.sdk.apiclient.infrastructure.CollectionFormats.*
 import fi.paytrail.sdk.apiclient.models.AddCardFormRequest
 import fi.paytrail.sdk.apiclient.models.TokenMITPaymentResponse
 import fi.paytrail.sdk.apiclient.models.TokenPaymentRequest
 import fi.paytrail.sdk.apiclient.models.TokenizationRequestResponse
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface TokenPaymentsApi {
     /**
@@ -140,6 +141,6 @@ interface TokenPaymentsApi {
      */
     @POST("payments/{transactionId}/token/revert")
     suspend fun tokenRevert(
-        @Path("transactionId") transactionId: String
+        @Path("transactionId") transactionId: String,
     ): Response<TokenMITPaymentResponse>
 }

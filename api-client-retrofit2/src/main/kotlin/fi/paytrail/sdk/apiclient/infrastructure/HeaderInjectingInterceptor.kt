@@ -11,12 +11,10 @@ open class HeaderInjectingInterceptor(private val header: String, private val va
             chain.proceed(
                 chain.request().newBuilder()
                     .header(header, valueProvider.invoke(request))
-                    .build()
+                    .build(),
             )
         } else {
             chain.proceed(chain.request())
         }
-
     }
-
 }

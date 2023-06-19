@@ -33,23 +33,25 @@ data class ShoppingCart(
     }
 }
 
-val fakeCart = ShoppingCart(items = listOf(
-    ShoppingCartRow(
-        id = UUID.fromString("6391f2df-0dae-4fa3-ba1d-037273b27a4b"),
-        amount = 1,
-        price = BigDecimal.valueOf(30),
-    ),
-    ShoppingCartRow(
-        id = UUID.fromString("2e3f6d5a-c33b-46c9-9942-98bf02651e23"),
-        amount = 1,
-        price = BigDecimal.valueOf(20),
-    ),
-    ShoppingCartRow(
-        id = UUID.fromString("c739864b-0307-4cba-9101-60990c449da0"),
-        amount = 2,
-        price = BigDecimal.valueOf(40),
-    ),
-).associateBy { it.id })
+val fakeCart = ShoppingCart(
+    items = listOf(
+        ShoppingCartRow(
+            id = UUID.fromString("6391f2df-0dae-4fa3-ba1d-037273b27a4b"),
+            amount = 1,
+            price = BigDecimal.valueOf(30),
+        ),
+        ShoppingCartRow(
+            id = UUID.fromString("2e3f6d5a-c33b-46c9-9942-98bf02651e23"),
+            amount = 1,
+            price = BigDecimal.valueOf(20),
+        ),
+        ShoppingCartRow(
+            id = UUID.fromString("c739864b-0307-4cba-9101-60990c449da0"),
+            amount = 2,
+            price = BigDecimal.valueOf(40),
+        ),
+    ).associateBy { it.id },
+)
 
 class ShoppingCartRepository @Inject constructor() {
 
@@ -88,7 +90,7 @@ class ShoppingCartRepository @Inject constructor() {
             redirectUrls = Callbacks(
                 success = "https://ecom.example.org/success",
                 cancel = "https://ecom.example.org/cancel",
-            )
+            ),
         )
     }
 }

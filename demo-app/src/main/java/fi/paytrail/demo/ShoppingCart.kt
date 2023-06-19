@@ -1,6 +1,5 @@
 package fi.paytrail.demo
 
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -63,7 +62,7 @@ private fun ShoppingCart(
     items: List<ShoppingCartRow>,
     rowCount: Int,
     total: BigDecimal,
-    payAction: () -> Unit = {}
+    payAction: () -> Unit = {},
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),

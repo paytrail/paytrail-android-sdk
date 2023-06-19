@@ -9,9 +9,8 @@ import java.security.NoSuchAlgorithmException
 import javax.crypto.Mac
 import javax.crypto.spec.SecretKeySpec
 
-
 class PaytrailSignatureInterceptor(
-    private val secretProvider: () -> String
+    private val secretProvider: () -> String,
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request = chain.request().newBuilder()
@@ -38,7 +37,7 @@ class PaytrailSignatureInterceptor(
         return chain.proceed(
             request.newBuilder()
                 .addHeader("signature", signature)
-                .build()
+                .build(),
         )
     }
 
@@ -46,7 +45,7 @@ class PaytrailSignatureInterceptor(
         calculateHmac(
             algorithm = "HmacSHA512",
             key = key.toByteArray(),
-            message = message.toByteArray()
+            message = message.toByteArray(),
         ).bytesToHex()
     } catch (e: Exception) {
         e.printStackTrace()
@@ -60,7 +59,7 @@ class PaytrailSignatureInterceptor(
             doFinal(message)
         }
 
-    private fun  ByteArray.bytesToHex(): String {
+    private fun ByteArray.bytesToHex(): String {
         val hexArray = "0123456789abcdef".toCharArray()
         val hexChars = CharArray(size * 2)
         var v: Int

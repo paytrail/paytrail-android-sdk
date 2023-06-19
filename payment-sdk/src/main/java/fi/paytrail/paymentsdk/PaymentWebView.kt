@@ -15,7 +15,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
@@ -23,7 +22,7 @@ import fi.paytrail.sdk.apiclient.models.PaymentRequest
 @Composable
 fun PaymentWebView(
     viewModel: PaymentViewModel,
-    onPaymentResult: (PaytrailPaymentResult) -> Unit
+    onPaymentResult: (PaytrailPaymentResult) -> Unit,
 ) {
     val paymentMethod: PaymentMethod? = viewModel.selectedPaymentProvider.observeAsState(null).value
 
@@ -40,7 +39,7 @@ fun PaymentWebView(
 fun PaymentWebView(
     paymentMethod: PaymentMethod,
     paymentRequest: PaymentRequest,
-    onPaymentResult: (PaytrailPaymentResult) -> Unit
+    onPaymentResult: (PaytrailPaymentResult) -> Unit,
 ) {
     var webView: WebView? = null
 
@@ -68,7 +67,7 @@ fun PaymentWebView(
 
                     override fun shouldOverrideUrlLoading(
                         view: WebView,
-                        request: WebResourceRequest
+                        request: WebResourceRequest,
                     ): Boolean {
                         // TODO: Detect success/failure URLs properly.
                         //       Seems the URL detector should be provided here as parameter, since
@@ -104,7 +103,6 @@ fun PaymentWebView(
                     displayZoomControls = false
                 }
 
-
                 if (!webViewState.value.isEmpty) {
                     restoreState(webViewState.value)
                 }
@@ -115,13 +113,12 @@ fun PaymentWebView(
         update = {
             it.postUrl(
                 paymentMethod.provider.url,
-                paymentMethod.formParameters.toByteArray()
+                paymentMethod.formParameters.toByteArray(),
             )
 
             webView = it
-        }
+        },
     )
-
 
     // TODO: Back should take user back to selecting payment method.
     //       Current implementation takes user out of the payment flow;

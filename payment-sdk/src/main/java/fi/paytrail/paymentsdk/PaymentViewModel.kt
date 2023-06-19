@@ -15,7 +15,7 @@ import fi.paytrail.sdk.apiclient.models.PaymentRequest
 
 data class PaymentMethodGroup(
     val paymentMethodGroup: PaymentMethodGroupData,
-    val paymentMethods: List<PaymentMethod>
+    val paymentMethods: List<PaymentMethod>,
 ) {
     val id = paymentMethodGroup.id
     val name = paymentMethodGroup.name
@@ -54,14 +54,16 @@ class PaymentViewModel(
             val providers = body?.providers ?: emptyList()
             val groups = body?.groups ?: emptyList()
 
-            emit(groups.map { groupData ->
-                PaymentMethodGroup(
-                    paymentMethodGroup = groupData,
-                    paymentMethods = providers
-                        .filter { provider -> provider.group.value == groupData.id.value }
-                        .map { PaymentMethod(it) },
-                )
-            })
+            emit(
+                groups.map { groupData ->
+                    PaymentMethodGroup(
+                        paymentMethodGroup = groupData,
+                        paymentMethods = providers
+                            .filter { provider -> provider.group.value == groupData.id.value }
+                            .map { PaymentMethod(it) },
+                    )
+                },
+            )
         } else {
             // TODO: emit errors
             emit(emptyList())
@@ -118,5 +120,5 @@ enum class PaytrailPaymentStatus {
     PAYMENT_IN_PROGRESS,
     PAYMENT_ERROR,
     PAYMENT_CANCELED,
-    PAYMENT_DONE
+    PAYMENT_DONE,
 }
