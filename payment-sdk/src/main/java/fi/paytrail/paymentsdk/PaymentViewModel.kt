@@ -88,13 +88,13 @@ class PaymentViewModel(
     //    * until payment providers are loaded, status is LOADING_PAYMENT_PROVIDERS
     val paymentStatus: LiveData<PaytrailPaymentStatus> =
         MediatorLiveData(PaytrailPaymentStatus.LOADING_PAYMENT_PROVIDERS).apply {
-            var hasPPsLoaded = false
-            var isPPSelected = false
+            var isProvidersLoaded = false
+            var isProviderSelected = false
 
             fun refreshState() {
                 value = when {
-                    isPPSelected -> PaytrailPaymentStatus.PAYMENT_IN_PROGRESS
-                    hasPPsLoaded -> PaytrailPaymentStatus.SHOW_PAYMENT_PROVIDERS
+                    isProviderSelected -> PaytrailPaymentStatus.PAYMENT_IN_PROGRESS
+                    isProvidersLoaded -> PaytrailPaymentStatus.SHOW_PAYMENT_PROVIDERS
                     else -> PaytrailPaymentStatus.LOADING_PAYMENT_PROVIDERS
                 }
             }
@@ -102,12 +102,12 @@ class PaymentViewModel(
             addSource(paymentProviderListing) {
                 // TODO: This needs improving; we need to be looking at the create_payment
                 //       request & response, and set state accordingly (loading/ok/error)
-                hasPPsLoaded = true
+                isProvidersLoaded = true
                 refreshState()
             }
 
             addSource(selectedPaymentProvider) {
-                isPPSelected = it != null
+                isProviderSelected = it != null
                 refreshState()
             }
         }
