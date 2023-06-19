@@ -36,8 +36,7 @@ class DemoApp : Application() {
         // Allow debugging webview content for debug builds
         @SuppressLint("ObsoleteSdkInt")
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && BuildConfig.DEBUG) {
-            WebView.setWebContentsDebuggingEnabled(true);
+            WebView.setWebContentsDebuggingEnabled(true)
         }
     }
-
 }
