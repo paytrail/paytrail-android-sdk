@@ -8,8 +8,6 @@ on:
 
 jobs:
   ktlint:
-    env:
-      REPORTS_PATH: /**/build/reports/ktlint
     timeout-minutes: 10
     runs-on: ubuntu-latest
     steps:
@@ -24,12 +22,12 @@ jobs:
         with:
           name: ktlint-reports
           retention-days: 5
-          path: ${{ env.REPORTS_PATH }}
+          path: ./**/build/reports/ktlint
       - name: Ktlint Report
         uses: yutailang0119/action-ktlint@v3
         if: always()
         with:
-          report-path: ${{ env.REPORTS_PATH }}/**/*xml
+          report-path: ./**/build/reports/ktlint/**/*xml
 
   android_lint:
     timeout-minutes: 10
@@ -51,12 +49,12 @@ jobs:
         with:
           name: android-lint-reports
           retention-days: 5
-          path: /**/build/reports/lint-results-*
+          path: ./**/build/reports/lint-results-*
       - name: Android Lint Reports
         uses: yutailang0119/action-android-lint@v3
         if: always()
         with:
-          report-path: /**/build/reports/lint-results-debug.xml
+          report-path: ./**/build/reports/lint-results-debug.xml
 
   unit_tests:
     timeout-minutes: 10
@@ -78,11 +76,13 @@ jobs:
         with:
           name: unit-test-reports
           retention-days: 5
-          path: /**/build/reports/tests/**
+          path: ./**/build/reports/tests/**
+      # TODO: Split the unit test report to separate workflows when publishing the SDK.
+      # See https://github.com/dorny/test-reporter#recommended-setup-for-public-repositoriesg
       - name: Test Report
         uses: dorny/test-reporter@v1
         if: always()
         with:
           name: Unit Test Results
-          path: /**/build/test-results/testDebugUnitTest/*.xml
+          path: ./**/build/test-results/testDebugUnitTest/*.xml'
           reporter: java-junit
