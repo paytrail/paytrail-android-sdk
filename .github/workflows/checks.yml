@@ -42,7 +42,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version-file: /.java-version
+          java-version-file: .java-version
       - name: Run Android Lint
         run: ./gradlew lint --info
       - name: Upload Lint Results to Artifacts
@@ -69,7 +69,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: "temurin"
-          java-version-file: /.java-version
+          java-version-file: .java-version
       - name: Run Unit Tests
         run: ./gradlew testDebugUnitTest testReleaseUnitTest --info
       - name: Upload Test Results to Artifacts
