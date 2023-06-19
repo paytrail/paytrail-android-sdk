@@ -2,9 +2,10 @@ package fi.paytrail.paymentsdk
 
 import android.util.Log
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
-import androidx.lifecycle.map
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.apis.PaymentsApi
 import fi.paytrail.sdk.apiclient.infrastructure.ApiClient
@@ -27,11 +28,14 @@ data class PaymentMethod(
     val id: String = provider.id
     val name: String = provider.name
     val svg: String = provider.svg
+    val formParameters: String by lazy {
+        provider.parameters.joinToString(separator = "&") { "${it.name}=${it.value}" }
+    }
 }
 
 class PaymentViewModel(
-    private val paymentRequest: PaymentRequest,
-    private val merchantAccount: MerchantAccount,
+    val paymentRequest: PaymentRequest,
+    val merchantAccount: MerchantAccount,
 ) : ViewModel() {
 
     private val api by lazy {
@@ -64,6 +68,16 @@ class PaymentViewModel(
         }
     }
 
+    val selectedPaymentProvider = MutableLiveData<PaymentMethod?>(null)
+
+    fun startPayment(provider: PaymentMethod) {
+        selectedPaymentProvider.postValue(provider)
+    }
+
+    fun cancelPayment() {
+        selectedPaymentProvider.postValue(null)
+    }
+
     // TODO: This probably should be a MediatorLiveData, observing other request statuses,
     //  and showing result accordingly. Rough idea:
     //    * if payment is complete, PAYMENT_COMPLETE
@@ -71,14 +85,34 @@ class PaymentViewModel(
     //    * if payment provider has been selected, status is PAYMENT_IN_PROGRESS
     //    * if payment providers are loaded, status is SHOW_PAYMENT_PROVIDERS
     //    * until payment providers are loaded, status is LOADING_PAYMENT_PROVIDERS
-    val paymentStatus: LiveData<PaymentStatus> = liveData {
-        emit(PaymentStatus.LOADING_PAYMENT_PROVIDERS)
-        emitSource(paymentProviderListing.map { PaymentStatus.SHOW_PAYMENT_PROVIDERS })
-    }
+    val paymentStatus: LiveData<PaytrailPaymentStatus> =
+        MediatorLiveData(PaytrailPaymentStatus.LOADING_PAYMENT_PROVIDERS).apply {
+            var hasPPsLoaded = false
+            var isPPSelected = false
 
+            fun refreshState() {
+                value = when {
+                    isPPSelected -> PaytrailPaymentStatus.PAYMENT_IN_PROGRESS
+                    hasPPsLoaded -> PaytrailPaymentStatus.SHOW_PAYMENT_PROVIDERS
+                    else -> PaytrailPaymentStatus.LOADING_PAYMENT_PROVIDERS
+                }
+            }
+
+            addSource(paymentProviderListing) {
+                // TODO: This needs improving; we need to be looking at the create_payment
+                //       request & response, and set state accordingly (loading/ok/error)
+                hasPPsLoaded = true
+                refreshState()
+            }
+
+            addSource(selectedPaymentProvider) {
+                isPPSelected = it != null
+                refreshState()
+            }
+        }
 }
 
-enum class PaymentStatus {
+enum class PaytrailPaymentStatus {
     LOADING_PAYMENT_PROVIDERS,
     SHOW_PAYMENT_PROVIDERS,
     PAYMENT_IN_PROGRESS,

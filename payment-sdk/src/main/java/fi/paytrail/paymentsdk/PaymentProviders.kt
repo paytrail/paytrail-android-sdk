@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -46,7 +43,7 @@ fun PaymentProviders(
     val providers = viewModel.paymentProviderListing.observeAsState(emptyList()).value
 
     if (providers.isNotEmpty()) {
-        PaymentProviderListing(modifier.fillMaxSize(), providers)
+        PaymentProviderListing(modifier.fillMaxSize(), providers, viewModel::startPayment)
     } else {
         NoPaymentProvidersAvailable(modifier.fillMaxSize())
     }
@@ -56,7 +53,8 @@ fun PaymentProviders(
 @Composable
 private fun PaymentProviderListing(
     modifier: Modifier = Modifier,
-    groups: List<PaymentMethodGroup>
+    groups: List<PaymentMethodGroup>,
+    onPaymentMethodSelected: (PaymentMethod) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -74,7 +72,8 @@ private fun PaymentProviderListing(
                     for (method in group.paymentMethods) {
                         PaymentProvider(
                             modifier = Modifier.padding(4.dp),
-                            item = method
+                            item = method,
+                            onClick = { onPaymentMethodSelected(method) },
                         )
                     }
                 }
@@ -86,44 +85,25 @@ private fun PaymentProviderListing(
 }
 
 @Composable
-private fun LazyPaymentProviderListing(
-    modifier: Modifier = Modifier,
-    groups: List<PaymentMethodGroup>
-) {
-    LazyColumn(
-        modifier = modifier.fillMaxSize(),
-        contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 8.dp, bottom = 32.dp),
-    ) {
-        for (group in groups) {
-            item(key = "payment-group-header-${group.id}") {
-                PaymentGroupHeader(group)
-            }
-
-            itemsIndexed(items = group.paymentMethods) { index, item ->
-                PaymentProvider(Modifier.padding(4.dp), item)
-                if (index != group.paymentMethods.lastIndex) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                } else {
-                    Spacer(modifier = Modifier.height(24.dp))
-                }
-            }
-        }
-    }
-}
-
-@Composable
 fun PaymentGroupHeader(group: PaymentMethodGroup) {
     Text(group.name)
 }
 
 @Composable
-private fun PaymentProvider(modifier: Modifier = Modifier, item: PaymentMethod) {
+private fun PaymentProvider(
+    modifier: Modifier = Modifier,
+    item: PaymentMethod,
+    onClick: () -> Unit = {},
+) {
     val context = LocalContext.current
     Surface(
         modifier = modifier.size(width = 100.dp, height = 64.dp),
         shape = RoundedCornerShape(6.dp),
         border = BorderStroke(width = 1.dp, color = Color.Black),
-        onClick = { context.toast("TODO: Start ${item.name} payment") }
+        onClick = {
+            context.toast("Start ${item.name} payment")
+            onClick()
+        }
     ) {
         Column(
             modifier = Modifier
@@ -168,7 +148,7 @@ private fun PreviewPaymentProvider() {
     )
 }
 
-private fun Context.toast(text: String) = Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
+fun Context.toast(text: String) = Toast.makeText(this, text, Toast.LENGTH_SHORT).show()
 
 @Composable
 private fun NoPaymentProvidersAvailable(modifier: Modifier = Modifier) {

@@ -71,6 +71,10 @@ class ShoppingCartRepository @Inject constructor() {
         sf.value = ShoppingCart(items = emptyMap())
     }
 
+    /**
+     * Convert the current shopping cart contents into a [PaymentRequest].
+     * Each call creates [PaymentRequest] with new reference & stamps.
+     */
     fun cartAsPaymentOrder(): PaymentRequest {
         val cart = sf.value
 

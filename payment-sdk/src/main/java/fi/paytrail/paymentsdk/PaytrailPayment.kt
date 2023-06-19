@@ -1,5 +1,6 @@
 package fi.paytrail.paymentsdk
 
+import android.net.Uri
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.livedata.observeAsState
@@ -12,79 +13,53 @@ import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import java.util.concurrent.atomic.AtomicInteger
 
-/*
-enum class Currency(s: String) { EUR("EUR") }
+private val paymentCompositionCounter = AtomicInteger(0)
 
-enum class Language(s: String) { FI("FI"), SV("SV"), EN("EN") }
-
-data class Merchant(
-    val merchantId: String,
-    val secret: String,
+data class PaytrailPaymentState(
+    val paymentStatus: PaytrailPaymentStatus,
+    val transactionId: String,
+    val paymentResult: PaytrailPaymentResult, // XXX: Change this to API model?
 )
 
-@Parcelize
-data class Item(
-    val unitPrice: BigDecimal,
-    val units: Int,
-    val vatPercentage: Int,
-    val productCode: String,
-    // TODO: Rest of the fields
-) : Parcelable
-
-@Parcelize
-data class Customer(
-    val email: String,
-    val firstName: String? = null,
-    val lastName: String? = null,
-    val phone: String? = null,
-    val vatId: String? = null,
-) : Parcelable
-
-@Parcelize
-data class Callbacks(
-    val success: String,
-    val cancel: String,
-) : Parcelable
-
-/**
- * Known supported values for payment method groups.
- */
-object PaymentMethodGroup {
-    const val MOBILE = "mobile"
-    const val BANK = "bank"
-    const val CREDIT_CARD = "creditcard"
-    const val CREDIT = "credit"
-}
-
-@Parcelize
-data class Address(
-    val streetAddress: String? = null,
-    val postalCode: String? = null,
-    val city: String? = null,
-    val county: String? = null,
-    val country: String? = null,
-) : Parcelable
-
-// XXX: Should this model already include
-@Parcelize
-data class PaymentOrder(
+data class PaytrailPaymentResult(
+    val account: Int,
+    val algorithm: String,
+    val amount: Int,
+    val settlementReference: String?,
     val stamp: String,
     val reference: String,
-    val amount: BigDecimal,
-    val currency: Currency,
-    val language: Language,
-    val customer: Customer,
-    val redirectUrls: Callbacks,
-    val deliveryAddress: Address? = null,
-    val invoicingAddress: Address? = null,
-    val manualInvoiceActivation: Boolean? = null,
-    val items: List<Item>? = null,
-    val groups: List<String>? = null,
-    val usePricesWithoutVat: Boolean? = null,
-) : Parcelable
-*/
+    val transactionId: String,
+    val status: Status,
+    val provider: String,
+    val signature: String,
+) {
+    constructor(redirectUri: Uri) : this(
+        account = redirectUri.getQueryParameter("checkout-account")!!.toInt(),
+        algorithm = redirectUri.getQueryParameter("checkout-algorithm")!!,
+        amount = redirectUri.getQueryParameter("checkout-amount")!!.toInt(),
+        settlementReference = redirectUri.getQueryParameter("checkout-settlement-reference"),
+        stamp = redirectUri.getQueryParameter("checkout-stamp")!!,
+        reference = redirectUri.getQueryParameter("checkout-reference")!!,
+        transactionId = redirectUri.getQueryParameter("checkout-transaction-id")!!,
+        status = Status.fromQueryParamString(redirectUri.getQueryParameter("checkout-status")!!),
+        provider = redirectUri.getQueryParameter("checkout-provider")!!,
+        signature = redirectUri.getQueryParameter("signature")!!
 
-private val paymentCompositionCounter = AtomicInteger(0)
+
+    )
+
+    enum class Status(val s: String) {
+        New("new"),
+        Ok("ok"),
+        Fail("fail"),
+        Pending("pending"),
+        Delayed("delayed");
+
+        companion object {
+            fun fromQueryParamString(s: String): Status = values().first { it.s == s }
+        }
+    }
+}
 
 // TODO: Provide payment state as a hoistable state object?
 @Composable
@@ -92,6 +67,7 @@ fun PaytrailPayment(
     modifier: Modifier,
     payment: PaymentRequest,
     merchant: MerchantAccount = MerchantAccount.default,
+    onPaymentResult: (PaytrailPaymentResult) -> Unit,
 ) {
     val paymentCompositionId = remember(
         keys = arrayOf(
@@ -112,27 +88,36 @@ fun PaytrailPayment(
         )[paymentCompositionId, PaymentViewModel::class.java]
     }
 
-    PaytrailPayment(modifier, viewModel)
+    PaytrailPayment(
+        modifier = modifier,
+        viewModel = viewModel,
+        onPaymentResult = onPaymentResult
+    )
 }
 
 @Composable
 internal fun PaytrailPayment(
     modifier: Modifier = Modifier,
     viewModel: PaymentViewModel,
+    onPaymentResult: (PaytrailPaymentResult) -> Unit,
 ) {
     val paymentStatus =
-        viewModel.paymentStatus.observeAsState(initial = PaymentStatus.LOADING_PAYMENT_PROVIDERS).value
+        viewModel.paymentStatus.observeAsState(initial = PaytrailPaymentStatus.LOADING_PAYMENT_PROVIDERS).value
 
     // TODO: Set up & apply custom theming to relevant components
 
     Surface(modifier) {
         when (paymentStatus) {
-            PaymentStatus.LOADING_PAYMENT_PROVIDERS -> LoadingPaymentMethods()
-            PaymentStatus.SHOW_PAYMENT_PROVIDERS -> PaymentProviders(viewModel = viewModel)
-            PaymentStatus.PAYMENT_IN_PROGRESS -> TODO()
-            PaymentStatus.PAYMENT_ERROR -> TODO()
-            PaymentStatus.PAYMENT_CANCELED -> TODO()
-            PaymentStatus.PAYMENT_DONE -> TODO()
+            PaytrailPaymentStatus.LOADING_PAYMENT_PROVIDERS -> LoadingPaymentMethods()
+            PaytrailPaymentStatus.SHOW_PAYMENT_PROVIDERS -> PaymentProviders(viewModel = viewModel)
+            PaytrailPaymentStatus.PAYMENT_IN_PROGRESS -> PaymentWebView(
+                viewModel = viewModel,
+                onPaymentResult = onPaymentResult
+            )
+
+            PaytrailPaymentStatus.PAYMENT_ERROR -> TODO()
+            PaytrailPaymentStatus.PAYMENT_CANCELED -> TODO()
+            PaytrailPaymentStatus.PAYMENT_DONE -> TODO()
         }
     }
 }
