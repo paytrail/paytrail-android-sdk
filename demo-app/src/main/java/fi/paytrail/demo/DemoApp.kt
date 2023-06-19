@@ -1,8 +1,11 @@
 package fi.paytrail.demo
 
 import FlipperInitializer
+import android.annotation.SuppressLint
 import android.app.Application
+import android.os.Build
 import android.util.Log
+import android.webkit.WebView
 import dagger.hilt.android.HiltAndroidApp
 import fi.paytrail.paymentsdk.PaytrailBaseOkHttpClient
 import okhttp3.OkHttpClient
@@ -30,6 +33,11 @@ class DemoApp : Application() {
         // SDK will set up a new client based on this client, if it has been installed.
         PaytrailBaseOkHttpClient.install(okHttpClientBuilder.build())
 
+        // Allow debugging webview content for debug builds
+        @SuppressLint("ObsoleteSdkInt")
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && BuildConfig.DEBUG) {
+            WebView.setWebContentsDebuggingEnabled(true);
+        }
     }
 
 }
