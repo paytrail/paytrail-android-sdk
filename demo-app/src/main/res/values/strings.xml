@@ -2,4 +2,6 @@
     <string name="app_name">Paytrail SDK</string>
     <string name="shopping_cart_screen_title">Shopping cart (<xliff:g id="shopping_cart_row_count" example="3">%1$s</xliff:g>)</string>
     <string name="shopping_cart_button_pay">Pay</string>
+    <string name="payment_status_view_status">Payment status: %1$s</string>
+    <string name="payment_status_view_transaction_id">Transaction id: %1$s</string>
 </resources>
