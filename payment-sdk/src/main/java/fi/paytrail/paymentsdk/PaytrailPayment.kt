@@ -21,31 +21,17 @@ data class PaytrailPaymentState(
     val paymentResult: PaytrailPaymentResult, // XXX: Change this to API model?
 )
 
-data class PaytrailPaymentResult(
-    val account: Int,
-    val algorithm: String,
-    val amount: Int,
-    val settlementReference: String?,
-    val stamp: String,
-    val reference: String,
-    val transactionId: String,
-    val status: Status,
-    val provider: String,
-    val signature: String,
-) {
-    constructor(redirectUri: Uri) : this(
-        account = redirectUri.getQueryParameter("checkout-account")!!.toInt(),
-        algorithm = redirectUri.getQueryParameter("checkout-algorithm")!!,
-        amount = redirectUri.getQueryParameter("checkout-amount")!!.toInt(),
-        settlementReference = redirectUri.getQueryParameter("checkout-settlement-reference"),
-        stamp = redirectUri.getQueryParameter("checkout-stamp")!!,
-        reference = redirectUri.getQueryParameter("checkout-reference")!!,
-        transactionId = redirectUri.getQueryParameter("checkout-transaction-id")!!,
-        status = Status.fromQueryParamString(redirectUri.getQueryParameter("checkout-status")!!),
-        provider = redirectUri.getQueryParameter("checkout-provider")!!,
-        signature = redirectUri.getQueryParameter("signature")!!,
-
-    )
+data class PaytrailPaymentResult(val redirectUri: Uri) {
+    val account: Int by lazy { redirectUri.getQueryParameter("checkout-account")!!.toInt() }
+    val algorithm: String by lazy { redirectUri.getQueryParameter("checkout-algorithm")!! }
+    val amount: Int by lazy { redirectUri.getQueryParameter("checkout-amount")!!.toInt() }
+    val settlementReference: String? by lazy { redirectUri.getQueryParameter("checkout-settlement-reference") }
+    val stamp: String by lazy { redirectUri.getQueryParameter("checkout-stamp")!! }
+    val reference: String by lazy { redirectUri.getQueryParameter("checkout-reference")!! }
+    val transactionId: String by lazy { redirectUri.getQueryParameter("checkout-transaction-id")!! }
+    val status: Status by lazy { Status.fromQueryParamString(redirectUri.getQueryParameter("checkout-status")!!) }
+    val provider: String by lazy { redirectUri.getQueryParameter("checkout-provider")!! }
+    val signature: String by lazy { redirectUri.getQueryParameter("signature")!! }
 
     enum class Status(val s: String) {
         New("new"),
@@ -61,7 +47,6 @@ data class PaytrailPaymentResult(
     }
 }
 
-// TODO: Provide payment state as a hoistable state object?
 @Composable
 fun PaytrailPayment(
     modifier: Modifier,
