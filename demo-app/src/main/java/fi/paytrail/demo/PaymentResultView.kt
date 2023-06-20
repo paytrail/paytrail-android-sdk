@@ -54,7 +54,7 @@ private fun PaymentResultView(
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             Text(
                 text = stringResource(
@@ -73,13 +73,12 @@ private fun PaymentResultView(
 
         IconButton(
             modifier = Modifier.align(CenterVertically),
-            onClick = onHide
+            onClick = onHide,
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.close),
                 contentDescription = "Close",
             )
-
         }
     }
 }

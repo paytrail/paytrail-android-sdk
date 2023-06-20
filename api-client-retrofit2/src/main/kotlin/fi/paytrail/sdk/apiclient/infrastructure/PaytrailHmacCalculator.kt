@@ -29,7 +29,7 @@ abstract class PaytrailHmacCalculator(
         val bodyString = request.bodyString
         return calculateHmac(
             message = (headerList + bodyString).joinToString("\n"),
-            key = key
+            key = key,
         )
     }
 
@@ -38,7 +38,7 @@ abstract class PaytrailHmacCalculator(
         val bodyString = response.bodyString
         return calculateHmac(
             message = (headerList + bodyString).joinToString("\n"),
-            key = key
+            key = key,
         )
     }
 

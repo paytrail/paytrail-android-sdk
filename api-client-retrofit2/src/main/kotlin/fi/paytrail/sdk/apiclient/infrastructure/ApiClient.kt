@@ -50,7 +50,7 @@ class ApiClient(
                     PaytrailResponseSignatureValidator(
                         calculatorProvider = ::paytrailHmacCalculator,
                         secretProvider = { merchantAccount.secret },
-                    )
+                    ),
                 ),
             )
         }
@@ -63,5 +63,4 @@ class ApiClient(
             baseUrl += "/"
         }
     }
-
 }
