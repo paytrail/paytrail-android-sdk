@@ -1,6 +1,6 @@
 package fi.paytrail.sdk.apiclient.infrastructure
 
-class PaytrailCallMethodInterceptor : HeaderInjectingInterceptor(
+class PaytrailCallMethodInjector : HeaderInjectingInterceptor(
     "checkout-method",
     { it.method },
 )

@@ -2,7 +2,7 @@ package fi.paytrail.sdk.apiclient.infrastructure
 
 import java.util.UUID
 
-class PaytrailNonceInterceptor : HeaderInjectingInterceptor(
+class PaytrailNonceInjector : HeaderInjectingInterceptor(
     "checkout-nonce",
     { UUID.randomUUID().toString() },
 )

@@ -35,15 +35,22 @@ class ApiClient(
 
     fun <S> createService(serviceClass: Class<S>): S {
         val interceptors = clientBuilder.interceptors()
-        if (interceptors.none { it is PaytrailSignatureInterceptor }) {
+        if (interceptors.none { it is PaytrailRequestSigner }) {
             interceptors.addAll(
                 index = 0,
                 elements = listOf(
-                    PaytrailCallMethodInterceptor(),
-                    PaytrailCallTimestampInterceptor(),
-                    PaytrailNonceInterceptor(),
-                    PaytrailAccountIdInterceptor { merchantAccount.id },
-                    PaytrailSignatureInterceptor { merchantAccount.secret },
+                    PaytrailCallMethodInjector(),
+                    PaytrailCallTimestampInjector(),
+                    PaytrailNonceInjector(),
+                    PaytrailAccountIdInjector { merchantAccount.id },
+                    PaytrailRequestSigner(
+                        hmacCalculator = PaytrailSHA512HmacCalculator,
+                        secretProvider = { merchantAccount.secret },
+                    ),
+                    PaytrailResponseSignatureValidator(
+                        calculatorProvider = ::paytrailHmacCalculator,
+                        secretProvider = { merchantAccount.secret },
+                    )
                 ),
             )
         }
@@ -57,12 +64,4 @@ class ApiClient(
         }
     }
 
-    private inline fun <T, reified U> Iterable<T>.runOnFirst(callback: U.() -> Unit) {
-        for (element in this) {
-            if (element is U) {
-                callback.invoke(element)
-                break
-            }
-        }
-    }
 }
