@@ -1,4 +1,4 @@
-package fi.paytrail.sdk.apiclient.apis
+package fi.paytrail.sdk.apiclient.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

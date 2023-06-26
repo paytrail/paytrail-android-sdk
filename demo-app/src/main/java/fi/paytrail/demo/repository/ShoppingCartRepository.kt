@@ -2,7 +2,9 @@ package fi.paytrail.demo.repository
 
 import fi.paytrail.demo.util.times
 import fi.paytrail.sdk.apiclient.models.Callbacks
+import fi.paytrail.sdk.apiclient.models.Currency
 import fi.paytrail.sdk.apiclient.models.Customer
+import fi.paytrail.sdk.apiclient.models.Language
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -84,8 +86,8 @@ class ShoppingCartRepository @Inject constructor() {
             stamp = "PO-stamp-${UUID.randomUUID()}",
             reference = "PO-ref-${UUID.randomUUID()}",
             amount = cart.totalAmount.multiply(100.toBigDecimal()).toLong(),
-            currency = PaymentRequest.Currency.EUR,
-            language = PaymentRequest.Language.EN,
+            currency = Currency.EUR,
+            language = Language.EN,
             customer = Customer(email = "erkki.esimerkki@example.com"),
             redirectUrls = Callbacks(
                 success = "https://ecom.example.org/success",

@@ -67,6 +67,7 @@ class PaytrailHmacCalculator private constructor(
          * Verify validity of Paytrail redirect URL by checking its `signature` query parameter
          * against calculated HMAC.
          *
+         * @return true if redirect URL has been signed with corresponding key
          * @throws IllegalArgumentException if [url] does not contain `signature` or `checkout-algorithm` query parameters
          * @throws UnknownHmacAlgorithmException if [url] requires verifying signature with unsupported algorithm
          */

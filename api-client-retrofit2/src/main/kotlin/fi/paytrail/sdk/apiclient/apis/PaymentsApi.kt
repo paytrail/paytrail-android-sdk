@@ -4,6 +4,8 @@ import fi.paytrail.sdk.apiclient.infrastructure.CollectionFormats.CSVParams
 import fi.paytrail.sdk.apiclient.models.ActivateInvoiceResponse
 import fi.paytrail.sdk.apiclient.models.BasePaymentMethodProvider
 import fi.paytrail.sdk.apiclient.models.GroupedPaymentProvidersResponse
+import fi.paytrail.sdk.apiclient.models.Groups
+import fi.paytrail.sdk.apiclient.models.Language
 import fi.paytrail.sdk.apiclient.models.Payment
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import fi.paytrail.sdk.apiclient.models.PaymentRequestResponse
@@ -72,8 +74,8 @@ interface PaymentsApi {
      */
     @GET("merchants/grouped-payment-providers")
     suspend fun getGroupedPaymentProviders(
-        @Query("amount") amount: Int? = null,
-        @Query("groups") groups: CSVParams? = null,
+        @Query("amount") amount: Long? = null,
+        @Query("groups") groups: List<Groups>? = null,
         @Query("language") language: Language? = null,
     ): Response<GroupedPaymentProvidersResponse>
 

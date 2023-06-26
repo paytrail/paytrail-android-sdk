@@ -17,6 +17,8 @@ package fi.paytrail.sdk.apiclient.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 /**
  *
@@ -26,10 +28,10 @@ import kotlinx.serialization.Serializable
  * @param meta Possible detailed error descriptions
  */
 @Serializable
-data class Error(
+data class ErrorResponse(
 
     @SerialName(value = "status")
-    val status: Error.Status,
+    val status: ErrorResponse.Status,
 
     /* Error description */
     @SerialName(value = "message")
@@ -40,7 +42,6 @@ data class Error(
     val meta: kotlin.collections.List<kotlin.String>? = null,
 
 ) {
-
     /**
      *
      *
@@ -50,5 +51,9 @@ data class Error(
     enum class Status(val value: kotlin.String) {
         @SerialName(value = "error")
         Error("error"),
+    }
+
+    companion object {
+        fun deserialize(json: String): ErrorResponse = Json.decodeFromString(json)
     }
 }

@@ -84,15 +84,15 @@ fun PaymentWebView(
                             (requestHost == cancelHost && requestPath == cancelPath)
                         ) {
                             if (verifyUrlSignature(
-                                    request.url.toString(),
-                                    merchantAccount.secret + "potato",
+                                    url = request.url.toString(),
+                                    key = merchantAccount.secret,
                                 )
                             ) {
                                 onPaymentRedirect(PaytrailPaymentRedirect(request.url))
                             } else {
                                 onPaymentError(
                                     InvalidSignatureException(
-                                        "Invalid signature in redirect to ${request.url}",
+                                        "Invalid signature in redirect URL: ${request.url}",
                                     ),
                                 )
                             }

@@ -3,6 +3,7 @@ package fi.paytrail.sdk.apiclient.apis
 import fi.paytrail.sdk.apiclient.infrastructure.CollectionFormats.CSVParams
 import fi.paytrail.sdk.apiclient.models.BasePaymentMethodProvider
 import fi.paytrail.sdk.apiclient.models.GroupedPaymentProvidersResponse
+import fi.paytrail.sdk.apiclient.models.Language
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

@@ -22,6 +22,7 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_METH
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.apis.PaymentsApi
 import fi.paytrail.sdk.apiclient.infrastructure.ApiClient
+import fi.paytrail.sdk.apiclient.models.ErrorResponse.Companion.deserialize
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 
 class PaymentViewModel(
@@ -36,7 +37,6 @@ class PaymentViewModel(
         ).createService(PaymentsApi::class.java)
     }
 
-    // TODO: Add mechanism to trigger retrying the createPayment request?
     val paymentProviderListing = liveData {
         try {
             val result = api.createPayment(paymentRequest = paymentRequest)
@@ -57,8 +57,22 @@ class PaymentViewModel(
                     },
                 )
             } else {
-                Log.i("PaymentViewModel", "API error: $result")
-                apiErrorResponse.postValue(PaytrailApiErrorResponse(result))
+                val errorBody = result.errorBody()?.string()
+                val errorResponse = errorBody?.let {
+                    try {
+                        deserialize(it)
+                    } catch (e: IllegalArgumentException) {
+                        Log.w("PaymentViewModel", "Failed deserializing error body: $errorBody")
+                        null
+                    }
+                }
+                apiErrorResponse.postValue(
+                    PaytrailApiErrorResponse(
+                        code = result.code(),
+                        errorBody = errorBody,
+                        errorResponse = errorResponse,
+                    ),
+                )
                 emit(emptyList())
             }
         } catch (e: Exception) {
