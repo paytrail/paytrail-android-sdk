@@ -17,12 +17,16 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
+import fi.paytrail.paymentsdk.model.PaymentMethod
+import fi.paytrail.paymentsdk.model.PaytrailPaymentRedirect
+import fi.paytrail.sdk.apiclient.MerchantAccount
+import fi.paytrail.sdk.apiclient.infrastructure.InvalidSignatureException
+import fi.paytrail.sdk.apiclient.infrastructure.PaytrailHmacCalculator.Companion.verifyUrlSignature
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 
 @Composable
 fun PaymentWebView(
     viewModel: PaymentViewModel,
-    onPaymentResult: (PaytrailPaymentResult) -> Unit,
 ) {
     val paymentMethod: PaymentMethod? = viewModel.selectedPaymentProvider.observeAsState(null).value
 
@@ -30,7 +34,9 @@ fun PaymentWebView(
         PaymentWebView(
             paymentMethod = paymentMethod,
             paymentRequest = viewModel.paymentRequest,
-            onPaymentResult = onPaymentResult,
+            merchantAccount = viewModel.merchantAccount,
+            onPaymentRedirect = viewModel::onPaymentRedirect,
+            onPaymentError = viewModel::onPaymentError,
         )
     }
 }
@@ -39,20 +45,21 @@ fun PaymentWebView(
 fun PaymentWebView(
     paymentMethod: PaymentMethod,
     paymentRequest: PaymentRequest,
-    onPaymentResult: (PaytrailPaymentResult) -> Unit,
+    merchantAccount: MerchantAccount,
+    onPaymentRedirect: (PaytrailPaymentRedirect) -> Unit,
+    onPaymentError: (Exception) -> Unit,
 ) {
     var webView: WebView? = null
 
     var canGoBack by remember { mutableStateOf(false) }
 
-    // TODO: Figure out how to persit/restore the WebView state through
+    // TODO: Figure out how to persist/restore the WebView state through
     //       Activity (and process) destruction/recreation.
     //       Check how Accompanist WebView does this for inspiration.
     val webViewState: State<Bundle> = rememberSaveable { mutableStateOf(Bundle()) }
 
     AndroidView(
         factory = { context ->
-
             WebView(context).apply {
                 webViewClient = object : WebViewClient() {
                     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -69,9 +76,6 @@ fun PaymentWebView(
                         view: WebView,
                         request: WebResourceRequest,
                     ): Boolean {
-                        // TODO: Detect success/failure URLs properly.
-                        //       Seems the URL detector should be provided here as parameter, since
-                        //       the redirect URLs are not part of PaymentMethodProvider data.
                         val (requestHost, requestPath) = with(request.url) { host to path }
                         val (successHost, successPath) = with(paymentRequest.redirectUrls.success.toUri()) { host to path }
                         val (cancelHost, cancelPath) = with(paymentRequest.redirectUrls.cancel.toUri()) { host to path }
@@ -79,8 +83,19 @@ fun PaymentWebView(
                         if ((requestHost == successHost && requestPath == successPath) ||
                             (requestHost == cancelHost && requestPath == cancelPath)
                         ) {
-                            onPaymentResult(PaytrailPaymentResult(request.url))
-                            // TODO: Should the webview be allowed to follow the redirect? Maybe?
+                            if (verifyUrlSignature(
+                                    request.url.toString(),
+                                    merchantAccount.secret + "potato",
+                                )
+                            ) {
+                                onPaymentRedirect(PaytrailPaymentRedirect(request.url))
+                            } else {
+                                onPaymentError(
+                                    InvalidSignatureException(
+                                        "Invalid signature in redirect to ${request.url}",
+                                    ),
+                                )
+                            }
                             return true
                         }
 
@@ -120,13 +135,8 @@ fun PaymentWebView(
         },
     )
 
-    // TODO: Back should take user back to selecting payment method.
-    //       Current implementation takes user out of the payment flow;
     BackHandler(enabled = canGoBack) {
         webView?.apply {
-            // TODO: Should we block back navigation if at success/fail? Probably yes.
-            // TODO: Should we block back navigation completely during flow, and return user
-            //       to payment method selection with back key? Probably not...
             if (canGoBack()) {
                 goBack()
             }

@@ -1,36 +1,28 @@
 package fi.paytrail.paymentsdk
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import fi.paytrail.paymentsdk.model.PaymentMethod
+import fi.paytrail.paymentsdk.model.PaymentMethodGroup
+import fi.paytrail.paymentsdk.model.PaytrailApiErrorResponse
+import fi.paytrail.paymentsdk.model.PaytrailPaymentRedirect
+import fi.paytrail.paymentsdk.model.PaytrailPaymentRedirect.Status.Fail
+import fi.paytrail.paymentsdk.model.PaytrailPaymentRedirect.Status.Ok
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_METHODS
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_CANCELED
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_FAIL
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_METHODS
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.apis.PaymentsApi
 import fi.paytrail.sdk.apiclient.infrastructure.ApiClient
-import fi.paytrail.sdk.apiclient.models.PaymentMethodGroupData
-import fi.paytrail.sdk.apiclient.models.PaymentMethodProvider
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
-
-data class PaymentMethodGroup(
-    val paymentMethodGroup: PaymentMethodGroupData,
-    val paymentMethods: List<PaymentMethod>,
-) {
-    val id = paymentMethodGroup.id
-    val name = paymentMethodGroup.name
-    val svg = paymentMethodGroup.svg
-}
-
-data class PaymentMethod(
-    val provider: PaymentMethodProvider,
-) {
-    val id: String = provider.id
-    val name: String = provider.name
-    val svg: String = provider.svg
-    val formParameters: String by lazy {
-        provider.parameters.joinToString(separator = "&") { "${it.name}=${it.value}" }
-    }
-}
 
 class PaymentViewModel(
     val paymentRequest: PaymentRequest,
@@ -46,37 +38,59 @@ class PaymentViewModel(
 
     // TODO: Add mechanism to trigger retrying the createPayment request?
     val paymentProviderListing = liveData {
-        val result = api.createPayment(paymentRequest = paymentRequest)
-        if (result.isSuccessful) {
-            val body = result.body()
+        try {
+            val result = api.createPayment(paymentRequest = paymentRequest)
+            if (result.isSuccessful) {
+                val body = result.body()
 
-            val providers = body?.providers ?: emptyList()
-            val groups = body?.groups ?: emptyList()
+                val providers = body?.providers ?: emptyList()
+                val groups = body?.groups ?: emptyList()
 
-            emit(
-                groups.map { groupData ->
-                    PaymentMethodGroup(
-                        paymentMethodGroup = groupData,
-                        paymentMethods = providers
-                            .filter { provider -> provider.group.value == groupData.id.value }
-                            .map { PaymentMethod(it) },
-                    )
-                },
-            )
-        } else {
-            // TODO: emit errors
-            emit(emptyList())
+                emit(
+                    groups.map { groupData ->
+                        PaymentMethodGroup(
+                            paymentMethodGroup = groupData,
+                            paymentMethods = providers
+                                .filter { provider -> provider.group.value == groupData.id.value }
+                                .map { PaymentMethod(it) },
+                        )
+                    },
+                )
+            } else {
+                Log.i("PaymentViewModel", "API error: $result")
+                apiErrorResponse.postValue(PaytrailApiErrorResponse(result))
+                emit(emptyList())
+            }
+        } catch (e: Exception) {
+            Log.i("PaymentViewModel", "Error in loading payment providers", e)
+            paymentError.postValue(e)
         }
     }
 
     val selectedPaymentProvider = MutableLiveData<PaymentMethod?>(null)
+    private val paymentWebViewRedirect = MutableLiveData<PaytrailPaymentRedirect>()
+    private val paymentError = MutableLiveData<Exception>()
+    private val apiErrorResponse = MutableLiveData<PaytrailApiErrorResponse>()
+    private val paymentCanceled = MutableLiveData(false)
 
     fun startPayment(provider: PaymentMethod) {
         selectedPaymentProvider.postValue(provider)
     }
 
-    fun cancelPayment() {
-        selectedPaymentProvider.postValue(null)
+    fun onBackNavigation() {
+        if (selectedPaymentProvider.value != null) {
+            selectedPaymentProvider.postValue(null)
+        } else {
+            paymentCanceled.postValue(true)
+        }
+    }
+
+    fun onPaymentRedirect(redirect: PaytrailPaymentRedirect) {
+        this.paymentWebViewRedirect.postValue(redirect)
+    }
+
+    fun onPaymentError(exception: Exception) {
+        this.paymentError.postValue(exception)
     }
 
     // TODO: This probably should be a MediatorLiveData, observing other request statuses,
@@ -86,38 +100,66 @@ class PaymentViewModel(
     //    * if payment provider has been selected, status is PAYMENT_IN_PROGRESS
     //    * if payment providers are loaded, status is SHOW_PAYMENT_PROVIDERS
     //    * until payment providers are loaded, status is LOADING_PAYMENT_PROVIDERS
-    val paymentStatus: LiveData<PaytrailPaymentStatus> =
-        MediatorLiveData(PaytrailPaymentStatus.LOADING_PAYMENT_PROVIDERS).apply {
-            var isProvidersLoaded = false
-            var isProviderSelected = false
+    val paymentState: LiveData<PaytrailPaymentState> =
+        MediatorLiveData(PaytrailPaymentState(LOADING_PAYMENT_METHODS)).apply {
+            var paymentProvidersLoaded = false
+            var selectedMethod: PaymentMethod? = null
+            var redirect: PaytrailPaymentRedirect? = null
+            var error: Exception? = null
+            var errorResponse: PaytrailApiErrorResponse? = null
+            var canceled = false
 
             fun refreshState() {
                 value = when {
-                    isProviderSelected -> PaytrailPaymentStatus.PAYMENT_IN_PROGRESS
-                    isProvidersLoaded -> PaytrailPaymentStatus.SHOW_PAYMENT_PROVIDERS
-                    else -> PaytrailPaymentStatus.LOADING_PAYMENT_PROVIDERS
+                    canceled -> PaytrailPaymentState(PAYMENT_CANCELED)
+
+                    errorResponse != null || error != null || redirect?.status == Fail -> PaytrailPaymentState(
+                        state = PAYMENT_FAIL,
+                        redirectRequest = redirect,
+                        exception = error,
+                    )
+
+                    redirect?.status == Ok -> PaytrailPaymentState(
+                        state = PAYMENT_OK,
+                        redirectRequest = redirect,
+                    )
+
+                    selectedMethod != null -> PaytrailPaymentState(PAYMENT_IN_PROGRESS)
+                    paymentProvidersLoaded -> PaytrailPaymentState(SHOW_PAYMENT_METHODS)
+                    else -> PaytrailPaymentState(LOADING_PAYMENT_METHODS)
                 }
             }
 
             addSource(paymentProviderListing) {
                 // TODO: This needs improving; we need to be looking at the create_payment
                 //       request & response, and set state accordingly (loading/ok/error)
-                isProvidersLoaded = true
+                paymentProvidersLoaded = true
                 refreshState()
             }
 
             addSource(selectedPaymentProvider) {
-                isProviderSelected = it != null
+                selectedMethod = it
+                refreshState()
+            }
+
+            addSource(paymentWebViewRedirect) {
+                redirect = it
+                refreshState()
+            }
+
+            addSource(paymentError) {
+                error = it
+                refreshState()
+            }
+
+            addSource(apiErrorResponse) {
+                errorResponse = it
+                refreshState()
+            }
+
+            addSource(paymentCanceled) {
+                canceled = it
                 refreshState()
             }
         }
-}
-
-enum class PaytrailPaymentStatus {
-    LOADING_PAYMENT_PROVIDERS,
-    SHOW_PAYMENT_PROVIDERS,
-    PAYMENT_IN_PROGRESS,
-    PAYMENT_ERROR,
-    PAYMENT_CANCELED,
-    PAYMENT_DONE,
 }

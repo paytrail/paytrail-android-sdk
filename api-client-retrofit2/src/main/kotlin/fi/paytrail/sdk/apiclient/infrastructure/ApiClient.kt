@@ -44,11 +44,11 @@ class ApiClient(
                     PaytrailNonceInjector(),
                     PaytrailAccountIdInjector { merchantAccount.id },
                     PaytrailRequestSigner(
-                        hmacCalculator = PaytrailSHA512HmacCalculator,
+                        hmacCalculator = PaytrailHmacCalculator.SHA512,
                         secretProvider = { merchantAccount.secret },
                     ),
                     PaytrailResponseSignatureValidator(
-                        calculatorProvider = ::paytrailHmacCalculator,
+                        calculatorProvider = PaytrailHmacCalculator::getCalculator,
                         secretProvider = { merchantAccount.secret },
                     ),
                 ),

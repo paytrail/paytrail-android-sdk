@@ -33,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
+import fi.paytrail.paymentsdk.model.PaymentMethod
+import fi.paytrail.paymentsdk.model.PaymentMethodGroup
 import fi.paytrail.sdk.apiclient.models.PaymentMethodProvider
 
 @Composable
