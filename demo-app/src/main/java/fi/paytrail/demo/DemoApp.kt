@@ -29,8 +29,9 @@ class DemoApp : Application() {
         // Initialize Flipper
         FlipperInitializer.initialize(applicationContext, okHttpClientBuilder)
 
-        // Provide Paytrail SDK with OkHttp client set up with logging plugins.
-        // SDK will set up a new client based on this client, if it has been installed.
+        // Provide Paytrail SDK with OkHttp client set up with logging interceptors.
+        // SDK will use this client as basis for the OkHttpClient it uses to call API
+        // endpoints.
         PaytrailBaseOkHttpClient.install(okHttpClientBuilder.build())
 
         // Allow debugging webview content for debug builds

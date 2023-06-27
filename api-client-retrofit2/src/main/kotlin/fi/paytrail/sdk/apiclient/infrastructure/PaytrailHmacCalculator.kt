@@ -43,6 +43,7 @@ class PaytrailHmacCalculator private constructor(
          * @throws IllegalArgumentException if [url] does not contain `checkout-algorithm`
          * query parameters.
          */
+        @Suppress("MemberVisibilityCanBePrivate")
         fun calculateHmac(url: String, key: String) = calculateHmac(url = URL(url), key = key)
 
         /**
@@ -55,6 +56,7 @@ class PaytrailHmacCalculator private constructor(
          * @throws IllegalArgumentException if [url] does not contain `checkout-algorithm`
          * query parameters.
          */
+        @Suppress("MemberVisibilityCanBePrivate")
         fun calculateHmac(url: URL, key: String): String {
             val parameters = url.parameters()
             val algorithm = url.parameter("checkout-algorithm")
