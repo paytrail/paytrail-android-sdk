@@ -9,7 +9,7 @@ data class MerchantAccount(
         private val UNDEFINED = MerchantAccount(0, "")
 
         // XXX: Remove default MerchantAccount, and require it always as parameter to payment flow?
-        var default: MerchantAccount = UNDEFINED
+        var account: MerchantAccount = UNDEFINED
             get() {
                 if (field == UNDEFINED) {
                     throw RuntimeException("Default merchant configuration not set up")

@@ -15,8 +15,11 @@
 
 package fi.paytrail.sdk.apiclient.models
 
+import fi.paytrail.sdk.apiclient.MerchantAccount
+import fi.paytrail.sdk.apiclient.infrastructure.PaytrailHmacCalculator
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlin.reflect.full.memberProperties
 
 /**
  * Add card form request
@@ -34,62 +37,78 @@ data class AddCardFormRequest(
 
     /* Merchant ID */
     @SerialName(value = "checkout-account")
-    val checkoutAccount: kotlin.Int,
+    val checkoutAccount: Int,
 
     /* HMAC algorithm */
     @SerialName(value = "checkout-algorithm")
-    val checkoutAlgorithm: AddCardFormRequest.CheckoutAlgorithm,
+    val checkoutAlgorithm: String,
+
+    @SerialName(value = "checkout-method")
+    val checkoutMethod: String,
+
+    @SerialName(value = "checkout-nonce")
+    val checkoutNonce: String,
+
+    @SerialName(value = "checkout-timestamp")
+    val checkoutTimestamp: String,
 
     /* Merchant's url for user redirect on successful card addition */
     @SerialName(value = "checkout-redirect-success-url")
-    val checkoutRedirectSuccessUrl: kotlin.String,
+    val checkoutRedirectSuccessUrl: String,
 
     /* Merchant's url for user redirect on failed card addition */
     @SerialName(value = "checkout-redirect-cancel-url")
-    val checkoutRedirectCancelUrl: kotlin.String,
+    val checkoutRedirectCancelUrl: String,
 
     /* Merchant's url called on successful card addition */
     @SerialName(value = "checkout-callback-success-url")
-    val checkoutCallbackSuccessUrl: kotlin.String? = null,
+    val checkoutCallbackSuccessUrl: String? = null,
 
     /* Merchant's url called on failed card addition */
     @SerialName(value = "checkout-callback-cancel-url")
-    val checkoutCallbackCancelUrl: kotlin.String? = null,
+    val checkoutCallbackCancelUrl: String? = null,
 
     /* Alpha-2 language code for the card addition form */
     @SerialName(value = "language")
-    val language: AddCardFormRequest.Language? = null,
+    val language: Language? = null,
 
 ) {
-
-    /**
-     * HMAC algorithm
-     *
-     * Values: Sha256,Sha512
-     */
-    @Serializable
-    enum class CheckoutAlgorithm(val value: kotlin.String) {
-        @SerialName(value = "sha256")
-        Sha256("sha256"),
-
-        @SerialName(value = "sha512")
-        Sha512("sha512"),
+    @SerialName(value = "signature")
+    val signature: String by lazy {
+        PaytrailHmacCalculator
+            .getCalculator(checkoutAlgorithm)
+            .calculateHmac(
+                params = asPostParams(includeSignature = false),
+                key = MerchantAccount.account.secret,
+            )
     }
 
-    /**
-     * Alpha-2 language code for the card addition form
-     *
-     * Values: FI,SV,EN
-     */
-    @Serializable
-    enum class Language(val value: kotlin.String) {
-        @SerialName(value = "FI")
-        FI("FI"),
+    fun asPostParams(includeSignature: Boolean = true): Iterable<Pair<String, String>> =
+        this::class.memberProperties
+            .filter { property -> property.annotations.any { it is SerialName } }
+            .filter { property ->
+                includeSignature || property.annotations.none { annotation ->
+                    annotation is SerialName && annotation.value == "signature"
+                }
+            }
+            .filter { property -> property.getter.call(this) != null }
+            .map { property ->
+                val name = if (property.annotations.any { it is SerialName }) {
+                    val nameAnnotation =
+                        property.annotations.firstOrNull { it is SerialName } as? SerialName
+                    nameAnnotation?.value ?: property.name
+                } else {
+                    property.name
+                }
 
-        @SerialName(value = "SV")
-        SV("SV"),
-
-        @SerialName(value = "EN")
-        EN("EN"),
-    }
+                val getter = property.getter
+                val value = getter.call(this)
+                property.returnType
+                name to when (value) {
+                    is String -> value
+                    is Int -> value.toString()
+                    is Language -> value.value
+                    else -> throw RuntimeException("Unknown property type in ${this::class}: $property")
+                }
+            }
 }

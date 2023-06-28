@@ -45,9 +45,9 @@ fun PaymentProviders(
     val providers = viewModel.paymentProviderListing.observeAsState(emptyList()).value
 
     if (providers.isNotEmpty()) {
-        PaymentProviderListing(modifier.fillMaxSize(), providers, viewModel::startPayment)
+        PaymentProviderListing(modifier, providers, viewModel::startPayment)
     } else {
-        NoPaymentProvidersAvailable(modifier.fillMaxSize())
+        NoPaymentProvidersAvailable(modifier)
     }
 }
 

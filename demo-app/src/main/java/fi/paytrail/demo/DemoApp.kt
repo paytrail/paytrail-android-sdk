@@ -8,6 +8,7 @@ import android.util.Log
 import android.webkit.WebView
 import dagger.hilt.android.HiltAndroidApp
 import fi.paytrail.paymentsdk.PaytrailBaseOkHttpClient
+import fi.paytrail.sdk.apiclient.MerchantAccount
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
@@ -18,6 +19,8 @@ class DemoApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        MerchantAccount.account = MerchantAccount(id = 375917, secret = "SAIPPUAKAUPPIAS")
 
         val okHttpClientBuilder = OkHttpClient.Builder()
 

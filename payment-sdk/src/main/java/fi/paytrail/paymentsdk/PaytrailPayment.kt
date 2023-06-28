@@ -1,6 +1,7 @@
 package fi.paytrail.paymentsdk
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,7 +15,6 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_METHODS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_METHODS
-import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -22,17 +22,12 @@ private val paymentCompositionCounter = AtomicInteger(0)
 
 @Composable
 fun PaytrailPayment(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     payment: PaymentRequest,
-    merchant: MerchantAccount = MerchantAccount.default,
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
 ) {
-    val paymentCompositionId = remember(
-        keys = arrayOf(
-            payment,
-            merchant,
-        ),
-    ) { "payment-${paymentCompositionCounter.incrementAndGet()}" }
+    val paymentCompositionId =
+        remember(payment) { "payment-${paymentCompositionCounter.incrementAndGet()}" }
 
     val localView = LocalView.current
     val viewModel = remember(paymentCompositionId) {
@@ -42,7 +37,7 @@ fun PaytrailPayment(
 
         ViewModelProvider(
             viewModelStoreOwner,
-            PaymentViewModelFactory(payment, merchant),
+            PaymentViewModelFactory(payment),
         )[paymentCompositionId, PaymentViewModel::class.java]
     }
 
@@ -74,9 +69,18 @@ internal fun PaytrailPayment(
 
     Surface(modifier) {
         when (paymentStatus.state) {
-            LOADING_PAYMENT_METHODS -> LoadingPaymentMethods()
-            SHOW_PAYMENT_METHODS -> PaymentProviders(viewModel = viewModel)
-            PAYMENT_IN_PROGRESS -> PaymentWebView(viewModel = viewModel)
+            LOADING_PAYMENT_METHODS -> LoadingPaymentMethods(modifier = Modifier.fillMaxSize())
+
+            SHOW_PAYMENT_METHODS -> PaymentProviders(
+                modifier = Modifier.fillMaxSize(),
+                viewModel = viewModel,
+            )
+
+            PAYMENT_IN_PROGRESS -> PayWithPaymentMethod(
+                modifier = Modifier.fillMaxSize(),
+                viewModel = viewModel,
+            )
+
             else -> {
                 // No content for complete/error/cancel states. Application should remove PaytrailPayment
                 // from composition, or remove PaytrailPaymentFragment from view tree.

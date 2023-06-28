@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.kapt) apply false
     alias(libs.plugins.org.jetbrains.kotlin.parcelize) apply false
     alias(libs.plugins.jlleitschuh.ktlint) apply false
+    alias(libs.plugins.ksp) apply false
 }
 
 true // Needed to make the Suppress annotation work for the plugins block

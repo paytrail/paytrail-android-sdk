@@ -4,6 +4,7 @@ coil = "2.4.0"
 desugar_jdk_libs = "2.0.3"
 flipper = "0.199.0"
 kotlin = "1.8.21"
+ksp = "1.8.21-1.0.11"
 kotlintest-runner-junit5 = "3.4.2"
 kotlinx-coroutines-core = "1.6.4"
 kotlinx-serialization-json = "1.4.1"
@@ -28,9 +29,13 @@ ktlint = "0.49.1"
 navigation = "2.6.0-rc02"
 retrofit = "2.9.0"
 retrofit2-kotlinx-serialization-converter = "0.8.0"
+room = "2.5.2"
 soloader = "0.10.5"
 
 [libraries]
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "room" }
 coil = { module = "io.coil-kt:coil", version.ref = "coil" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
 coil-svg = { module = "io.coil-kt:coil-svg", version.ref = "coil" }
@@ -39,6 +44,7 @@ flipper = { module = "com.facebook.flipper:flipper", version.ref = "flipper" }
 flipper-network-plugin = { module = "com.facebook.flipper:flipper-network-plugin", version.ref = "flipper" }
 flipper-noop = { module = "com.facebook.flipper:flipper-noop", version.ref = "flipper" }
 kotlin-gradle-plugin = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin" }
+kotlin-reflect = { module = "org.jetbrains.kotlin:kotlin-reflect", version.ref = "kotlin" }
 kotlin-serialization = { module = "org.jetbrains.kotlin:kotlin-serialization", version.ref = "kotlin" }
 kotlin-stdlib-jdk8 = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "kotlin" }
 retrofit-converter-scalars = { module = "com.squareup.retrofit2:converter-scalars", version.ref = "retrofit" }
@@ -90,5 +96,6 @@ com-android-library = { id = "com.android.library", version.ref = "agp" }
 hilt-android-plugin = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 
 jlleitschuh-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref="jlleitschuh-ktlint" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp"}
 
 [bundles]

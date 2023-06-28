@@ -8,7 +8,7 @@ data class PaymentMethod(
     val id: String = provider.id
     val name: String = provider.name
     val svg: String = provider.svg
-    val formParameters: String by lazy {
-        provider.parameters.joinToString(separator = "&") { "${it.name}=${it.value}" }
+    val formParameters: List<Pair<String, String>> by lazy {
+        provider.parameters.map { it.name to it.value }
     }
 }

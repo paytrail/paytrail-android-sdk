@@ -19,7 +19,6 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_FAIL
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_METHODS
-import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.apis.PaymentsApi
 import fi.paytrail.sdk.apiclient.infrastructure.ApiClient
 import fi.paytrail.sdk.apiclient.models.ErrorResponse.Companion.deserialize
@@ -27,12 +26,10 @@ import fi.paytrail.sdk.apiclient.models.PaymentRequest
 
 class PaymentViewModel(
     val paymentRequest: PaymentRequest,
-    val merchantAccount: MerchantAccount,
 ) : ViewModel() {
 
     private val api by lazy {
         ApiClient(
-            merchantAccount = merchantAccount,
             okHttpClientBuilder = PaytrailBaseOkHttpClient.baseClient?.newBuilder(),
         ).createService(PaymentsApi::class.java)
     }

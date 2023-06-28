@@ -11,7 +11,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 class ApiClient(
     private var baseUrl: String = "https://services.paytrail.com",
     private val okHttpClientBuilder: OkHttpClient.Builder? = null,
-    private val merchantAccount: MerchantAccount,
+    private val merchantAccount: MerchantAccount = MerchantAccount.account,
 ) {
 
     private val retrofitBuilder: Retrofit.Builder by lazy {

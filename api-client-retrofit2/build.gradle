@@ -31,6 +31,7 @@ test {
 
 dependencies {
     implementation libs.kotlin.stdlib.jdk8
+    implementation libs.kotlin.reflect
     implementation libs.kotlinx.coroutines.core
     implementation libs.kotlinx.serialization.json
     api libs.logging.interceptor

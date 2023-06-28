@@ -47,12 +47,13 @@ fun ShoppingCart(
     modifier: Modifier = Modifier,
     viewModel: ShoppingCartViewModel,
     payAction: () -> Unit,
+    cardsAction: () -> Unit,
 ) {
     val items = viewModel.items.collectAsState(initial = emptyList()).value
     val total = viewModel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
     val rowCount = viewModel.rowCount.collectAsState(initial = 0).value
 
-    ShoppingCart(modifier, items, rowCount, total, payAction)
+    ShoppingCart(modifier, items, rowCount, total, payAction, cardsAction)
 }
 
 @Composable
@@ -62,6 +63,7 @@ private fun ShoppingCart(
     rowCount: Int,
     total: BigDecimal,
     payAction: () -> Unit = {},
+    cardsAction: () -> Unit = {},
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -75,7 +77,7 @@ private fun ShoppingCart(
             items = items,
         )
 
-        ShoppingCartBottomBar(total, items, payAction)
+        ShoppingCartBottomBar(total, items, payAction, cardsAction)
     }
 }
 
@@ -116,6 +118,7 @@ private fun ShoppingCartBottomBar(
     total: BigDecimal,
     items: List<ShoppingCartRow>,
     payAction: () -> Unit,
+    cardsAction: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -124,7 +127,23 @@ private fun ShoppingCartBottomBar(
         Divider()
         Spacer(modifier = Modifier.height(4.dp))
         Text("Total: ${currencyFormatter.format(total)} €")
-        PayButton(enabled = items.isNotEmpty(), onClick = payAction)
+        Row {
+            PayButton(enabled = items.isNotEmpty(), onClick = payAction)
+            Spacer(modifier = Modifier.width(8.dp))
+            CardsButton(onClick = cardsAction)
+        }
+    }
+}
+
+@Composable
+fun CardsButton(onClick: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .widthIn(min = 80.dp)
+            .padding(top = 8.dp, bottom = 16.dp),
+        onClick = onClick,
+    ) {
+        Text(stringResource(R.string.shopping_cart_button_cards))
     }
 }
 

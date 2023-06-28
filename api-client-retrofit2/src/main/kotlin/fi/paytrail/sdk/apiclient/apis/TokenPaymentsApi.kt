@@ -6,6 +6,7 @@ import fi.paytrail.sdk.apiclient.models.TokenPaymentRequest
 import fi.paytrail.sdk.apiclient.models.TokenizationRequestResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
 
@@ -34,11 +35,15 @@ interface TokenPaymentsApi {
      *  - 401: Unauthorized
      *  - 403: Credit cards and/or AMEX not enabled for merchant
      *
+     * @param checkoutTokenizationId Tokenization ID. In
+     * @param checkoutTokenizationIdHeader Must be same as [checkoutTokenizationId]; default value is copied from this parameter.
+     *
      * @return [TokenizationRequestResponse]
      */
     @POST("tokenization/{checkout-tokenization-id}")
     suspend fun requestTokenForTokenizationId(
         @Path("checkout-tokenization-id") checkoutTokenizationId: String,
+        @Header("checkout-tokenization-id") checkoutTokenizationIdHeader: String = checkoutTokenizationId,
     ): Response<TokenizationRequestResponse>
 
     /**
