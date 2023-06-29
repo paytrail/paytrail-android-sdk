@@ -7,8 +7,8 @@ import android.os.Build
 import android.util.Log
 import android.webkit.WebView
 import dagger.hilt.android.HiltAndroidApp
-import fi.paytrail.paymentsdk.PaytrailBaseOkHttpClient
 import fi.paytrail.sdk.apiclient.MerchantAccount
+import fi.paytrail.sdk.apiclient.PaytrailBaseOkHttpClient
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC

@@ -1,4 +1,4 @@
-package fi.paytrail.paymentsdk
+package fi.paytrail.sdk.apiclient
 
 import okhttp3.OkHttpClient
 

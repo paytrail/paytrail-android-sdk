@@ -29,9 +29,7 @@ class PaymentViewModel(
 ) : ViewModel() {
 
     private val api by lazy {
-        ApiClient(
-            okHttpClientBuilder = PaytrailBaseOkHttpClient.baseClient?.newBuilder(),
-        ).createService(PaymentsApi::class.java)
+        ApiClient().createService(PaymentsApi::class.java)
     }
 
     val paymentProviderListing = liveData {

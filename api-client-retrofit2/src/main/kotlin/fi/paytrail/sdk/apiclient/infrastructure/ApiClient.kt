@@ -2,6 +2,7 @@ package fi.paytrail.sdk.apiclient.infrastructure
 
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import fi.paytrail.sdk.apiclient.MerchantAccount
+import fi.paytrail.sdk.apiclient.PaytrailBaseOkHttpClient
 import fi.paytrail.sdk.apiclient.infrastructure.Serializer.kotlinxSerializationJson
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -10,7 +11,7 @@ import retrofit2.converter.scalars.ScalarsConverterFactory
 
 class ApiClient(
     private var baseUrl: String = "https://services.paytrail.com",
-    private val okHttpClientBuilder: OkHttpClient.Builder? = null,
+    private val okHttpClientBuilder: OkHttpClient.Builder? = PaytrailBaseOkHttpClient.baseClient?.newBuilder(),
     private val merchantAccount: MerchantAccount = MerchantAccount.account,
 ) {
 
