@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.compose.runtime.livedata)
     implementation(libs.ui.tooling.preview)
     implementation(libs.material3)
+    implementation(libs.html.text)
 
     implementation(libs.coil)
     implementation(libs.coil.compose)

@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
+import de.charlex.compose.HtmlText
 import fi.paytrail.paymentsdk.model.PaymentMethod
 import fi.paytrail.paymentsdk.model.PaymentMethodGroup
 import fi.paytrail.sdk.apiclient.models.PaymentMethodProvider
@@ -42,10 +43,16 @@ fun PaymentProviders(
     modifier: Modifier = Modifier,
     viewModel: PaymentViewModel,
 ) {
-    val providers = viewModel.paymentProviderListing.observeAsState(emptyList()).value
+    val providers = viewModel.paymentMethodGroups.observeAsState(emptyList()).value
+    val terms = viewModel.paymentTerms.observeAsState("").value
 
     if (providers.isNotEmpty()) {
-        PaymentProviderListing(modifier, providers, viewModel::startPayment)
+        PaymentProviderListing(
+            modifier = modifier,
+            terms = terms,
+            groups = providers,
+            onPaymentMethodSelected = viewModel::startPayment,
+        )
     } else {
         NoPaymentProvidersAvailable(modifier)
     }
@@ -55,16 +62,19 @@ fun PaymentProviders(
 @Composable
 private fun PaymentProviderListing(
     modifier: Modifier = Modifier,
+    terms: String?,
     groups: List<PaymentMethodGroup>,
     onPaymentMethodSelected: (PaymentMethod) -> Unit = {},
 ) {
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 8.dp)
+            .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 32.dp)
             .verticalScroll(rememberScrollState()),
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
+        if (terms != null) {
+            PaytrailTerms(terms)
+        }
         for (group in groups) {
             key(group) {
                 PaymentGroupHeader(group)
@@ -82,8 +92,25 @@ private fun PaymentProviderListing(
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
-        Spacer(modifier = Modifier.height(32.dp))
     }
+}
+
+@Preview
+@Composable
+fun PreviewPaytrailTerms() {
+    PaytrailTerms(
+        terms = "By selecting a payment method, you agree to our <a href=\\\"https://www.paytrail.com/kuluttaja/maksupalveluehdot\\\" target=\\\"_blank\\\">payment service terms & conditions</a>",
+    )
+}
+
+@Composable
+fun PaytrailTerms(terms: String) {
+    // TODO: Consider adding a composition-local LocalUriHandler to open
+    //       the terms in a WebView instead of platform default browser.
+    HtmlText(
+        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp),
+        text = terms,
+    )
 }
 
 @Composable

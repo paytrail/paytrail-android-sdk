@@ -6,6 +6,8 @@ import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import fi.paytrail.paymentsdk.model.PaymentMethod
 import fi.paytrail.paymentsdk.model.PaymentMethodGroup
 import fi.paytrail.paymentsdk.model.PaytrailApiErrorResponse
@@ -24,6 +26,8 @@ import fi.paytrail.sdk.apiclient.apis.PaymentsApi
 import fi.paytrail.sdk.apiclient.infrastructure.ApiClient
 import fi.paytrail.sdk.apiclient.models.ErrorResponse.Companion.deserialize
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
+import fi.paytrail.sdk.apiclient.models.PaymentRequestResponse
+import retrofit2.Response
 
 class PaymentViewModel(
     val paymentRequest: PaymentRequest,
@@ -35,16 +39,32 @@ class PaymentViewModel(
         ).createService(PaymentsApi::class.java)
     }
 
-    val paymentProviderListing = liveData {
+    val createPaymentResponse: LiveData<Response<PaymentRequestResponse>> = liveData {
         try {
-            val result = api.createPayment(paymentRequest = paymentRequest)
-            if (result.isSuccessful) {
-                val body = result.body()
+            emit(api.createPayment(paymentRequest = paymentRequest))
+        } catch (e: Exception) {
+            Log.i("PaymentViewModel", "Error in loading payment providers", e)
+            paymentError.postValue(e)
+        }
+    }
 
-                val providers = body?.providers ?: emptyList()
-                val groups = body?.groups ?: emptyList()
+    val paymentTerms: LiveData<String> = createPaymentResponse.map {
+        if (it.isSuccessful) {
+            it.body()?.terms ?: ""
+        } else {
+            ""
+        }
+    }
 
-                emit(
+    val paymentMethodGroups: LiveData<List<PaymentMethodGroup>> =
+        createPaymentResponse.map { result ->
+            try {
+                if (result.isSuccessful) {
+                    val body = result.body()
+
+                    val providers = body?.providers ?: emptyList()
+                    val groups = body?.groups ?: emptyList()
+
                     groups.map { groupData ->
                         PaymentMethodGroup(
                             paymentMethodGroup = groupData,
@@ -52,9 +72,24 @@ class PaymentViewModel(
                                 .filter { provider -> provider.group.value == groupData.id.value }
                                 .map { PaymentMethod(it) },
                         )
-                    },
-                )
-            } else {
+                    }
+                } else {
+                    emptyList()
+                }
+            } catch (e: Exception) {
+                Log.i("PaymentViewModel", "Error in loading payment providers", e)
+                paymentError.postValue(e)
+                emptyList()
+            }
+        }
+
+    val selectedPaymentProvider = MutableLiveData<PaymentMethod?>(null)
+    private val paymentWebViewRedirect = MutableLiveData<PaytrailPaymentRedirect>()
+    private val paymentError = MutableLiveData<Exception>()
+
+    private val apiErrorResponse = createPaymentResponse.switchMap { result ->
+        liveData {
+            if (!result.isSuccessful) {
                 val errorBody = result.errorBody()?.string()
                 val errorResponse = errorBody?.let {
                     try {
@@ -64,25 +99,16 @@ class PaymentViewModel(
                         null
                     }
                 }
-                apiErrorResponse.postValue(
+                emit(
                     PaytrailApiErrorResponse(
                         code = result.code(),
                         errorBody = errorBody,
                         errorResponse = errorResponse,
                     ),
                 )
-                emit(emptyList())
             }
-        } catch (e: Exception) {
-            Log.i("PaymentViewModel", "Error in loading payment providers", e)
-            paymentError.postValue(e)
         }
     }
-
-    val selectedPaymentProvider = MutableLiveData<PaymentMethod?>(null)
-    private val paymentWebViewRedirect = MutableLiveData<PaytrailPaymentRedirect>()
-    private val paymentError = MutableLiveData<Exception>()
-    private val apiErrorResponse = MutableLiveData<PaytrailApiErrorResponse>()
     private val paymentCanceled = MutableLiveData(false)
 
     fun startPayment(provider: PaymentMethod) {
@@ -143,7 +169,7 @@ class PaymentViewModel(
                 }
             }
 
-            addSource(paymentProviderListing) {
+            addSource(paymentMethodGroups) {
                 // TODO: This needs improving; we need to be looking at the create_payment
                 //       request & response, and set state accordingly (loading/ok/error)
                 paymentProvidersLoaded = true
