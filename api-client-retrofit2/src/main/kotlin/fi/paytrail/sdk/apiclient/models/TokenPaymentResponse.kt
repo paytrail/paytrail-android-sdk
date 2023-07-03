@@ -15,9 +15,11 @@
 
 package fi.paytrail.sdk.apiclient.models
 
+import fi.paytrail.sdk.apiclient.infrastructure.Serializer.kotlinxSerializationJson
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.decodeFromString
 
 /**
  * Response for a successful customer initiated transaction payment request.
@@ -26,7 +28,7 @@ import kotlinx.serialization.Serializable
  * @param threeDSecureUrl URL for 3DS authentication step-up. If this is returned, merchants needs to redirect customer to this given URL for 3DS authentication.
  */
 @Serializable
-data class TokenCITPaymentResponse(
+data class TokenPaymentResponse(
 
     /* Checkout assigned transaction ID for the payment. */
     @Contextual @SerialName(value = "transactionId")
@@ -36,4 +38,8 @@ data class TokenCITPaymentResponse(
     @SerialName(value = "threeDSecureUrl")
     val threeDSecureUrl: kotlin.String? = null,
 
-)
+) {
+    companion object {
+        fun deserialize(json: String): TokenPaymentResponse = kotlinxSerializationJson.decodeFromString(json)
+    }
+}

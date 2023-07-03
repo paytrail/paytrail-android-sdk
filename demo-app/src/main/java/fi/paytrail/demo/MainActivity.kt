@@ -1,6 +1,7 @@
 package fi.paytrail.demo
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -15,16 +16,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import fi.paytrail.demo.repository.ShoppingCartRepository
-import fi.paytrail.demo.tokenization.ManageCards
 import fi.paytrail.demo.tokenization.SavedCardsRepository
+import fi.paytrail.demo.tokenization.TokenizedCreditCards
 import fi.paytrail.demo.ui.theme.PaytrailSDKTheme
 import fi.paytrail.paymentsdk.PaytrailPayment
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
@@ -33,6 +35,8 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_ERROR
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_FAIL
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
 import fi.paytrail.paymentsdk.tokenization.AddCardForm
+import fi.paytrail.paymentsdk.tokenization.PayWithTokenizationId
+import fi.paytrail.paymentsdk.tokenization.TokenPaymentChargeType
 import fi.paytrail.paymentsdk.tokenization.model.AddCardRequest
 import fi.paytrail.paymentsdk.tokenization.model.AddCardResult
 import fi.paytrail.sdk.apiclient.models.Callbacks
@@ -41,8 +45,9 @@ import javax.inject.Inject
 
 private const val NAV_SHOPPING_CART = "shopping_cart"
 private const val NAV_PAYMENT = "payment"
-private const val NAV_MANAGE_CARDS = "manage_cards"
-private const val NAV_ADD_CARD = "tokenize_card"
+private const val NAV_CARDS = "cards"
+private const val NAV_ADD_CARD = "cards/tokenize"
+private const val NAV_PAY_WITH_TOKENIZATION_ID = "cards/charge/{tokenizationId}"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -74,10 +79,32 @@ class MainActivity : ComponentActivity() {
                         }
 
                         val navController = rememberNavController()
-                        ApplicationContent(
+                        MainContent(
                             modifier = Modifier.weight(1f),
                             navController = navController,
-                            onPaymentStateChanged = { paymentState = it },
+                            onPaymentStateChanged = { state ->
+                                paymentState = state
+                                when (state.state) {
+                                    // When handling payment results, application should navigate
+                                    // out of payment when a success or error state has been
+                                    // reached.
+                                    PAYMENT_OK, PAYMENT_FAIL, PAYMENT_ERROR, PAYMENT_CANCELED -> {
+                                        navController.popBackStack(
+                                            route = NAV_SHOPPING_CART,
+                                            inclusive = false,
+                                        )
+                                    }
+
+                                    else -> {
+                                        // Payment progress state can be tracked here.
+                                        // If you want transaction ID,
+                                    }
+                                }
+                                Log.i(
+                                    "MainActivity",
+                                    "state: ${state.state} Transaction ID ${state.finalRedirectRequest?.transactionId}",
+                                )
+                            },
                         )
                     }
                 }
@@ -89,7 +116,7 @@ class MainActivity : ComponentActivity() {
         paymentResult?.state in setOf(PAYMENT_OK, PAYMENT_FAIL, PAYMENT_ERROR)
 
     @Composable
-    private fun ApplicationContent(
+    private fun MainContent(
         modifier: Modifier = Modifier,
         navController: NavHostController,
         onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
@@ -106,19 +133,42 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     viewModel = hiltViewModel(),
                     payAction = { navController.navigate(NAV_PAYMENT) },
-                ) { navController.navigate(NAV_MANAGE_CARDS) }
+                ) { navController.navigate(NAV_CARDS) }
             }
 
-            composable(NAV_MANAGE_CARDS) {
-                ManageCards(
+            composable(NAV_CARDS) {
+                TokenizedCreditCards(
                     modifier = Modifier.fillMaxSize(),
                     viewModel = hiltViewModel(),
+                    payWithCardAction = { tokenizationId ->
+                        navController.navigate(
+                            NAV_PAY_WITH_TOKENIZATION_ID.replace(
+                                "{tokenizationId}",
+                                tokenizationId,
+                            ),
+                        )
+                    },
                     addCardAction = { navController.navigate(NAV_ADD_CARD) },
                 )
             }
 
+            composable(
+                route = NAV_PAY_WITH_TOKENIZATION_ID,
+                arguments = listOf(
+                    navArgument("tokenizationId") { type = NavType.StringType },
+                ),
+            ) {
+                val tokenizationId = it.arguments!!.getString("tokenizationId")!!
+                PayWithTokenizationId(
+                    modifier = Modifier.fillMaxSize(),
+                    paymentRequest = shoppingCartRepository.cartAsPaymentRequest(),
+                    tokenizationId = tokenizationId,
+                    onPaymentStateChanged = onPaymentStateChanged,
+                    chargeType = TokenPaymentChargeType.CHARGE,
+                )
+            }
+
             composable(NAV_ADD_CARD) {
-                val context = LocalContext.current
                 AddCardForm(
                     request = AddCardRequest(
                         redirectUrls = Callbacks(
@@ -157,35 +207,12 @@ class MainActivity : ComponentActivity() {
                 //    * items
                 //    * shop-in-shop stuff?
                 //    * theming? (could use MyFancyTheme {} wrapper as well...)
-                val paymentRequest = remember { shoppingCartRepository.cartAsPaymentRequest() }
+                val paymentRequest =
+                    remember { shoppingCartRepository.cartAsPaymentRequest() }
                 PaytrailPayment(
                     modifier = Modifier.fillMaxSize(),
-                    payment = paymentRequest,
-                    onPaymentStateChanged = { state ->
-                        // TODO: Mark shopping cart as "paid" when called with PAYMENT_OK
-
-                        // Call state.redirectRequest.url if necessary.
-                        //
-                        // The WebView in SDK for the payment flow does not follow the final HTTP
-                        // redirect to PaymentRequest.redirectUrls.success/cancel URLs. If your
-                        // system depends on call to these URLs happening, application needs to
-                        // make this call. This can be done either by opening a WebView to the URL,
-                        // or using a HTTP client (e.g. OkHttp) to call the URL.
-
-                        when (state.state) {
-                            PAYMENT_OK, PAYMENT_FAIL, PAYMENT_ERROR, PAYMENT_CANCELED -> {
-                                navController.popBackStack(
-                                    route = NAV_SHOPPING_CART,
-                                    inclusive = false,
-                                )
-                                onPaymentStateChanged(state)
-                            }
-
-                            else -> {
-                                // navigate out of payment only when result is ok or fail
-                            }
-                        }
-                    },
+                    paymentRequest = paymentRequest,
+                    onPaymentStateChanged = onPaymentStateChanged,
                 )
             }
         }

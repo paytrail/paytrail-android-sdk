@@ -1,6 +1,7 @@
 package fi.paytrail.demo.tokenization
 
-import fi.paytrail.demo.util.RequestStatus
+import fi.paytrail.paymentsdk.RequestStatus
+import fi.paytrail.paymentsdk.model.createErrorResponse
 import fi.paytrail.sdk.apiclient.apis.TokenPaymentsApi
 import fi.paytrail.sdk.apiclient.models.ErrorResponse
 import fi.paytrail.sdk.apiclient.models.TokenizationRequestResponse
@@ -51,7 +52,7 @@ private fun <T> Response<T>.asRequestStatus(): RequestStatus<T> {
     return if (isSuccessful) {
         RequestStatus.success(value = body())
     } else {
-        RequestStatus.error(error = bodyAsErrorResponse())
+        RequestStatus.error(error = createErrorResponse(this))
     }
 }
 

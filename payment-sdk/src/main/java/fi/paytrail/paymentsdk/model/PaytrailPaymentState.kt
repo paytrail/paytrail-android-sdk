@@ -1,10 +1,14 @@
 package fi.paytrail.paymentsdk.model
 
-// TODO: Include transaction id in the state when it is known?
-// TODO: Should other paymebnt request info be included in the state?
+import fi.paytrail.sdk.apiclient.models.TokenPaymentResponse
+
+// TODO: Include transaction id in the state when it is known
+// TODO: Should other payment request info be included in the state?
 data class PaytrailPaymentState internal constructor(
     val state: State,
-    val redirectRequest: PaytrailPaymentRedirect? = null,
+    val finalRedirectRequest: PaytrailPaymentRedirect? = null,
+    val tokenPaymentResponse: TokenPaymentResponse? = null,
+    val apiErrorResponse: PaytrailApiErrorResponse? = null,
     val exception: Exception? = null,
 ) {
     enum class State {
@@ -17,7 +21,7 @@ data class PaytrailPaymentState internal constructor(
         PAYMENT_IN_PROGRESS,
 
         /**
-         * Payment was completed successfully. PaytrailPaymentState contains [redirectRequest]
+         * Payment was completed successfully. PaytrailPaymentState contains [finalRedirectRequest]
          * with the data relevant to the payment.
          */
         PAYMENT_OK,

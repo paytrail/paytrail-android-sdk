@@ -6,40 +6,23 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalView
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.findViewTreeViewModelStoreOwner
+import androidx.lifecycle.viewmodel.compose.viewModel
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_METHODS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_METHODS
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
-import java.util.concurrent.atomic.AtomicInteger
-
-private val paymentCompositionCounter = AtomicInteger(0)
 
 @Composable
 fun PaytrailPayment(
     modifier: Modifier = Modifier,
-    payment: PaymentRequest,
+    paymentRequest: PaymentRequest,
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
 ) {
-    val paymentCompositionId =
-        remember(payment) { "payment-${paymentCompositionCounter.incrementAndGet()}" }
-
-    val localView = LocalView.current
-    val viewModel = remember(paymentCompositionId) {
-        val viewModelStoreOwner = localView.findViewTreeViewModelStoreOwner() ?: run {
-            throw RuntimeException("No ViewModelStoreOwner associated with local view $localView")
-        }
-
-        ViewModelProvider(
-            viewModelStoreOwner,
-            PaymentViewModelFactory(payment),
-        )[paymentCompositionId, PaymentViewModel::class.java]
-    }
+    val viewModel: PaymentViewModel = viewModel(
+        factory = PaymentViewModelFactory(paymentRequest),
+    )
 
     PaytrailPayment(
         modifier = modifier,
@@ -69,7 +52,7 @@ internal fun PaytrailPayment(
 
     Surface(modifier) {
         when (paymentStatus.state) {
-            LOADING_PAYMENT_METHODS -> LoadingPaymentMethods(modifier = Modifier.fillMaxSize())
+            LOADING_PAYMENT_METHODS -> LoadingIndicator(modifier = Modifier.fillMaxSize())
 
             SHOW_PAYMENT_METHODS -> PaymentProviders(
                 modifier = Modifier.fillMaxSize(),

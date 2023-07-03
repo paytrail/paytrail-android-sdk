@@ -21,7 +21,7 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
 /**
- *
+ * Error response from Paytrail APIs.
  *
  * @param status
  * @param message Error description
@@ -31,7 +31,7 @@ import kotlinx.serialization.json.Json
 data class ErrorResponse(
 
     @SerialName(value = "status")
-    val status: ErrorResponse.Status,
+    val status: Status,
 
     /* Error description */
     @SerialName(value = "message")
@@ -40,6 +40,20 @@ data class ErrorResponse(
     /* Possible detailed error descriptions */
     @SerialName(value = "meta")
     val meta: kotlin.collections.List<kotlin.String>? = null,
+
+    /**
+     * Acquirer response code or empty.
+     * Relevant for tokenized payments.
+     */
+    @SerialName(value = "acquirerResponseCode")
+    val acquirerResponseCode: String? = null,
+
+    /**
+     * Meaningful description of the acquirer response code or empty.
+     * Relevant for tokenized payments.
+     */
+    @SerialName(value = "acquirerResponseCodeDescription")
+    val acquirerResponseCodeDescription: String? = null,
 
 ) {
     /**

@@ -67,10 +67,9 @@ fun PaytrailWebView(
                         super.onLoadResource(view, url)
                     }
 
-                    // TODO: In case of errors, see if we can decode response body
-                    //       as PaytrailApiErrorResponse
-
-                    // TODO: Add error callbacks
+                    // TODO: In case of onReceivedError and onReceivedHttpError, expose the error
+                    //       as PaytrailApiErrorResponse or similar. As of now, errors from loaded
+                    //       URLs are not emitted, and users will be shown default error pages.
 
                     override fun onReceivedError(
                         view: WebView?,

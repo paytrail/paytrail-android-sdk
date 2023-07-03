@@ -33,7 +33,8 @@ fun PaymentResultView(paymentResult: PaytrailPaymentState?, onHide: () -> Unit) 
     if (paymentResult != null) resultToShow = paymentResult
 
     val status = resultToShow?.state
-    val transactionId = resultToShow?.redirectRequest?.transactionId
+    val transactionId = resultToShow?.finalRedirectRequest?.transactionId
+        ?: resultToShow?.tokenPaymentResponse?.transactionId?.toString()
     val errorMessage = resultToShow?.exception?.toString()
 
     PaymentResultView(status, transactionId, errorMessage, onHide)

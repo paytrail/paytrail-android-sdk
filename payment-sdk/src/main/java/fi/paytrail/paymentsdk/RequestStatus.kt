@@ -1,12 +1,11 @@
-package fi.paytrail.demo.util
+package fi.paytrail.paymentsdk
 
-import fi.paytrail.sdk.apiclient.models.ErrorResponse
+import fi.paytrail.paymentsdk.model.PaytrailApiErrorResponse
 
-// TODO: Move this into SDK?
 data class RequestStatus<T> constructor(
     val status: Status,
     val value: T? = null,
-    val error: ErrorResponse? = null,
+    val error: PaytrailApiErrorResponse? = null,
     val exception: Exception? = null,
 ) {
 
@@ -22,7 +21,7 @@ data class RequestStatus<T> constructor(
         fun <V> success(value: V? = null) = RequestStatus(status = Status.SUCCESS, value = value)
 
         fun <V> error(
-            error: ErrorResponse? = null,
+            error: PaytrailApiErrorResponse? = null,
             exception: Exception? = null,
         ) = RequestStatus<V>(
             status = Status.ERROR,

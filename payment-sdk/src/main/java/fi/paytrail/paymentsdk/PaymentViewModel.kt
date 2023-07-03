@@ -19,6 +19,7 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_FAIL
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_METHODS
+import fi.paytrail.sdk.apiclient.PaytrailBaseOkHttpClient
 import fi.paytrail.sdk.apiclient.apis.PaymentsApi
 import fi.paytrail.sdk.apiclient.infrastructure.ApiClient
 import fi.paytrail.sdk.apiclient.models.ErrorResponse.Companion.deserialize
@@ -29,7 +30,9 @@ class PaymentViewModel(
 ) : ViewModel() {
 
     private val api by lazy {
-        ApiClient().createService(PaymentsApi::class.java)
+        ApiClient(
+            okHttpClientBuilder = PaytrailBaseOkHttpClient.baseClient?.newBuilder(),
+        ).createService(PaymentsApi::class.java)
     }
 
     val paymentProviderListing = liveData {
@@ -124,13 +127,14 @@ class PaymentViewModel(
 
                     errorResponse != null || error != null || redirect?.status == Fail -> PaytrailPaymentState(
                         state = PAYMENT_FAIL,
-                        redirectRequest = redirect,
+                        finalRedirectRequest = redirect,
+                        apiErrorResponse = errorResponse,
                         exception = error,
                     )
 
                     redirect?.status == Ok -> PaytrailPaymentState(
                         state = PAYMENT_OK,
-                        redirectRequest = redirect,
+                        finalRedirectRequest = redirect,
                     )
 
                     selectedMethod != null -> PaytrailPaymentState(PAYMENT_IN_PROGRESS)

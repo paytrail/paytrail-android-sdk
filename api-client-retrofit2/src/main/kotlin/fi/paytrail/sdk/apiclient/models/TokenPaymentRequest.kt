@@ -52,14 +52,14 @@ data class TokenPaymentRequest(
     val amount: kotlin.Long,
 
     @SerialName(value = "currency")
-    val currency: TokenPaymentRequest.Currency,
+    val currency: Currency,
 
     /* Alpha-2 language code for the payment process */
     @SerialName(value = "language")
-    val language: TokenPaymentRequest.Language,
+    val language: Language,
 
     @SerialName(value = "items")
-    val items: kotlin.collections.List<Item>,
+    val items: kotlin.collections.List<Item>?,
 
     @SerialName(value = "customer")
     val customer: Customer,
@@ -88,33 +88,4 @@ data class TokenPaymentRequest(
     @SerialName(value = "callbackDelay")
     val callbackDelay: kotlin.Int? = null,
 
-) {
-
-    /**
-     *
-     *
-     * Values: EUR
-     */
-    @Serializable
-    enum class Currency(val value: kotlin.String) {
-        @SerialName(value = "EUR")
-        EUR("EUR"),
-    }
-
-    /**
-     * Alpha-2 language code for the payment process
-     *
-     * Values: FI,SV,EN
-     */
-    @Serializable
-    enum class Language(val value: kotlin.String) {
-        @SerialName(value = "FI")
-        FI("FI"),
-
-        @SerialName(value = "SV")
-        SV("SV"),
-
-        @SerialName(value = "EN")
-        EN("EN"),
-    }
-}
+)

@@ -207,6 +207,7 @@ fun PreviewShoppingCartItem() {
             id = UUID.fromString("6427e0c2-382d-4f03-99e5-413fff4d0afb"),
             amount = 2,
             price = BigDecimal("2.99"),
+            vatPercentage = 24,
         ),
     )
 }

@@ -4,7 +4,6 @@ import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import fi.paytrail.paymentsdk.PaytrailWebView
 import fi.paytrail.paymentsdk.PaytrailWebViewCallMethod
 import fi.paytrail.paymentsdk.tokenization.model.AddCardRequest
@@ -61,7 +60,6 @@ private fun AddCardForm(
     request: AddCardFormRequest,
     onAddCardStatusChanged: (AddCardResult) -> Unit,
 ) {
-    val context = LocalContext.current
     PaytrailWebView(
         modifier = modifier,
         method = PaytrailWebViewCallMethod.POST,

@@ -5,10 +5,11 @@ import androidx.lifecycle.ViewModelProvider
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 
 class PaymentViewModelFactory(
-    val paymentOrder: PaymentRequest,
+    private val paymentRequest: PaymentRequest,
 ) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return PaymentViewModel(paymentOrder) as T
+        @Suppress("UNCHECKED_CAST")
+        return PaymentViewModel(paymentRequest) as T
     }
 }

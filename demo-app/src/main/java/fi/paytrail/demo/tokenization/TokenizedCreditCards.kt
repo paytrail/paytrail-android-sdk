@@ -26,14 +26,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fi.paytrail.demo.R
-import fi.paytrail.demo.util.RequestStatus
-import fi.paytrail.sdk.apiclient.models.Card
+import fi.paytrail.paymentsdk.RequestStatus
+import fi.paytrail.sdk.apiclient.models.TokenizationRequestResponse
 import kotlinx.coroutines.flow.Flow
 
 @Composable
-fun ManageCards(
+fun TokenizedCreditCards(
     modifier: Modifier,
     viewModel: ManageCardsViewModel,
+    payWithCardAction: (String) -> Unit,
     addCardAction: () -> Unit,
 ) {
     val cards: List<Pair<String, Flow<RequestStatus<TokenizedCreditCard>>>> = viewModel.cards
@@ -49,6 +50,7 @@ fun ManageCards(
             if (cards.isNotEmpty()) {
                 CreditCardListing(
                     cards = cards,
+                    onCardClick = { tokenizationId, _ -> payWithCardAction(tokenizationId) },
                     onCardLongClick = { tokenizationId, _ -> viewModel.removeCard(tokenizationId) },
                 )
             } else {
@@ -64,8 +66,8 @@ fun ManageCards(
 @Composable
 private fun CreditCardListing(
     cards: List<Pair<String, Flow<RequestStatus<TokenizedCreditCard>>>>,
-    onCardClick: (String, Card?) -> Unit = { _, _ -> },
-    onCardLongClick: (String, Card?) -> Unit = { _, _ -> },
+    onCardClick: (String, TokenizationRequestResponse?) -> Unit = { _, _ -> },
+    onCardLongClick: (String, TokenizationRequestResponse?) -> Unit = { _, _ -> },
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -76,6 +78,10 @@ private fun CreditCardListing(
             end = 16.dp,
         ),
     ) {
+        item("card-header-prompt") {
+            Text(stringResource(R.string.manage_cards_prompt))
+        }
+
         cards.forEachIndexed { index, cardRequestFlow ->
             val (tokenizationId, requestStatusFlow) = cardRequestFlow
             item(tokenizationId) {
@@ -86,16 +92,17 @@ private fun CreditCardListing(
                         .fillMaxWidth()
                         .heightIn(min = 64.dp)
                         .combinedClickable(
+                            enabled = requestStatus.value?.response != null,
                             onLongClick = {
                                 onCardLongClick(
                                     tokenizationId,
-                                    requestStatus.value?.response?.card,
+                                    requestStatus.value?.response,
                                 )
                             },
                             onClick = {
                                 onCardClick(
                                     tokenizationId,
-                                    requestStatus.value?.response?.card,
+                                    requestStatus.value?.response,
                                 )
                             },
                         )

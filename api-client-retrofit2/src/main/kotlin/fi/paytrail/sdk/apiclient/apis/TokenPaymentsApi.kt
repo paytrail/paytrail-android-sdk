@@ -1,8 +1,8 @@
 package fi.paytrail.sdk.apiclient.apis
 
 import fi.paytrail.sdk.apiclient.models.AddCardFormRequest
-import fi.paytrail.sdk.apiclient.models.TokenMITPaymentResponse
 import fi.paytrail.sdk.apiclient.models.TokenPaymentRequest
+import fi.paytrail.sdk.apiclient.models.TokenPaymentResponse
 import fi.paytrail.sdk.apiclient.models.TokenizationRequestResponse
 import retrofit2.Response
 import retrofit2.http.Body
@@ -62,7 +62,7 @@ interface TokenPaymentsApi {
     @POST("payments/token/cit/authorization-hold")
     suspend fun tokenCitAuthorizationHold(
         @Body tokenPaymentRequest: TokenPaymentRequest,
-    ): Response<TokenMITPaymentResponse>
+    ): Response<TokenPaymentResponse>
 
     /**
      * Request customer initiated transaction charge on token
@@ -80,7 +80,7 @@ interface TokenPaymentsApi {
     @POST("payments/token/cit/charge")
     suspend fun tokenCitCharge(
         @Body tokenPaymentRequest: TokenPaymentRequest,
-    ): Response<TokenMITPaymentResponse>
+    ): Response<TokenPaymentResponse>
 
     /**
      * Request committing (charging) of previously created authorization hold on token
@@ -97,7 +97,7 @@ interface TokenPaymentsApi {
     @POST("payments/{transactionId}/token/commit")
     suspend fun tokenCommit(
         @Body tokenPaymentRequest: TokenPaymentRequest,
-    ): Response<TokenMITPaymentResponse>
+    ): Response<TokenPaymentResponse>
 
     /**
      * Request merchant initiated transaction authorization hold on token
@@ -114,7 +114,7 @@ interface TokenPaymentsApi {
     @POST("payments/token/mit/authorization-hold")
     suspend fun tokenMitAuthorizationHold(
         @Body tokenPaymentRequest: TokenPaymentRequest,
-    ): Response<TokenMITPaymentResponse>
+    ): Response<TokenPaymentResponse>
 
     /**
      * Request merchant initiated transaction charge on token
@@ -131,7 +131,7 @@ interface TokenPaymentsApi {
     @POST("payments/token/mit/charge")
     suspend fun tokenMitCharge(
         @Body tokenPaymentRequest: TokenPaymentRequest,
-    ): Response<TokenMITPaymentResponse>
+    ): Response<TokenPaymentResponse>
 
     /**
      * Revert (removal) of previously created authorization hold on token
@@ -147,5 +147,5 @@ interface TokenPaymentsApi {
     @POST("payments/{transactionId}/token/revert")
     suspend fun tokenRevert(
         @Path("transactionId") transactionId: String,
-    ): Response<TokenMITPaymentResponse>
+    ): Response<TokenPaymentResponse>
 }

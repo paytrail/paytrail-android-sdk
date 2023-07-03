@@ -9,7 +9,7 @@ import androidx.compose.ui.tooling.preview.Preview
 
 @Composable
 @Preview
-fun LoadingPaymentMethods(modifier: Modifier = Modifier) {
+fun LoadingIndicator(modifier: Modifier = Modifier) {
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center,

@@ -6,4 +6,5 @@
     <string name="payment_status_view_status">Payment status: %1$s</string>
     <string name="payment_status_view_transaction_id">Transaction id: %1$s</string>
     <string name="manage_cards_button_add_card">Add card</string>
+    <string name="manage_cards_prompt">Select a card to pay with, or add a new card. Long-press to remove a saved card.</string>
 </resources>
