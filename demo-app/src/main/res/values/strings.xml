@@ -6,5 +6,10 @@
     <string name="payment_status_view_status">Payment status: %1$s</string>
     <string name="payment_status_view_transaction_id">Transaction id: %1$s</string>
     <string name="manage_cards_button_add_card">Add card</string>
-    <string name="manage_cards_prompt">Select a card to pay with, or add a new card. Long-press to remove a saved card.</string>
+    <string name="manage_cards_prompt">Click on a card to create CIT payment. Long-press for more actions.</string>
+    <string name="card_action_pay_cit_charge">Pay (CIT / Charge)</string>
+    <string name="card_action_pay_cit_auth_hold">Pay (CIT / Auth Hold)</string>
+    <string name="card_action_pay_mit_charge">Pay (MIT / Charge)</string>
+    <string name="card_action_pay_mit_auth_hold">Pay (MIT / Auth Hold)</string>
+    <string name="card_action_remove_card">Remove Card</string>
 </resources>

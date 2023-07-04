@@ -17,9 +17,9 @@ enum class TokenPaymentChargeType {
     CHARGE,
 }
 
-enum class TokenPaymentType(s: String) {
-    MIT("mit"),
-    CIT("cit"),
+enum class TokenPaymentType {
+    MIT,
+    CIT,
 }
 
 @Composable

@@ -1,7 +1,6 @@
 package fi.paytrail.demo
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
@@ -37,17 +36,23 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
 import fi.paytrail.paymentsdk.tokenization.AddCardForm
 import fi.paytrail.paymentsdk.tokenization.PayWithTokenizationId
 import fi.paytrail.paymentsdk.tokenization.TokenPaymentChargeType
+import fi.paytrail.paymentsdk.tokenization.TokenPaymentType
 import fi.paytrail.paymentsdk.tokenization.model.AddCardRequest
 import fi.paytrail.paymentsdk.tokenization.model.AddCardResult
 import fi.paytrail.sdk.apiclient.models.Callbacks
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+private const val NAV_ARG_TOKENIZATION_ID = "tokenizationId"
+private const val NAV_ARG_PAYMENT_TYPE = "paymentType"
+private const val NAV_ARG_CHARGE_TYPE = "chargeType"
+
 private const val NAV_SHOPPING_CART = "shopping_cart"
 private const val NAV_PAYMENT = "payment"
 private const val NAV_CARDS = "cards"
 private const val NAV_ADD_CARD = "cards/tokenize"
-private const val NAV_PAY_WITH_TOKENIZATION_ID = "cards/charge/{tokenizationId}"
+private const val NAV_PAY_WITH_TOKENIZATION_ID =
+    "cards/{$NAV_ARG_TOKENIZATION_ID}/{$NAV_ARG_PAYMENT_TYPE}/{$NAV_ARG_CHARGE_TYPE}"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -100,10 +105,6 @@ class MainActivity : ComponentActivity() {
                                         // If you want transaction ID,
                                     }
                                 }
-                                Log.i(
-                                    "MainActivity",
-                                    "state: ${state.state} Transaction ID ${state.finalRedirectRequest?.transactionId}",
-                                )
                             },
                         )
                     }
@@ -140,12 +141,12 @@ class MainActivity : ComponentActivity() {
                 TokenizedCreditCards(
                     modifier = Modifier.fillMaxSize(),
                     viewModel = hiltViewModel(),
-                    payWithCardAction = { tokenizationId ->
+                    payWithCardAction = { tokenizationId: String, paymentType: TokenPaymentType, chargeType: TokenPaymentChargeType ->
                         navController.navigate(
-                            NAV_PAY_WITH_TOKENIZATION_ID.replace(
-                                "{tokenizationId}",
-                                tokenizationId,
-                            ),
+                            NAV_PAY_WITH_TOKENIZATION_ID
+                                .replace("{$NAV_ARG_TOKENIZATION_ID}", tokenizationId)
+                                .replace("{$NAV_ARG_PAYMENT_TYPE}", paymentType.name)
+                                .replace("{$NAV_ARG_CHARGE_TYPE}", chargeType.name),
                         )
                     },
                     addCardAction = { navController.navigate(NAV_ADD_CARD) },
@@ -155,16 +156,24 @@ class MainActivity : ComponentActivity() {
             composable(
                 route = NAV_PAY_WITH_TOKENIZATION_ID,
                 arguments = listOf(
-                    navArgument("tokenizationId") { type = NavType.StringType },
+                    navArgument(NAV_ARG_TOKENIZATION_ID) { type = NavType.StringType },
+                    navArgument(NAV_ARG_PAYMENT_TYPE) { type = NavType.StringType },
+                    navArgument(NAV_ARG_CHARGE_TYPE) { type = NavType.StringType },
                 ),
             ) {
-                val tokenizationId = it.arguments!!.getString("tokenizationId")!!
+                val args = it.arguments!!
+                val tokenizationId = args.getString(NAV_ARG_TOKENIZATION_ID)!!
+                val chargeType =
+                    TokenPaymentChargeType.valueOf(args.getString(NAV_ARG_CHARGE_TYPE)!!)
+                val paymentType =
+                    TokenPaymentType.valueOf(args.getString(NAV_ARG_PAYMENT_TYPE)!!)
                 PayWithTokenizationId(
                     modifier = Modifier.fillMaxSize(),
                     paymentRequest = shoppingCartRepository.cartAsPaymentRequest(),
                     tokenizationId = tokenizationId,
                     onPaymentStateChanged = onPaymentStateChanged,
-                    chargeType = TokenPaymentChargeType.CHARGE,
+                    paymentType = paymentType,
+                    chargeType = chargeType,
                 )
             }
 
