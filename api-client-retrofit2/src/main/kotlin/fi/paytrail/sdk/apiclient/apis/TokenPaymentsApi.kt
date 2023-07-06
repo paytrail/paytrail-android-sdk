@@ -9,6 +9,7 @@ import retrofit2.http.Body
 import retrofit2.http.Header
 import retrofit2.http.POST
 import retrofit2.http.Path
+import java.util.UUID
 
 interface TokenPaymentsApi {
     /**
@@ -96,6 +97,8 @@ interface TokenPaymentsApi {
      */
     @POST("payments/{transactionId}/token/commit")
     suspend fun tokenCommit(
+        @Path("transactionId") transactionId: UUID,
+        @Header("checkout-transaction-id") checkoutTransactionId: UUID? = transactionId,
         @Body tokenPaymentRequest: TokenPaymentRequest,
     ): Response<TokenPaymentResponse>
 
@@ -146,6 +149,7 @@ interface TokenPaymentsApi {
      */
     @POST("payments/{transactionId}/token/revert")
     suspend fun tokenRevert(
-        @Path("transactionId") transactionId: String,
+        @Path("transactionId") transactionId: UUID,
+        @Header("checkout-transaction-id") checkoutTransactionId: UUID? = transactionId,
     ): Response<TokenPaymentResponse>
 }

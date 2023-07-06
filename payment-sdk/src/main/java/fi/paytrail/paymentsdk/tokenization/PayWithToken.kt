@@ -11,6 +11,7 @@ import fi.paytrail.paymentsdk.LoadingIndicator
 import fi.paytrail.paymentsdk.PaytrailWebView
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
+import kotlinx.coroutines.flow.collect
 
 enum class TokenPaymentChargeType {
     AUTH_HOLD,
@@ -27,9 +28,10 @@ fun PayWithTokenizationId(
     modifier: Modifier = Modifier,
     paymentRequest: PaymentRequest,
     tokenizationId: String,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
     paymentType: TokenPaymentType = TokenPaymentType.CIT,
     chargeType: TokenPaymentChargeType = TokenPaymentChargeType.CHARGE,
+    onTokenAvailable: (String) -> Unit,
+    onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
 ) {
     val viewModel: PayWithTokenViewModel = viewModel(
         factory = PayWithTokenViewModelFactory(
@@ -40,6 +42,10 @@ fun PayWithTokenizationId(
             chargeType = chargeType,
         ),
     )
+
+    LaunchedEffect(tokenizationId, paymentRequest) {
+        viewModel.paymentToken.collect { if (it.isSuccess) onTokenAvailable(it.value!!) }
+    }
 
     PayWithToken(
         modifier = modifier,

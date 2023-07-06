@@ -2,6 +2,7 @@
     <string name="app_name">Paytrail SDK</string>
     <string name="shopping_cart_screen_title">Shopping cart (<xliff:g id="shopping_cart_row_count" example="3">%1$s</xliff:g>)</string>
     <string name="shopping_cart_button_cards">Cards</string>
+    <string name="shopping_cart_button_history">History</string>
     <string name="shopping_cart_button_pay">Pay</string>
     <string name="payment_status_view_status">Payment status: %1$s</string>
     <string name="payment_status_view_transaction_id">Transaction id: %1$s</string>
@@ -12,4 +13,5 @@
     <string name="card_action_pay_mit_charge">Pay (MIT / Charge)</string>
     <string name="card_action_pay_mit_auth_hold">Pay (MIT / Auth Hold)</string>
     <string name="card_action_remove_card">Remove Card</string>
+    <string name="payment_list_no_payments_prompt">No payment history available</string>
 </resources>

@@ -1,6 +1,7 @@
 package fi.paytrail.demo
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -28,16 +29,20 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
 import java.io.IOException
 
 @Composable
-fun PaymentResultView(paymentResult: PaytrailPaymentState?, onHide: () -> Unit) {
-    var resultToShow by remember { mutableStateOf(paymentResult) }
-    if (paymentResult != null) resultToShow = paymentResult
+fun PaymentResultView(
+    paymentState: PaytrailPaymentState?,
+    onHide: () -> Unit,
+    onClick: () -> Unit,
+) {
+    var resultToShow by remember { mutableStateOf(paymentState) }
+    if (paymentState != null) resultToShow = paymentState
 
     val status = resultToShow?.state
     val transactionId = resultToShow?.finalRedirectRequest?.transactionId
         ?: resultToShow?.tokenPaymentResponse?.transactionId?.toString()
     val errorMessage = resultToShow?.exception?.toString()
 
-    PaymentResultView(status, transactionId, errorMessage, onHide)
+    PaymentResultView(status, transactionId, errorMessage, onClick, onHide)
 }
 
 @Composable
@@ -45,7 +50,8 @@ private fun PaymentResultView(
     status: PaytrailPaymentState.State?,
     transactionId: String?,
     errorMessage: String?,
-    onHide: () -> Unit,
+    onClick: () -> Unit = {},
+    onHide: () -> Unit = {},
 ) {
     Row(
         modifier = Modifier
@@ -60,6 +66,7 @@ private fun PaymentResultView(
     ) {
         Column(
             modifier = Modifier
+                .clickable(onClick = onClick)
                 .weight(1f)
                 .padding(16.dp),
         ) {
@@ -73,7 +80,7 @@ private fun PaymentResultView(
                 Text(
                     text = stringResource(
                         R.string.payment_status_view_transaction_id,
-                        transactionId ?: "",
+                        transactionId,
                     ),
                     fontSize = 10.sp,
                 )
@@ -106,7 +113,6 @@ fun PreviewPaymentResultViewSuccess() {
         status = PAYMENT_OK,
         transactionId = "841fe3cc-8d82-4f2e-ae67-fc1e10be10a2",
         errorMessage = null,
-        onHide = {},
     )
 }
 
@@ -117,7 +123,6 @@ fun PreviewPaymentResultViewFailure() {
         status = PAYMENT_FAIL,
         transactionId = "841fe3cc-8d82-4f2e-ae67-fc1e10be10a2",
         errorMessage = null,
-        onHide = {},
     )
 }
 
@@ -128,6 +133,5 @@ fun PreviewPaymentResultViewError() {
         status = PAYMENT_ERROR,
         transactionId = null,
         errorMessage = IOException("Preview exception").toString(),
-        onHide = {},
     )
 }

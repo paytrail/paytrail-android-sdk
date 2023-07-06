@@ -1,13 +1,11 @@
-package fi.paytrail.demo
+package fi.paytrail.demo.shoppingcart
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import fi.paytrail.demo.repository.ShoppingCartRepository
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 // TODO: support SavedStateHandle to persist state across activity recreation
-
 @HiltViewModel
 class ShoppingCartViewModel @Inject constructor(
     repository: ShoppingCartRepository,

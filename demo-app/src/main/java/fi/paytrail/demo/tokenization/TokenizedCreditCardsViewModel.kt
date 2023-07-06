@@ -20,7 +20,7 @@ data class TokenizedCreditCard(
 
 @HiltViewModel
 class TokenizedCreditCardsViewModel @Inject constructor(
-    private val cardsRepository: SavedCardsRepository,
+    private val cardsRepository: TokenizedCardsRepository,
 ) : ViewModel() {
 
     private val tokenizationIds = cardsRepository.observeSavedTokenizationIDs()
@@ -40,7 +40,7 @@ class TokenizedCreditCardsViewModel @Inject constructor(
             }
         }.shareIn(
             scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+            started = SharingStarted.Lazily,
             replay = 1,
         )
 
@@ -48,7 +48,7 @@ class TokenizedCreditCardsViewModel @Inject constructor(
         cardsRepository.getToken(tokenizationId)
             .shareIn(
                 viewModelScope,
-                started = SharingStarted.WhileSubscribed(stopTimeoutMillis = 5000),
+                started = SharingStarted.Lazily,
                 replay = 1,
             ) as Flow<RequestStatus<TokenizationRequestResponse>>
 

@@ -81,7 +81,7 @@ data class Payment(
     /**
      * Transaction status
      *
-     * Values: New,Ok,Fail,Pending,Delayed
+     * Values: New,Ok,Fail,Pending,Delayed,AuthorizationHold
      */
     @Serializable
     enum class Status(val value: kotlin.String) {
@@ -99,6 +99,9 @@ data class Payment(
 
         @SerialName(value = "delayed")
         Delayed("delayed"),
+
+        @SerialName(value = "authorization-hold")
+        AuthorizationHold("authorization-hold"),
     }
 
     /**

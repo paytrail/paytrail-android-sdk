@@ -39,7 +39,7 @@ interface PaymentsApi {
     @POST("payments/{transactionId}/activate-invoice")
     suspend fun activateInvoiceByTransactionId(
         @Path("transactionId") transactionId: UUID,
-        @Header("checkout-transaction-id") checkoutTransactionId: UUID? = null,
+        @Header("checkout-transaction-id") checkoutTransactionId: UUID? = transactionId,
     ): Response<ActivateInvoiceResponse>
 
     /**
@@ -96,7 +96,7 @@ interface PaymentsApi {
     @GET("payments/{transactionId}")
     suspend fun getPaymentByTransactionId(
         @Path("transactionId") transactionId: UUID,
-        @Header("checkout-transaction-id") checkoutTransactionId: UUID? = null,
+        @Header("checkout-transaction-id") checkoutTransactionId: UUID? = transactionId,
     ): Response<Payment>
 
     /**
@@ -137,6 +137,6 @@ interface PaymentsApi {
     suspend fun refundPaymentByTransactionId(
         @Path("transactionId") transactionId: UUID,
         @Body refund: Refund,
-        @Header("checkout-transaction-id") checkoutTransactionId: UUID? = null,
+        @Header("checkout-transaction-id") checkoutTransactionId: UUID? = transactionId,
     ): Response<RefundResponse>
 }

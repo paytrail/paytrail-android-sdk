@@ -2,7 +2,7 @@ package fi.paytrail.paymentsdk.model
 
 import android.net.Uri
 
-class PaytrailPaymentRedirect(url: Uri) {
+data class PaytrailPaymentRedirect(val url: Uri) {
     val account: Int by lazy { url.getQueryParameter("checkout-account")!!.toInt() }
     val algorithm: String by lazy { url.getQueryParameter("checkout-algorithm")!! }
     val amount: Int by lazy { url.getQueryParameter("checkout-amount")!!.toInt() }

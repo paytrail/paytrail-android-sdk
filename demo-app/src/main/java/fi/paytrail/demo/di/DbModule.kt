@@ -7,7 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import fi.paytrail.demo.tokenization.TokenizedCardDb
+import fi.paytrail.demo.DemoDb
 import javax.inject.Singleton
 
 @Module
@@ -16,13 +16,13 @@ class DbModule {
 
     @Provides
     @Singleton
-    fun provideCardDb(@ApplicationContext applicationContext: Context) = Room.databaseBuilder(
+    fun provideDb(@ApplicationContext applicationContext: Context) = Room.databaseBuilder(
         applicationContext,
-        TokenizedCardDb::class.java,
-        "tokenized-cards",
+        DemoDb::class.java,
+        "paytrail-demo",
     ).build()
 
     @Provides
     @Singleton
-    fun provideCardDao(db: TokenizedCardDb) = db.tokenizedCardDao()
+    fun provideCardDao(db: DemoDb) = db.tokenizedCardDao()
 }

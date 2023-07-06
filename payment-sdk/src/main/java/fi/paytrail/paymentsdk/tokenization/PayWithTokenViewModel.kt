@@ -36,9 +36,8 @@ class PayWithTokenViewModel(
         ApiClient().createService(TokenPaymentsApi::class.java)
     }
 
-    private val paymentToken: Flow<RequestStatus<String>> = flow {
+    val paymentToken: Flow<RequestStatus<String>> = flow {
         if (token != null) {
-
             emit(RequestStatus.success(token))
         } else if (tokenizationId != null) {
             emit(RequestStatus.loading())
@@ -63,8 +62,8 @@ class PayWithTokenViewModel(
         when {
             it.isSuccess -> {
                 val paymentToken = requireNotNull(it.value)
-                val response =
-                    callTokenPaymentApi(paymentRequest.combineWithToken(paymentToken))
+                val tokenPaymentRequest = paymentRequest.asTokenizedPaymentRequest(paymentToken)
+                val response = callTokenPaymentApi(tokenPaymentRequest)
                 try {
                     if (response.isSuccessful) {
                         RequestStatus.success(requireNotNull(response.body()))
@@ -92,10 +91,6 @@ class PayWithTokenViewModel(
 
     val payment3DSRedirectUrl = paymentResponse.map {
         it.value?.threeDSecureUrl
-    }.shared()
-
-    val transactionId = paymentResponse.map {
-        if (it.isSuccess) it.value!!.transactionId else null
     }.shared()
 
     private val tokenPaymentResponse: Flow<TokenPaymentResponse?> =
@@ -188,25 +183,7 @@ class PayWithTokenViewModel(
 
     private fun <T> Flow<T>.shared(): Flow<T> = shareIn(
         scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
+        started = SharingStarted.Lazily,
         replay = 1,
     )
 }
-
-private fun PaymentRequest.combineWithToken(token: String): TokenPaymentRequest =
-    TokenPaymentRequest(
-        stamp = stamp,
-        reference = reference,
-        amount = amount,
-        currency = currency,
-        language = language,
-        items = items,
-        customer = customer,
-        redirectUrls = redirectUrls,
-        token = token,
-        orderId = orderId,
-        deliveryAddress = deliveryAddress,
-        invoicingAddress = invoicingAddress,
-        callbackUrls = callbackUrls,
-        callbackDelay = callbackDelay,
-    )

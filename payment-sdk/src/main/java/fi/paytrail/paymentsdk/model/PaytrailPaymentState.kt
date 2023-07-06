@@ -1,16 +1,23 @@
 package fi.paytrail.paymentsdk.model
 
 import fi.paytrail.sdk.apiclient.models.TokenPaymentResponse
+import java.time.LocalDateTime
+import java.util.UUID
 
 // TODO: Include transaction id in the state when it is known
 // TODO: Should other payment request info be included in the state?
 data class PaytrailPaymentState internal constructor(
     val state: State,
+    val timestamp: LocalDateTime = LocalDateTime.now(),
     val finalRedirectRequest: PaytrailPaymentRedirect? = null,
     val tokenPaymentResponse: TokenPaymentResponse? = null,
     val apiErrorResponse: PaytrailApiErrorResponse? = null,
     val exception: Exception? = null,
 ) {
+    val transactionId: UUID?
+        get() = tokenPaymentResponse?.transactionId
+            ?: finalRedirectRequest?.transactionId?.let { UUID.fromString(it) }
+
     enum class State {
         LOADING_PAYMENT_METHODS,
         SHOW_PAYMENT_METHODS,

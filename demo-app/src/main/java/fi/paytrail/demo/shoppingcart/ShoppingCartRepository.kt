@@ -1,4 +1,4 @@
-package fi.paytrail.demo.repository
+package fi.paytrail.demo.shoppingcart
 
 import fi.paytrail.demo.util.times
 import fi.paytrail.sdk.apiclient.models.Callbacks
@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.update
 import java.math.BigDecimal
 import java.util.UUID
 import javax.inject.Inject
+import javax.inject.Singleton
 
 // TODO: Replace ShoppingCartRepository by handling state completely
 //       in the ShoppingCartViewModel?
@@ -60,6 +61,7 @@ val fakeCart = ShoppingCart(
     ).associateBy { it.id },
 )
 
+@Singleton
 class ShoppingCartRepository @Inject constructor() {
 
     private val sf = MutableStateFlow(fakeCart)

@@ -1,4 +1,4 @@
-package fi.paytrail.demo
+package fi.paytrail.demo.shoppingcart
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Column
@@ -27,7 +27,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import fi.paytrail.demo.repository.ShoppingCartRow
+import fi.paytrail.demo.R
 import java.math.BigDecimal
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -48,12 +48,13 @@ fun ShoppingCart(
     viewModel: ShoppingCartViewModel,
     payAction: () -> Unit,
     cardsAction: () -> Unit,
+    showPaymentHistory: () -> Unit,
 ) {
     val items = viewModel.items.collectAsState(initial = emptyList()).value
     val total = viewModel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
     val rowCount = viewModel.rowCount.collectAsState(initial = 0).value
 
-    ShoppingCart(modifier, items, rowCount, total, payAction, cardsAction)
+    ShoppingCart(modifier, items, rowCount, total, payAction, cardsAction, showPaymentHistory)
 }
 
 @Composable
@@ -64,6 +65,7 @@ private fun ShoppingCart(
     total: BigDecimal,
     payAction: () -> Unit = {},
     cardsAction: () -> Unit = {},
+    showPaymentHistory: () -> Unit = {},
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -77,7 +79,7 @@ private fun ShoppingCart(
             items = items,
         )
 
-        ShoppingCartBottomBar(total, items, payAction, cardsAction)
+        ShoppingCartBottomBar(total, items, payAction, cardsAction, showPaymentHistory)
     }
 }
 
@@ -119,6 +121,7 @@ private fun ShoppingCartBottomBar(
     items: List<ShoppingCartRow>,
     payAction: () -> Unit,
     cardsAction: () -> Unit,
+    showPaymentHistory: () -> Unit,
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -131,6 +134,8 @@ private fun ShoppingCartBottomBar(
             PayButton(enabled = items.isNotEmpty(), onClick = payAction)
             Spacer(modifier = Modifier.width(8.dp))
             CardsButton(onClick = cardsAction)
+            Spacer(modifier = Modifier.width(8.dp))
+            HistoryButton(onClick = showPaymentHistory)
         }
     }
 }
@@ -144,6 +149,18 @@ fun CardsButton(onClick: () -> Unit) {
         onClick = onClick,
     ) {
         Text(stringResource(R.string.shopping_cart_button_cards))
+    }
+}
+
+@Composable
+fun HistoryButton(onClick: () -> Unit) {
+    Button(
+        modifier = Modifier
+            .widthIn(min = 80.dp)
+            .padding(top = 8.dp, bottom = 16.dp),
+        onClick = onClick,
+    ) {
+        Text(stringResource(R.string.shopping_cart_button_history))
     }
 }
 

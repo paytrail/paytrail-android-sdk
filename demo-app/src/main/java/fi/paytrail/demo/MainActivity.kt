@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,8 +24,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
-import fi.paytrail.demo.repository.ShoppingCartRepository
-import fi.paytrail.demo.tokenization.SavedCardsRepository
+import fi.paytrail.demo.payments.PaymentDetails
+import fi.paytrail.demo.payments.PaymentListing
+import fi.paytrail.demo.payments.PaymentRepository
+import fi.paytrail.demo.shoppingcart.ShoppingCart
+import fi.paytrail.demo.shoppingcart.ShoppingCartRepository
+import fi.paytrail.demo.tokenization.TokenizedCardsRepository
 import fi.paytrail.demo.tokenization.TokenizedCreditCards
 import fi.paytrail.demo.ui.theme.PaytrailSDKTheme
 import fi.paytrail.paymentsdk.PaytrailPayment
@@ -41,18 +46,23 @@ import fi.paytrail.paymentsdk.tokenization.model.AddCardRequest
 import fi.paytrail.paymentsdk.tokenization.model.AddCardResult
 import fi.paytrail.sdk.apiclient.models.Callbacks
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
+/* Locally assigned ID of a payment. Note that this is not same as the transaction ID. */
+const val NAV_ARG_PAYMENT_ID = "paymentId"
 private const val NAV_ARG_TOKENIZATION_ID = "tokenizationId"
 private const val NAV_ARG_PAYMENT_TYPE = "paymentType"
 private const val NAV_ARG_CHARGE_TYPE = "chargeType"
 
 private const val NAV_SHOPPING_CART = "shopping_cart"
-private const val NAV_PAYMENT = "payment"
+private const val NAV_CREATE_PAYMENT = "payment/create"
 private const val NAV_CARDS = "cards"
 private const val NAV_ADD_CARD = "cards/tokenize"
 private const val NAV_PAY_WITH_TOKENIZATION_ID =
     "cards/{$NAV_ARG_TOKENIZATION_ID}/{$NAV_ARG_PAYMENT_TYPE}/{$NAV_ARG_CHARGE_TYPE}"
+private const val NAV_PAYMENT_LISTING = "payments"
+private const val NAV_PAYMENT_DETAILS = "payment/{$NAV_ARG_PAYMENT_ID}"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -61,12 +71,15 @@ class MainActivity : ComponentActivity() {
     lateinit var shoppingCartRepository: ShoppingCartRepository
 
     @Inject
-    lateinit var savedCardsRepository: SavedCardsRepository
+    lateinit var tokenizedCardsRepository: TokenizedCardsRepository
+
+    @Inject
+    lateinit var paymentRepository: PaymentRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        var paymentState: PaytrailPaymentState? by mutableStateOf(null)
+        var paymentState: Pair<UUID, PaytrailPaymentState>? by mutableStateOf(null)
 
         setContent {
             PaytrailSDKTheme {
@@ -75,20 +88,30 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
+                    val navController = rememberNavController()
                     Column(modifier = Modifier.fillMaxSize()) {
-                        AnimatedVisibility(visible = shouldShowStatus(paymentState)) {
+                        val state = paymentState?.second
+                        AnimatedVisibility(visible = shouldShowStatus(state)) {
                             PaymentResultView(
-                                paymentResult = paymentState,
+                                paymentState = state,
+                                onClick = {
+                                    navController.navigate(
+                                        NAV_PAYMENT_DETAILS.replace(
+                                            "{$NAV_ARG_PAYMENT_ID}",
+                                            paymentState?.first.toString(),
+                                        ),
+                                    )
+                                },
                                 onHide = { paymentState = null },
                             )
                         }
 
-                        val navController = rememberNavController()
                         MainContent(
                             modifier = Modifier.weight(1f),
                             navController = navController,
-                            onPaymentStateChanged = { state ->
-                                paymentState = state
+                            onPaymentStateChanged = { id: UUID, state: PaytrailPaymentState ->
+                                paymentState = id to state
+                                paymentRepository.store(id, state)
                                 when (state.state) {
                                     // When handling payment results, application should navigate
                                     // out of payment when a success or error state has been
@@ -102,7 +125,6 @@ class MainActivity : ComponentActivity() {
 
                                     else -> {
                                         // Payment progress state can be tracked here.
-                                        // If you want transaction ID,
                                     }
                                 }
                             },
@@ -120,7 +142,7 @@ class MainActivity : ComponentActivity() {
     private fun MainContent(
         modifier: Modifier = Modifier,
         navController: NavHostController,
-        onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+        onPaymentStateChanged: (UUID, PaytrailPaymentState) -> Unit,
     ) {
         val coroutineScope = rememberCoroutineScope()
 
@@ -133,8 +155,10 @@ class MainActivity : ComponentActivity() {
                 ShoppingCart(
                     modifier = Modifier.fillMaxSize(),
                     viewModel = hiltViewModel(),
-                    payAction = { navController.navigate(NAV_PAYMENT) },
-                ) { navController.navigate(NAV_CARDS) }
+                    payAction = { navController.navigate(NAV_CREATE_PAYMENT) },
+                    cardsAction = { navController.navigate(NAV_CARDS) },
+                    showPaymentHistory = { navController.navigate(NAV_PAYMENT_LISTING) },
+                )
             }
 
             composable(NAV_CARDS) {
@@ -161,19 +185,25 @@ class MainActivity : ComponentActivity() {
                     navArgument(NAV_ARG_CHARGE_TYPE) { type = NavType.StringType },
                 ),
             ) {
+                val paymentRequest = remember { shoppingCartRepository.cartAsPaymentRequest() }
+                val paymentId = remember { UUID.randomUUID() }
                 val args = it.arguments!!
                 val tokenizationId = args.getString(NAV_ARG_TOKENIZATION_ID)!!
                 val chargeType =
                     TokenPaymentChargeType.valueOf(args.getString(NAV_ARG_CHARGE_TYPE)!!)
                 val paymentType =
                     TokenPaymentType.valueOf(args.getString(NAV_ARG_PAYMENT_TYPE)!!)
+                LaunchedEffect(paymentId, paymentRequest) {
+                    paymentRepository.store(paymentId, paymentRequest)
+                }
                 PayWithTokenizationId(
                     modifier = Modifier.fillMaxSize(),
-                    paymentRequest = shoppingCartRepository.cartAsPaymentRequest(),
+                    paymentRequest = paymentRequest,
                     tokenizationId = tokenizationId,
-                    onPaymentStateChanged = onPaymentStateChanged,
                     paymentType = paymentType,
                     chargeType = chargeType,
+                    onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
+                    onTokenAvailable = { token -> paymentRepository.storeToken(paymentId, token) },
                 )
             }
 
@@ -200,7 +230,7 @@ class MainActivity : ComponentActivity() {
                                 // can be used for retrieving the actual payment token, and masked card
                                 // details.
 
-                                savedCardsRepository.saveTokenizationId(it.redirect!!.tokenizationId!!)
+                                tokenizedCardsRepository.saveTokenizationId(it.redirect!!.tokenizationId!!)
                             }
 
                             // Once tokenization result is available, remove the view from
@@ -211,18 +241,38 @@ class MainActivity : ComponentActivity() {
                 )
             }
 
-            composable(NAV_PAYMENT) {
-                // TODO: Pass as parameters:
-                //    * items
-                //    * shop-in-shop stuff?
-                //    * theming? (could use MyFancyTheme {} wrapper as well...)
-                val paymentRequest =
-                    remember { shoppingCartRepository.cartAsPaymentRequest() }
+            composable(NAV_CREATE_PAYMENT) {
+                val paymentId = remember { UUID.randomUUID() }
+                val paymentRequest = remember { shoppingCartRepository.cartAsPaymentRequest() }
+                LaunchedEffect(paymentId, paymentRequest) {
+                    paymentRepository.store(paymentId, paymentRequest)
+                }
                 PaytrailPayment(
                     modifier = Modifier.fillMaxSize(),
                     paymentRequest = paymentRequest,
-                    onPaymentStateChanged = onPaymentStateChanged,
+                    onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
                 )
+            }
+
+            composable(NAV_PAYMENT_LISTING) {
+                PaymentListing(
+                    modifier = Modifier.fillMaxSize(),
+                    viewModel = hiltViewModel(),
+                    showPaymentDetails = {
+                        navController.navigate(
+                            NAV_PAYMENT_DETAILS.replace("{$NAV_ARG_PAYMENT_ID}", it.toString()),
+                        )
+                    },
+                )
+            }
+
+            composable(
+                NAV_PAYMENT_DETAILS,
+                arguments = listOf(
+                    navArgument(NAV_ARG_PAYMENT_ID) { type = NavType.StringType },
+                ),
+            ) {
+                PaymentDetails(modifier = Modifier.fillMaxSize(), viewModel = hiltViewModel())
             }
         }
     }

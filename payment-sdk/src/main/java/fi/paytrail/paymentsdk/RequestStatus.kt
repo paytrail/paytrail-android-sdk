@@ -1,6 +1,10 @@
 package fi.paytrail.paymentsdk
 
 import fi.paytrail.paymentsdk.model.PaytrailApiErrorResponse
+import fi.paytrail.paymentsdk.model.createErrorResponse
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import retrofit2.Response
 
 data class RequestStatus<T> constructor(
     val status: Status,
@@ -42,4 +46,27 @@ data class RequestStatus<T> constructor(
             exception = exception,
         )
     }
+}
+
+/**
+ * Creates a new [Flow] to execute [func] in, and emits the result as [RequestStatus].
+ * Emits [RequestStatus.loading] before making the request.
+ */
+fun <T> flowApiRequest(func: suspend () -> Response<T>): Flow<RequestStatus<T>> = flow {
+    emit(RequestStatus.loading())
+    emit(apiRequest(func))
+}
+
+/**
+ * Make a retrofit API call, and convert the result to [RequestStatus].
+ */
+suspend fun <T> apiRequest(func: suspend () -> Response<T>): RequestStatus<T> = try {
+    val response = func()
+    if (response.isSuccessful) {
+        RequestStatus.success(response.body())
+    } else {
+        RequestStatus.error(error = createErrorResponse(response))
+    }
+} catch (e: Exception) {
+    RequestStatus.error(exception = e)
 }
