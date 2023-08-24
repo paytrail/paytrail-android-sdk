@@ -23,6 +23,12 @@ class PaytrailResponseSignatureValidator(
         val calculator = calculatorProvider.invoke(algorithm)
         val expectedSignature = calculator.calculateHmac(response, secretProvider.invoke())
 
-        if (expectedSignature != signature) throw RuntimeException("Invalid response signature")
+        if (expectedSignature != signature) {
+            throw InvalidSignatureException(
+                "Invalid response signature\n" +
+                    " !!! Actual:   $signature\n" +
+                    " !!! Expected: $expectedSignature",
+            )
+        }
     }
 }

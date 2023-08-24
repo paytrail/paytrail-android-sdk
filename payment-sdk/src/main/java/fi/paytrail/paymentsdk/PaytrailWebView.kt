@@ -22,7 +22,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
-import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.InvalidSignatureException
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailHmacCalculator.Companion.verifyUrlSignature
 import fi.paytrail.sdk.apiclient.models.Callbacks
@@ -37,7 +36,7 @@ fun PaytrailWebView(
     method: PaytrailWebViewCallMethod = PaytrailWebViewCallMethod.GET,
     postParameters: Iterable<Pair<String, String>> = emptyList(),
     redirectUrls: Callbacks,
-    signatureVerificationSecret: String = MerchantAccount.account.secret,
+    signatureVerificationSecret: String,
     onFinalRedirect: (Uri) -> Unit,
     onError: (Exception) -> Unit,
     allowBackNavigation: Boolean = true,

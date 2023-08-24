@@ -19,7 +19,7 @@ ktlint {
 
 android {
     namespace = "fi.paytrail.demo"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "fi.paytrail.demo"

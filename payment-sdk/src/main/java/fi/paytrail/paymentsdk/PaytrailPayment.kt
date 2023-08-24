@@ -7,27 +7,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
-import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_METHODS
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_PROVIDERS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
-import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_METHODS
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS
+import fi.paytrail.sdk.apiclient.MerchantAccount
+import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 
 @Composable
 fun PaytrailPayment(
     modifier: Modifier = Modifier,
     paymentRequest: PaymentRequest,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    onPaymentStateChanged: (PaytrailPaymentState) -> Unit, // TODO: Replace with functional interface! for java compatibility
+    merchantAccount: MerchantAccount,
+    apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
 ) {
     val viewModel: PaymentViewModel = viewModel(
-        factory = PaymentViewModelFactory(paymentRequest),
+        factory = PaymentViewModelFactory(paymentRequest, apiClient),
     )
 
     PaytrailPayment(
         modifier = modifier,
         viewModel = viewModel,
         onPaymentStateChanged = onPaymentStateChanged,
+        merchantAccount = merchantAccount,
     )
 }
 
@@ -36,11 +43,12 @@ internal fun PaytrailPayment(
     modifier: Modifier = Modifier,
     viewModel: PaymentViewModel,
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    merchantAccount: MerchantAccount,
 ) {
     val paymentStatus =
         viewModel.paymentState.observeAsState(
             initial = PaytrailPaymentState(
-                LOADING_PAYMENT_METHODS,
+                LOADING_PAYMENT_PROVIDERS,
             ),
         ).value
 
@@ -52,9 +60,12 @@ internal fun PaytrailPayment(
 
     Surface(modifier) {
         when (paymentStatus.state) {
-            LOADING_PAYMENT_METHODS -> LoadingIndicator(modifier = Modifier.fillMaxSize())
+            LOADING_PAYMENT_PROVIDERS -> LoadingIndicator(
+                modifier = Modifier.fillMaxSize()
+                    .semantics { testTag = "PaymentProvidersLoadingIndicator" },
+            )
 
-            SHOW_PAYMENT_METHODS -> PaymentProviders(
+            SHOW_PAYMENT_PROVIDERS -> PaymentProviders(
                 modifier = Modifier.fillMaxSize(),
                 viewModel = viewModel,
             )
@@ -62,6 +73,7 @@ internal fun PaytrailPayment(
             PAYMENT_IN_PROGRESS -> PayWithPaymentMethod(
                 modifier = Modifier.fillMaxSize(),
                 viewModel = viewModel,
+                merchantAccount = merchantAccount,
             )
 
             else -> {

@@ -85,7 +85,8 @@ class PaytrailHmacCalculator private constructor(
          */
         fun verifyUrlSignature(url: URL, key: String): Boolean {
             val requestSignature = url.parameter("signature")
-            return calculateHmac(url, key) == requestSignature
+            val expectedSignature = calculateHmac(url, key)
+            return expectedSignature == requestSignature
         }
     }
 

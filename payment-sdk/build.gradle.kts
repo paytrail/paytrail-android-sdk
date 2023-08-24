@@ -14,10 +14,11 @@ ktlint {
 
 android {
     namespace = "fi.paytrail.paymentsdk"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         minSdk = 21
+        targetSdk = 33
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
@@ -54,12 +55,14 @@ android {
     }
     packaging {
         resources {
-            excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/{AL2.0,LGPL2.1,LICENSE.md,LICENSE-notice.md}"
         }
     }
 }
 
 dependencies {
+
+    api(project(":api-client-retrofit2"))
 
     implementation(libs.core.ktx)
     implementation(libs.appcompat)
@@ -85,8 +88,13 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.espresso.core)
-
-    api(project(":api-client-retrofit2"))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    // Needed for createAndroidComposeRule, but not createComposeRule:
+    debugImplementation(libs.androidx.ui.test.manifest)
+    androidTestImplementation(libs.okhttp3.mockwebserver)
+    androidTestImplementation(libs.mockk.android)
+    androidTestImplementation(libs.kluent.android)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
+
 }

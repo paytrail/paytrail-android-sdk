@@ -72,25 +72,26 @@ data class AddCardFormRequest(
     @SerialName(value = "language")
     val language: Language? = null,
 
-) {
+    /* Signature calculated from 'checkout-' prefixed POST parameters the same way as calculating signature from headers */
     @SerialName(value = "signature")
-    val signature: String by lazy {
-        PaytrailHmacCalculator
-            .getCalculator(checkoutAlgorithm)
-            .calculateHmac(
-                params = asPostParams(includeSignature = false),
-                key = MerchantAccount.account.secret,
-            )
+    val signature: String = "",
+
+) {
+
+    fun withSignature(account: MerchantAccount): AddCardFormRequest {
+        return this.copy(
+            signature = PaytrailHmacCalculator
+                .getCalculator(checkoutAlgorithm)
+                .calculateHmac(
+                    params = asPostParams(),
+                    key = account.secret,
+                ),
+        )
     }
 
-    fun asPostParams(includeSignature: Boolean = true): Iterable<Pair<String, String>> =
+    fun asPostParams(): Iterable<Pair<String, String>> =
         this::class.memberProperties
             .filter { property -> property.annotations.any { it is SerialName } }
-            .filter { property ->
-                includeSignature || property.annotations.none { annotation ->
-                    annotation is SerialName && annotation.value == "signature"
-                }
-            }
             .filter { property -> property.getter.call(this) != null }
             .map { property ->
                 val name = if (property.annotations.any { it is SerialName }) {

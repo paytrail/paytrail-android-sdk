@@ -1,6 +1,7 @@
 package fi.paytrail.paymentsdk
 
 import android.content.Context
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
@@ -28,6 +29,8 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
@@ -58,7 +61,6 @@ fun PaymentProviders(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun PaymentProviderListing(
     modifier: Modifier = Modifier,
@@ -68,6 +70,7 @@ private fun PaymentProviderListing(
 ) {
     Column(
         modifier = modifier
+            .semantics { testTag = "PaymentProvidersListing" }
             .fillMaxWidth()
             .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 32.dp)
             .verticalScroll(rememberScrollState()),
@@ -77,19 +80,32 @@ private fun PaymentProviderListing(
         }
         for (group in groups) {
             key(group) {
-                PaymentGroupHeader(group)
-                FlowRow(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    for (method in group.paymentMethods) {
-                        PaymentProvider(
-                            modifier = Modifier.padding(4.dp),
-                            item = method,
-                            onClick = { onPaymentMethodSelected(method) },
-                        )
-                    }
-                }
+                PaymentProviderGroup(group, onPaymentMethodSelected)
                 Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalLayoutApi::class)
+@Composable
+fun PaymentProviderGroup(
+    group: PaymentMethodGroup,
+    onPaymentMethodSelected: (PaymentMethod) -> Unit,
+) {
+    Column(modifier = Modifier.semantics { testTag = "PaymentProviderGroup" }) {
+        PaymentProviderGroupHeader(group)
+        FlowRow(
+            modifier = Modifier.fillMaxWidth(),
+        ) {
+            for (method in group.paymentMethods) {
+                PaymentProvider(
+                    modifier = Modifier.padding(4.dp),
+                    item = method,
+                    onClick = {
+                        onPaymentMethodSelected(method)
+                    },
+                )
             }
         }
     }
@@ -114,8 +130,13 @@ fun PaytrailTerms(terms: String) {
 }
 
 @Composable
-fun PaymentGroupHeader(group: PaymentMethodGroup) {
-    Text(group.name)
+fun PaymentProviderGroupHeader(group: PaymentMethodGroup) {
+    Text(
+        modifier = Modifier.semantics {
+            testTag = "PaymentProviderGroupHeader"
+        },
+        text = group.name,
+    )
 }
 
 @Composable
@@ -125,7 +146,9 @@ private fun PaymentProvider(
     onClick: () -> Unit = {},
 ) {
     Surface(
-        modifier = modifier.size(width = 100.dp, height = 64.dp),
+        modifier = modifier.size(width = 100.dp, height = 64.dp).semantics {
+            testTag = "PaymentProvider"
+        },
         shape = RoundedCornerShape(6.dp),
         border = BorderStroke(width = 1.dp, color = Color.Black),
         onClick = onClick,

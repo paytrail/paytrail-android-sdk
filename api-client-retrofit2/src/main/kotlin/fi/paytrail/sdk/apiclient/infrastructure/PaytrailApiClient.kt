@@ -9,10 +9,10 @@ import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.scalars.ScalarsConverterFactory
 
-class ApiClient(
+class PaytrailApiClient(
     private var baseUrl: String = "https://services.paytrail.com",
     private val okHttpClientBuilder: OkHttpClient.Builder? = PaytrailBaseOkHttpClient.baseClient?.newBuilder(),
-    private val merchantAccount: MerchantAccount = MerchantAccount.account,
+    private val merchantAccount: MerchantAccount,
 ) {
 
     private val retrofitBuilder: Retrofit.Builder by lazy {

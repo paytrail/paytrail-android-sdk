@@ -1,0 +1,5 @@
+checkout-account=375917
+checkout-algorithm=sha512
+checkout-method=POST
+checkout-transaction-id=154dc4de-4033-11ee-9f46-dbccb2a11f6e
+signature=2fbbe939f39b8261561a13b4a70162ef4b7fed8ceec8a581b836d1945714e9597a6f486c437ce77587b01c0303dc42d20e3107126401dd8979a19f628a07b96d

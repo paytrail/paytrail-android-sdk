@@ -19,8 +19,8 @@ data class PaytrailPaymentState internal constructor(
             ?: finalRedirectRequest?.transactionId?.let { UUID.fromString(it) }
 
     enum class State {
-        LOADING_PAYMENT_METHODS,
-        SHOW_PAYMENT_METHODS,
+        LOADING_PAYMENT_PROVIDERS,
+        SHOW_PAYMENT_PROVIDERS,
 
         /**
          * Payment with a payment method is ongoing.

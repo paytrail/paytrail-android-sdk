@@ -2,7 +2,6 @@ package fi.paytrail.demo.tokenization
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -75,13 +74,6 @@ fun TokenizedCreditCards(
                 CreditCardListing(
                     cards = cards,
                     onCardClick = { tokenizationId, _ ->
-                        payWithCardAction(
-                            tokenizationId,
-                            TokenPaymentType.CIT,
-                            TokenPaymentChargeType.CHARGE,
-                        )
-                    },
-                    onCardLongClick = { tokenizationId, _ ->
                         viewModel.showCardActions(
                             tokenizationId,
                         )
@@ -208,7 +200,6 @@ fun BottomSheetAction(
 private fun CreditCardListing(
     cards: List<Pair<String, Flow<RequestStatus<TokenizedCreditCard>>>>,
     onCardClick: (String, TokenizationRequestResponse?) -> Unit = { _, _ -> },
-    onCardLongClick: (String, TokenizationRequestResponse?) -> Unit = { _, _ -> },
 ) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -233,14 +224,8 @@ private fun CreditCardListing(
                     val viewSizeModifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 64.dp)
-                        .combinedClickable(
+                        .clickable(
                             enabled = requestStatus.value?.response != null,
-                            onLongClick = {
-                                onCardLongClick(
-                                    tokenizationId,
-                                    requestStatus.value?.response,
-                                )
-                            },
                             onClick = {
                                 onCardClick(
                                     tokenizationId,

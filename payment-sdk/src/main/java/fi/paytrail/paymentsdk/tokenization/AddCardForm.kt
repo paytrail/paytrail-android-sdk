@@ -2,7 +2,6 @@ package fi.paytrail.paymentsdk.tokenization
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import fi.paytrail.paymentsdk.PaytrailWebView
 import fi.paytrail.paymentsdk.PaytrailWebViewCallMethod
@@ -29,10 +28,10 @@ data class AddCardRedirect(val url: Uri) {
 fun AddCardForm(
     modifier: Modifier = Modifier,
     request: AddCardRequest,
-    merchantAccount: MerchantAccount = MerchantAccount.account,
+    merchantAccount: MerchantAccount,
     onAddCardResult: (AddCardResult) -> Unit,
 ) {
-    val addCardFormRequest = remember(request) {
+    val addCardFormRequest =
         AddCardFormRequest(
             checkoutAccount = merchantAccount.id,
             checkoutMethod = "POST",
@@ -44,13 +43,13 @@ fun AddCardForm(
             language = request.language,
             checkoutNonce = UUID.randomUUID().toString(),
             checkoutTimestamp = DateTimeFormatter.ISO_OFFSET_DATE_TIME.format(OffsetDateTime.now()),
-        )
-    }
+        ).withSignature(account = merchantAccount)
 
     AddCardForm(
         modifier = modifier,
         request = addCardFormRequest,
         onAddCardStatusChanged = onAddCardResult,
+        merchantAccount = merchantAccount,
     )
 }
 
@@ -59,6 +58,7 @@ private fun AddCardForm(
     modifier: Modifier = Modifier,
     request: AddCardFormRequest,
     onAddCardStatusChanged: (AddCardResult) -> Unit,
+    merchantAccount: MerchantAccount,
 ) {
     PaytrailWebView(
         modifier = modifier,
@@ -91,6 +91,7 @@ private fun AddCardForm(
                 ),
             )
         },
+        signatureVerificationSecret = merchantAccount.secret,
         allowBackNavigation = false,
     )
 }

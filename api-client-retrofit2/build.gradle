@@ -30,11 +30,13 @@ test {
 }
 
 dependencies {
+
     implementation libs.kotlin.stdlib.jdk8
     implementation libs.kotlin.reflect
     implementation libs.kotlinx.coroutines.core
     implementation libs.kotlinx.serialization.json
-    api libs.logging.interceptor
+    api libs.okhttp3.client
+    api libs.okhttp3.logging.interceptor
     api libs.retrofit
     implementation libs.retrofit2.kotlinx.serialization.converter
     implementation libs.retrofit.converter.scalars

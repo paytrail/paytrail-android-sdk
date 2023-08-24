@@ -90,10 +90,10 @@ class MainActivity : ComponentActivity() {
                 ) {
                     val navController = rememberNavController()
                     Column(modifier = Modifier.fillMaxSize()) {
-                        val state = paymentState?.second
-                        AnimatedVisibility(visible = shouldShowStatus(state)) {
+                        val currentState = paymentState?.second
+                        AnimatedVisibility(visible = shouldShowStatus(currentState)) {
                             PaymentResultView(
-                                paymentState = state,
+                                paymentState = currentState,
                                 onClick = {
                                     navController.navigate(
                                         NAV_PAYMENT_DETAILS.replace(
@@ -204,6 +204,7 @@ class MainActivity : ComponentActivity() {
                     chargeType = chargeType,
                     onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
                     onTokenAvailable = { token -> paymentRepository.storeToken(paymentId, token) },
+                    merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
                 )
             }
 
@@ -238,6 +239,7 @@ class MainActivity : ComponentActivity() {
                             navController.navigateUp()
                         }
                     },
+                    merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
                 )
             }
 
@@ -251,6 +253,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     paymentRequest = paymentRequest,
                     onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
+                    merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
                 )
             }
 

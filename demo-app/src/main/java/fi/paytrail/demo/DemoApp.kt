@@ -14,13 +14,12 @@ import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
 import okhttp3.logging.HttpLoggingInterceptor.Level.BODY
 
+val SAMPLE_MERCHANT_ACCOUNT = MerchantAccount(id = 375917, secret = "SAIPPUAKAUPPIAS")
 @HiltAndroidApp
 class DemoApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
-
-        MerchantAccount.account = MerchantAccount(id = 375917, secret = "SAIPPUAKAUPPIAS")
 
         val okHttpClientBuilder = OkHttpClient.Builder()
 

@@ -10,6 +10,8 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import fi.paytrail.paymentsdk.LoadingIndicator
 import fi.paytrail.paymentsdk.PaytrailWebView
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
+import fi.paytrail.sdk.apiclient.MerchantAccount
+import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import kotlinx.coroutines.flow.collect
 
@@ -32,6 +34,8 @@ fun PayWithTokenizationId(
     chargeType: TokenPaymentChargeType = TokenPaymentChargeType.CHARGE,
     onTokenAvailable: (String) -> Unit,
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    merchantAccount: MerchantAccount,
+    apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
 ) {
     val viewModel: PayWithTokenViewModel = viewModel(
         factory = PayWithTokenViewModelFactory(
@@ -40,6 +44,7 @@ fun PayWithTokenizationId(
             paymentRequest = paymentRequest,
             paymentType = paymentType,
             chargeType = chargeType,
+            apiClient = apiClient,
         ),
     )
 
@@ -50,6 +55,7 @@ fun PayWithTokenizationId(
     PayWithToken(
         modifier = modifier,
         viewModel = viewModel,
+        merchantAccount = merchantAccount,
         onPaymentStateChanged = onPaymentStateChanged,
     )
 }
@@ -62,6 +68,8 @@ fun PayWithToken(
     paymentType: TokenPaymentType = TokenPaymentType.CIT,
     chargeType: TokenPaymentChargeType = TokenPaymentChargeType.CHARGE,
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    merchantAccount: MerchantAccount,
+    apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
 ) {
     val viewModel: PayWithTokenViewModel = viewModel(
         factory = PayWithTokenViewModelFactory(
@@ -70,12 +78,14 @@ fun PayWithToken(
             paymentRequest = paymentRequest,
             paymentType = paymentType,
             chargeType = chargeType,
+            apiClient = apiClient,
         ),
     )
 
     PayWithToken(
         modifier = modifier,
         viewModel = viewModel,
+        merchantAccount = merchantAccount,
         onPaymentStateChanged = onPaymentStateChanged,
     )
 }
@@ -84,6 +94,7 @@ fun PayWithToken(
 fun PayWithToken(
     modifier: Modifier = Modifier,
     viewModel: PayWithTokenViewModel,
+    merchantAccount: MerchantAccount,
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
 ) {
     val paymentStatus =
@@ -105,6 +116,7 @@ fun PayWithToken(
                 redirectUrls = viewModel.paymentRequest.redirectUrls,
                 onFinalRedirect = viewModel::finalRedirectReceived,
                 onError = viewModel::errorReceived,
+                signatureVerificationSecret = merchantAccount.secret,
             )
         } else {
             LoadingIndicator()

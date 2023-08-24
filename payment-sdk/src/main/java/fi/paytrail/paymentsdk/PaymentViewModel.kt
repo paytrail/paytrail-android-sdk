@@ -15,15 +15,14 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentRedirect
 import fi.paytrail.paymentsdk.model.PaytrailPaymentRedirect.Status.Fail
 import fi.paytrail.paymentsdk.model.PaytrailPaymentRedirect.Status.Ok
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
-import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_METHODS
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_PROVIDERS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_CANCELED
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_FAIL
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
-import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_METHODS
-import fi.paytrail.sdk.apiclient.PaytrailBaseOkHttpClient
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS
 import fi.paytrail.sdk.apiclient.apis.PaymentsApi
-import fi.paytrail.sdk.apiclient.infrastructure.ApiClient
+import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.ErrorResponse.Companion.deserialize
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import fi.paytrail.sdk.apiclient.models.PaymentRequestResponse
@@ -31,13 +30,10 @@ import retrofit2.Response
 
 class PaymentViewModel(
     val paymentRequest: PaymentRequest,
+    apiClient: PaytrailApiClient,
 ) : ViewModel() {
 
-    private val api by lazy {
-        ApiClient(
-            okHttpClientBuilder = PaytrailBaseOkHttpClient.baseClient?.newBuilder(),
-        ).createService(PaymentsApi::class.java)
-    }
+    private val api by lazy { apiClient.createService(PaymentsApi::class.java) }
 
     val createPaymentResponse: LiveData<Response<PaymentRequestResponse>> = liveData {
         try {
@@ -139,7 +135,7 @@ class PaymentViewModel(
     //    * if payment providers are loaded, status is SHOW_PAYMENT_PROVIDERS
     //    * until payment providers are loaded, status is LOADING_PAYMENT_PROVIDERS
     val paymentState: LiveData<PaytrailPaymentState> =
-        MediatorLiveData(PaytrailPaymentState(LOADING_PAYMENT_METHODS)).apply {
+        MediatorLiveData(PaytrailPaymentState(LOADING_PAYMENT_PROVIDERS)).apply {
             var paymentProvidersLoaded = false
             var selectedMethod: PaymentMethod? = null
             var redirect: PaytrailPaymentRedirect? = null
@@ -164,8 +160,8 @@ class PaymentViewModel(
                     )
 
                     selectedMethod != null -> PaytrailPaymentState(PAYMENT_IN_PROGRESS)
-                    paymentProvidersLoaded -> PaytrailPaymentState(SHOW_PAYMENT_METHODS)
-                    else -> PaytrailPaymentState(LOADING_PAYMENT_METHODS)
+                    paymentProvidersLoaded -> PaytrailPaymentState(SHOW_PAYMENT_PROVIDERS)
+                    else -> PaytrailPaymentState(LOADING_PAYMENT_PROVIDERS)
                 }
             }
 

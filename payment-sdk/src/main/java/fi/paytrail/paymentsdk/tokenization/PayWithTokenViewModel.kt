@@ -9,7 +9,7 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentRedirect
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.paymentsdk.model.createErrorResponse
 import fi.paytrail.sdk.apiclient.apis.TokenPaymentsApi
-import fi.paytrail.sdk.apiclient.infrastructure.ApiClient
+import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import fi.paytrail.sdk.apiclient.models.TokenPaymentRequest
 import fi.paytrail.sdk.apiclient.models.TokenPaymentResponse
@@ -30,11 +30,10 @@ class PayWithTokenViewModel(
     val paymentRequest: PaymentRequest,
     private val paymentType: TokenPaymentType,
     private val chargeType: TokenPaymentChargeType,
+    private val apiClient: PaytrailApiClient
 ) : ViewModel() {
 
-    private val api by lazy {
-        ApiClient().createService(TokenPaymentsApi::class.java)
-    }
+    private val api by lazy { apiClient.createService(TokenPaymentsApi::class.java) }
 
     val paymentToken: Flow<RequestStatus<String>> = flow {
         if (token != null) {
