@@ -162,13 +162,15 @@ private fun ShoppingCartListing(
         }
 
         item {
-            Row {
+            Column {
                 Spacer(modifier = Modifier.height(16.dp))
                 Divider()
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(stringResource(R.string.shopping_cart_total))
-                Spacer(modifier = Modifier.weight(1f))
-                Text("${currencyFormatter.format(total)} €")
+                Row {
+                    Text(stringResource(R.string.shopping_cart_total))
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text("${currencyFormatter.format(total)} €")
+                }
             }
         }
     }
