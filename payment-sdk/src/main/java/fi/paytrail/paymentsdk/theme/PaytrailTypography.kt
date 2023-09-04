@@ -1,4 +1,4 @@
-package fi.paytrail.paymentsdk.typography
+package fi.paytrail.paymentsdk.theme
 
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily

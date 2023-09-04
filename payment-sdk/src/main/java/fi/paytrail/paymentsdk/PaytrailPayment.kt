@@ -1,6 +1,8 @@
 package fi.paytrail.paymentsdk
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
@@ -9,6 +11,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
 import androidx.compose.ui.text.TextStyle
@@ -17,7 +20,8 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_PROVIDERS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS
-import fi.paytrail.paymentsdk.typography.Poppins
+import fi.paytrail.paymentsdk.theme.PaytrailColors.LightGrey
+import fi.paytrail.paymentsdk.theme.Poppins
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
@@ -34,16 +38,15 @@ fun PaytrailPayment(
         factory = PaymentViewModelFactory(paymentRequest, apiClient),
     )
 
-    // TODO: get the font family from current theme?
+    // TODO: Get colors from current theme
+    // TODO: Make font family themable?
     CompositionLocalProvider(LocalTextStyle provides TextStyle(fontFamily = Poppins)) {
-
         PaytrailPayment(
-            modifier = modifier,
+            modifier = modifier.background(color = LightGrey),
             viewModel = viewModel,
             onPaymentStateChanged = onPaymentStateChanged,
             merchantAccount = merchantAccount,
         )
-
     }
 }
 
@@ -67,7 +70,7 @@ internal fun PaytrailPayment(
 
     // TODO: Set up & apply custom theming to relevant components
 
-    Surface(modifier) {
+    Box(modifier = modifier) {
         when (paymentStatus.state) {
             LOADING_PAYMENT_PROVIDERS -> LoadingIndicator(
                 modifier = Modifier.fillMaxSize()
@@ -87,7 +90,7 @@ internal fun PaytrailPayment(
 
             else -> {
                 // No content for complete/error/cancel states. Application should remove PaytrailPayment
-                // from composition, or remove PaytrailPaymentFragment from view tree.
+                // from composition, or remove containing fragment/activity from backstack
             }
         }
     }

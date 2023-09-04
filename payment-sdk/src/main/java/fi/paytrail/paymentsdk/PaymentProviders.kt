@@ -2,7 +2,7 @@ package fi.paytrail.paymentsdk
 
 import android.content.Context
 import android.widget.Toast
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -28,17 +28,46 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight.Companion.W300
+import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import coil.decode.SvgDecoder
 import coil.request.ImageRequest
 import de.charlex.compose.HtmlText
 import fi.paytrail.paymentsdk.model.PaymentMethod
 import fi.paytrail.paymentsdk.model.PaymentMethodGroup
+import fi.paytrail.paymentsdk.theme.PaytrailColors.Grey02
+import fi.paytrail.paymentsdk.theme.Poppins
 import fi.paytrail.sdk.apiclient.models.PaymentMethodProvider
+
+val PaytrailTextChoosePaymentMethodHeading = TextStyle(
+    fontFamily = Poppins,
+    fontWeight = W700,
+    fontSize = 24.sp,
+    lineHeight = 36.sp,
+)
+
+val PaytrailTextPaymentGroupHeading = TextStyle(
+    fontFamily = Poppins,
+    fontWeight = W700,
+    fontSize = 16.sp,
+    lineHeight = 24.sp,
+)
+
+val PaytrailTextTermsAndConditions = TextStyle(
+    fontFamily = Poppins,
+    fontWeight = W300,
+    fontSize = 12.sp,
+    lineHeight = 17.sp,
+    color = Grey02,
+)
 
 @Composable
 fun PaymentProviders(
@@ -72,8 +101,12 @@ private fun PaymentProviderListing(
             .semantics { testTag = "PaymentProvidersListing" }
             .fillMaxWidth()
             .verticalScroll(rememberScrollState())
-            .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 32.dp),
+            .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 32.dp),
     ) {
+        Text(
+            text = "Choose payment method",
+            style = PaytrailTextChoosePaymentMethodHeading,
+        )
         if (terms != null) {
             PaytrailTerms(terms)
         }
@@ -94,12 +127,15 @@ fun PaymentProviderGroup(
 ) {
     Column(modifier = Modifier.semantics { testTag = "PaymentProviderGroup" }) {
         PaymentProviderGroupHeader(group)
+        Spacer(modifier = Modifier.height(8.dp))
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(22.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             for (method in group.paymentMethods) {
                 PaymentProvider(
-                    modifier = Modifier.padding(4.dp),
+                    modifier = Modifier,
                     item = method,
                     onClick = {
                         onPaymentMethodSelected(method)
@@ -107,6 +143,7 @@ fun PaymentProviderGroup(
                 )
             }
         }
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
@@ -125,6 +162,7 @@ fun PaytrailTerms(terms: String) {
     HtmlText(
         modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp),
         text = terms,
+        style = PaytrailTextTermsAndConditions,
     )
 }
 
@@ -135,6 +173,7 @@ fun PaymentProviderGroupHeader(group: PaymentMethodGroup) {
             testTag = "PaymentProviderGroupHeader"
         },
         text = group.name,
+        style = PaytrailTextPaymentGroupHeading,
     )
 }
 
@@ -145,12 +184,15 @@ private fun PaymentProvider(
     onClick: () -> Unit = {},
 ) {
     Surface(
-        modifier = modifier.size(width = 100.dp, height = 64.dp).semantics {
-            testTag = "PaymentProvider"
-        },
+        modifier = modifier.size(width = 100.dp, height = 64.dp)
+            .background(color = Color.White)
+            .semantics {
+                testTag = "PaymentProvider"
+                contentDescription = item.name
+            },
         shape = RoundedCornerShape(6.dp),
-        border = BorderStroke(width = 1.dp, color = Color.Black),
         onClick = onClick,
+        shadowElevation = 2.dp,
     ) {
         Column(
             modifier = Modifier

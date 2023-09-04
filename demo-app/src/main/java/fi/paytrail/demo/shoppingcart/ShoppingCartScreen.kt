@@ -8,6 +8,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -47,7 +49,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fi.paytrail.demo.R
-import fi.paytrail.demo.ui.theme.Grey02
+import fi.paytrail.paymentsdk.theme.PaytrailColors
 import java.math.BigDecimal
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -150,7 +152,7 @@ private fun ShoppingCartListing(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Divider(
                     modifier = Modifier.padding(vertical = 16.dp),
-                    color = Grey02,
+                    color = PaytrailColors.Grey02,
                 )
                 ShoppingCartTotalPrice(
                     modifier = Modifier.fillMaxWidth(),
@@ -177,6 +179,7 @@ private fun ShoppingCartTotalPrice(modifier: Modifier, totalPrice: BigDecimal) {
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ShoppingCartBottomBar(
     items: List<ShoppingCartRow>,
@@ -191,7 +194,8 @@ private fun ShoppingCartBottomBar(
     ) {
         Divider()
         Spacer(modifier = Modifier.height(4.dp))
-        Row {
+
+        FlowRow {
             PayButton(enabled = items.isNotEmpty(), onClick = payAction)
             Spacer(modifier = Modifier.width(8.dp))
             PayAndAddCardButton(enabled = items.isNotEmpty(), onClick = payAndAddCardAction)

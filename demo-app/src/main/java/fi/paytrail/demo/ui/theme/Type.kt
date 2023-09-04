@@ -6,7 +6,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.font.FontWeight.Companion.W500
 import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.unit.sp
-import fi.paytrail.paymentsdk.typography.Poppins
+import fi.paytrail.paymentsdk.theme.Poppins
 
 val PaytrailTypography = Typography(
     bodyLarge = TextStyle(
