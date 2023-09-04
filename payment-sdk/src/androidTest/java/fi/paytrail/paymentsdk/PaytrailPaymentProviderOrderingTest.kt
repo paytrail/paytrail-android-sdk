@@ -6,7 +6,6 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import fi.paytrail.paymentsdk.test.server.RequestMethod.POST
 import org.junit.Test
 
-
 const val CREDIT = "Invoice and instalment payment methods"
 const val CREDIT_CARD = "Card payment methods"
 const val MOBILE = "Mobile payment methods"
@@ -50,7 +49,6 @@ class PaytrailPaymentProviderOrderingTest : BasePaytrailUiTest() {
                 CREDIT_CARD,
                 defaultCreditCardOrdering,
             )
-
         }
     }
 
@@ -74,8 +72,6 @@ class PaytrailPaymentProviderOrderingTest : BasePaytrailUiTest() {
                 CREDIT_CARD,
                 listOf("Visa", "American Express", "Mastercard", "Visa Electron"),
             )
-
         }
     }
-
 }

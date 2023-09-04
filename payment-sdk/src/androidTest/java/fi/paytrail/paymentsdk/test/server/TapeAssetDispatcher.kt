@@ -65,7 +65,6 @@ class TapeAssetDispatcher : Dispatcher() {
                     setHeader(name, valueFun(it.headers, body))
                 }
             }
-
         } ?: MockResponse().setResponseCode(400)
     }
 
@@ -93,7 +92,6 @@ class TapeAssetDispatcher : Dispatcher() {
     infix fun String.globalHeader(tokenValue: (Map<String, String>, String) -> String) {
         additionalHeaders[this] = tokenValue
     }
-
 }
 
 private fun getTapeFileContent(fileName: String): Tape {

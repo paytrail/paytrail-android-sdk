@@ -15,6 +15,7 @@ import okhttp3.logging.HttpLoggingInterceptor.Level.BASIC
 import okhttp3.logging.HttpLoggingInterceptor.Level.BODY
 
 val SAMPLE_MERCHANT_ACCOUNT = MerchantAccount(id = 375917, secret = "SAIPPUAKAUPPIAS")
+
 @HiltAndroidApp
 class DemoApp : Application() {
 

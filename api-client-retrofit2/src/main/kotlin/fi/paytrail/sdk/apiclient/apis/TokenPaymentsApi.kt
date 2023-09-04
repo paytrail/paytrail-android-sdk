@@ -36,7 +36,7 @@ interface TokenPaymentsApi {
      *  - 401: Unauthorized
      *  - 403: Credit cards and/or AMEX not enabled for merchant
      *
-     * @param checkoutTokenizationId Tokenization ID. In
+     * @param checkoutTokenizationId Tokenization ID.
      * @param checkoutTokenizationIdHeader Must be same as [checkoutTokenizationId]; default value is copied from this parameter.
      *
      * @return [TokenizationRequestResponse]

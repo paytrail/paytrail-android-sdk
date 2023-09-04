@@ -47,6 +47,7 @@ fun ShoppingCart(
     modifier: Modifier = Modifier,
     viewModel: ShoppingCartViewModel,
     payAction: () -> Unit,
+    payAndAddCardAction: () -> Unit,
     cardsAction: () -> Unit,
     showPaymentHistory: () -> Unit,
 ) {
@@ -54,7 +55,16 @@ fun ShoppingCart(
     val total = viewModel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
     val rowCount = viewModel.rowCount.collectAsState(initial = 0).value
 
-    ShoppingCart(modifier, items, rowCount, total, payAction, cardsAction, showPaymentHistory)
+    ShoppingCart(
+        modifier = modifier,
+        items = items,
+        rowCount = rowCount,
+        total = total,
+        payAction = payAction,
+        payAndAddCardAction = payAndAddCardAction,
+        cardsAction = cardsAction,
+        showPaymentHistory = showPaymentHistory,
+    )
 }
 
 @Composable
@@ -64,6 +74,7 @@ private fun ShoppingCart(
     rowCount: Int,
     total: BigDecimal,
     payAction: () -> Unit = {},
+    payAndAddCardAction: () -> Unit = {},
     cardsAction: () -> Unit = {},
     showPaymentHistory: () -> Unit = {},
 ) {
@@ -79,7 +90,14 @@ private fun ShoppingCart(
             items = items,
         )
 
-        ShoppingCartBottomBar(total, items, payAction, cardsAction, showPaymentHistory)
+        ShoppingCartBottomBar(
+            total = total,
+            items = items,
+            payAction = payAction,
+            payAndAddCardAction = payAndAddCardAction,
+            cardsAction = cardsAction,
+            showPaymentHistory = showPaymentHistory,
+        )
     }
 }
 
@@ -121,6 +139,7 @@ private fun ShoppingCartBottomBar(
     items: List<ShoppingCartRow>,
     payAction: () -> Unit,
     cardsAction: () -> Unit,
+    payAndAddCardAction: () -> Unit,
     showPaymentHistory: () -> Unit,
 ) {
     Column(
@@ -132,6 +151,8 @@ private fun ShoppingCartBottomBar(
         Text("Total: ${currencyFormatter.format(total)} €")
         Row {
             PayButton(enabled = items.isNotEmpty(), onClick = payAction)
+            Spacer(modifier = Modifier.width(8.dp))
+            PayAndAddCardButton(enabled = items.isNotEmpty(), onClick = payAndAddCardAction)
             Spacer(modifier = Modifier.width(8.dp))
             CardsButton(onClick = cardsAction)
             Spacer(modifier = Modifier.width(8.dp))
@@ -177,6 +198,22 @@ private fun PayButton(
         enabled = enabled,
     ) {
         Text(stringResource(R.string.shopping_cart_button_pay))
+    }
+}
+
+@Composable
+private fun PayAndAddCardButton(
+    enabled: Boolean,
+    onClick: () -> Unit,
+) {
+    Button(
+        modifier = Modifier
+            .widthIn(min = 80.dp)
+            .padding(top = 8.dp, bottom = 16.dp),
+        onClick = onClick,
+        enabled = enabled,
+    ) {
+        Text(stringResource(R.string.shopping_cart_button_pay_and_add))
     }
 }
 

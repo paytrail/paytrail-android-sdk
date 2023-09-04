@@ -32,6 +32,7 @@ import fi.paytrail.demo.shoppingcart.ShoppingCartRepository
 import fi.paytrail.demo.tokenization.TokenizedCardsRepository
 import fi.paytrail.demo.tokenization.TokenizedCreditCards
 import fi.paytrail.demo.ui.theme.PaytrailSDKTheme
+import fi.paytrail.paymentsdk.PayAndAddCard
 import fi.paytrail.paymentsdk.PaytrailPayment
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_CANCELED
@@ -59,6 +60,7 @@ private const val NAV_SHOPPING_CART = "shopping_cart"
 private const val NAV_CREATE_PAYMENT = "payment/create"
 private const val NAV_CARDS = "cards"
 private const val NAV_ADD_CARD = "cards/tokenize"
+private const val NAV_PAY_AND_ADD_CARD = "payment/pay_and_add_card"
 private const val NAV_PAY_WITH_TOKENIZATION_ID =
     "cards/{$NAV_ARG_TOKENIZATION_ID}/{$NAV_ARG_PAYMENT_TYPE}/{$NAV_ARG_CHARGE_TYPE}"
 private const val NAV_PAYMENT_LISTING = "payments"
@@ -156,6 +158,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     viewModel = hiltViewModel(),
                     payAction = { navController.navigate(NAV_CREATE_PAYMENT) },
+                    payAndAddCardAction = { navController.navigate(NAV_PAY_AND_ADD_CARD) },
                     cardsAction = { navController.navigate(NAV_CARDS) },
                     showPaymentHistory = { navController.navigate(NAV_PAYMENT_LISTING) },
                 )
@@ -250,6 +253,20 @@ class MainActivity : ComponentActivity() {
                     paymentRepository.store(paymentId, paymentRequest)
                 }
                 PaytrailPayment(
+                    modifier = Modifier.fillMaxSize(),
+                    paymentRequest = paymentRequest,
+                    onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
+                    merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
+                )
+            }
+
+            composable(NAV_PAY_AND_ADD_CARD) {
+                val paymentId = remember { UUID.randomUUID() }
+                val paymentRequest = remember { shoppingCartRepository.cartAsPaymentRequest() }
+                LaunchedEffect(paymentId, paymentRequest) {
+                    paymentRepository.store(paymentId, paymentRequest)
+                }
+                PayAndAddCard(
                     modifier = Modifier.fillMaxSize(),
                     paymentRequest = paymentRequest,
                     onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },

@@ -13,7 +13,6 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
-import kotlinx.coroutines.flow.collect
 
 enum class TokenPaymentChargeType {
     AUTH_HOLD,
@@ -115,7 +114,7 @@ fun PayWithToken(
                 url = url,
                 redirectUrls = viewModel.paymentRequest.redirectUrls,
                 onFinalRedirect = viewModel::finalRedirectReceived,
-                onError = viewModel::errorReceived,
+                onError = viewModel::webviewErrorReceived,
                 signatureVerificationSecret = merchantAccount.secret,
             )
         } else {

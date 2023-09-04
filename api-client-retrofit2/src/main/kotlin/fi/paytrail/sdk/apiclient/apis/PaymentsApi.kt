@@ -6,6 +6,7 @@ import fi.paytrail.sdk.apiclient.models.BasePaymentMethodProvider
 import fi.paytrail.sdk.apiclient.models.GroupedPaymentProvidersResponse
 import fi.paytrail.sdk.apiclient.models.Groups
 import fi.paytrail.sdk.apiclient.models.Language
+import fi.paytrail.sdk.apiclient.models.PayAndAddCardResponse
 import fi.paytrail.sdk.apiclient.models.Payment
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import fi.paytrail.sdk.apiclient.models.PaymentRequestResponse
@@ -55,9 +56,7 @@ interface PaymentsApi {
      * @return [PaymentRequestResponse]
      */
     @POST("payments")
-    suspend fun createPayment(
-        @Body paymentRequest: PaymentRequest,
-    ): Response<PaymentRequestResponse>
+    suspend fun createPayment(@Body paymentRequest: PaymentRequest): Response<PaymentRequestResponse>
 
     /**
      * List grouped merchant payment methods
@@ -139,4 +138,36 @@ interface PaymentsApi {
         @Body refund: Refund,
         @Header("checkout-transaction-id") checkoutTransactionId: UUID? = transactionId,
     ): Response<RefundResponse>
+
+    /**
+     * This method is an alternative way to add (tokenize) a card, which combines a payment
+     * and adding a new card to allow getting the card token after a successful payment with
+     * a single request.
+     *
+     * If the flow is successfully completed, the given success-callback URL will be called
+     * with an additional parameter: checkout-card-token, which is also included in the
+     * HMAC-calculation of the signature-parameter. This token can be saved by the merchant
+     * and additional payments can be charged on the token. The token is not included in the
+     * redirect URL parameters, as we don't want the user to be able to see the token.
+     *
+     * If the flow fails due to issues with the card itself (insufficient funds, fraud etc.),
+     * the given cancel-callback URL will be called with additional parameters
+     * `checkout-acquirer-response-code` and `checkout-acquirer-response-code-description`
+     * for troubleshooting the possible cause.
+     *
+     * Note that the callback is not visible to application itself. This is a backend-to-backend
+     * callback, and the merchant application must retrieve the token from merchant backend
+     * to use it for tokenized payments.
+     *
+     * Responses:
+     *  - 200: Payment request created successfully
+     *  - 400: Request did not pass input validation
+     *  - 401: Unauthorized
+     *  - 403: Tokenization not allowed for merchant
+     *
+     * @param addCardFormRequest Add card payload
+     * @return [PayAndAddCardResponse]
+     */
+    @POST("tokenization/pay-and-add-card")
+    suspend fun payAndAddCard(@Body paymentRequest: PaymentRequest): Response<PayAndAddCardResponse>
 }

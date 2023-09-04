@@ -30,7 +30,7 @@ class PayWithTokenViewModel(
     val paymentRequest: PaymentRequest,
     private val paymentType: TokenPaymentType,
     private val chargeType: TokenPaymentChargeType,
-    private val apiClient: PaytrailApiClient
+    private val apiClient: PaytrailApiClient,
 ) : ViewModel() {
 
     private val api by lazy { apiClient.createService(TokenPaymentsApi::class.java) }
@@ -40,18 +40,20 @@ class PayWithTokenViewModel(
             emit(RequestStatus.success(token))
         } else if (tokenizationId != null) {
             emit(RequestStatus.loading())
-            try {
-                val response = api.requestTokenForTokenizationId(tokenizationId)
-                if (response.isSuccessful) {
-                    val tokenizationRequestResponse = requireNotNull(response.body())
-                    emit(RequestStatus.success(tokenizationRequestResponse.token))
-                } else {
-                    val errorResponse = createErrorResponse(response)
-                    emit(RequestStatus.error(errorResponse))
-                }
-            } catch (e: Exception) {
-                emit(RequestStatus.error(exception = e))
-            }
+            emit(
+                try {
+                    val response = api.requestTokenForTokenizationId(tokenizationId)
+                    if (response.isSuccessful) {
+                        val tokenizationRequestResponse = requireNotNull(response.body())
+                        RequestStatus.success(tokenizationRequestResponse.token)
+                    } else {
+                        val errorResponse = createErrorResponse(response)
+                        RequestStatus.error(errorResponse)
+                    }
+                } catch (e: Exception) {
+                    RequestStatus.error(exception = e)
+                },
+            )
         } else {
             throw IllegalArgumentException("Either token or tokenizationId must be provided")
         }
@@ -64,18 +66,26 @@ class PayWithTokenViewModel(
                 val tokenPaymentRequest = paymentRequest.asTokenizedPaymentRequest(paymentToken)
                 val response = callTokenPaymentApi(tokenPaymentRequest)
                 try {
-                    if (response.isSuccessful) {
-                        RequestStatus.success(requireNotNull(response.body()))
-                    } else if (response.code() == 403) {
-                        // 403 indicates a redirect to 3DS verification. It is not an error
-                        // for token payment APIs, app just needs to be showing the 3DS flow
-                        // in a webview.
-                        val string = response.errorBody()?.string()
-                        val value = TokenPaymentResponse.deserialize(string ?: "")
-                        RequestStatus.success(value)
-                    } else {
-                        val errorResponse = createErrorResponse(response)
-                        RequestStatus.error(errorResponse)
+                    when {
+                        response.isSuccessful -> {
+                            RequestStatus.success(requireNotNull(response.body()))
+                        }
+
+                        response.code() == 403 -> {
+                            // 403 indicates a redirect to 3DSecure verification. It is not an error
+                            // for token payment APIs. Instead app needs to show the 3DSecure flow
+                            // in a webview. It is passed through as a success, with
+                            RequestStatus.success(
+                                TokenPaymentResponse.deserialize(
+                                    response.errorBody()?.string() ?: "",
+                                ),
+                            )
+                        }
+
+                        else -> {
+                            val errorResponse = createErrorResponse(response)
+                            RequestStatus.error(errorResponse)
+                        }
                     }
                 } catch (e: Exception) {
                     RequestStatus.error(exception = e)
@@ -110,27 +120,38 @@ class PayWithTokenViewModel(
             }
         }.shared()
 
+    private val apiException: Flow<Exception?> =
+        paymentResponse.flatMapLatest {
+            flow {
+                if (it.isError && it.exception != null) {
+                    emit(it.exception)
+                }
+            }
+        }.shared()
+
     private val finalRedirect = MutableStateFlow<PaytrailPaymentRedirect?>(null)
-    private val apiException = MutableStateFlow<Exception?>(null)
+    private val webviewException = MutableStateFlow<Exception?>(null)
+
+    private val paymentException = combine(apiException, webviewException) { a, b -> a ?: b }
 
     val paymentState: Flow<PaytrailPaymentState> = combine(
         flow = finalRedirect.onStart { emit(null) },
         flow2 = apiErrorResponse.onStart { emit(null) },
-        flow3 = apiException.onStart { emit(null) },
+        flow3 = paymentException.onStart { emit(null) },
         flow4 = tokenPaymentResponse.onStart { emit(null) },
         transform = {
                 redirect: PaytrailPaymentRedirect?,
                 errorResponse: PaytrailApiErrorResponse?,
-                error: Exception?,
+                exception: Exception?,
                 response: TokenPaymentResponse?,
             ->
             when {
 
-                errorResponse != null || error != null || redirect?.status == PaytrailPaymentRedirect.Status.Fail -> PaytrailPaymentState(
+                errorResponse != null || exception != null || redirect?.status == PaytrailPaymentRedirect.Status.Fail -> PaytrailPaymentState(
                     state = PaytrailPaymentState.State.PAYMENT_FAIL,
                     finalRedirectRequest = redirect,
                     apiErrorResponse = errorResponse,
-                    exception = error,
+                    exception = exception,
                 )
 
                 redirect?.status == PaytrailPaymentRedirect.Status.Ok -> PaytrailPaymentState(
@@ -146,7 +167,7 @@ class PayWithTokenViewModel(
                 else -> PaytrailPaymentState(PaytrailPaymentState.State.PAYMENT_IN_PROGRESS)
             }
         },
-    )
+    ).shared()
 
     private suspend fun callTokenPaymentApi(
         tokenPaymentRequest: TokenPaymentRequest,
@@ -176,8 +197,8 @@ class PayWithTokenViewModel(
         finalRedirect.value = PaytrailPaymentRedirect(uri)
     }
 
-    fun errorReceived(exception: Exception) {
-        apiException.value = exception
+    fun webviewErrorReceived(exception: Exception) {
+        webviewException.value = exception
     }
 
     private fun <T> Flow<T>.shared(): Flow<T> = shareIn(

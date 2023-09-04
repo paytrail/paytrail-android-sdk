@@ -1,13 +1,11 @@
 package fi.paytrail.paymentsdk
 
-import android.util.Log
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertAny
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.filter
 import androidx.compose.ui.test.filterToOne
 import androidx.compose.ui.test.hasAnyChild
-import androidx.compose.ui.test.hasAnyDescendant
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.hasText
@@ -83,9 +81,7 @@ fun ComposeContentTestRule.assertGroupProviderOrdering(
         expectedProviders.forEachIndexed { index, expectedProvider ->
             val node = providerNodes[index]
             node.onChildren().assertAny(hasContentDescription(expectedProvider))
-
         }
-
     } catch (t: Throwable) {
         onRoot(useUnmergedTree = true).printToLog("PaymentTest")
         throw t

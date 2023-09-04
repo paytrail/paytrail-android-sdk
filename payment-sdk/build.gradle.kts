@@ -96,5 +96,4 @@ dependencies {
     androidTestImplementation(libs.kluent.android)
 
     coreLibraryDesugaring(libs.desugar.jdk.libs)
-
 }

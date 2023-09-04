@@ -1,10 +1,8 @@
 package fi.paytrail.paymentsdk
 
-import android.util.Log
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import org.amshove.kluent.shouldBe
 import org.amshove.kluent.shouldBeEqualTo
-import org.amshove.kluent.shouldContain
 import org.junit.Test
 
 class PaytrailLaunchPaymentMethodTest : BasePaytrailUiTest() {

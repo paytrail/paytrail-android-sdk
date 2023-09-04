@@ -56,7 +56,7 @@ internal fun PaytrailPayment(
         onPaymentStateChanged(paymentStatus)
     }
 
-    // TODO: Set up & apply custom theming to relevant components
+    // TODO: Set up & apply custom theming to relevapnt components
 
     Surface(modifier) {
         when (paymentStatus.state) {

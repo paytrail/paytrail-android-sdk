@@ -45,7 +45,6 @@ abstract class BasePaytrailUiTest {
     @Before
     fun foo() {
         apiResponses {
-
             apiResponses {
                 POST requestOf "/payments" serves "payments-response-default"
 
