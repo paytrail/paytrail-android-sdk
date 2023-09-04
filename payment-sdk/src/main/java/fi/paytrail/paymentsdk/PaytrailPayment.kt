@@ -2,18 +2,22 @@ package fi.paytrail.paymentsdk
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTag
+import androidx.compose.ui.text.TextStyle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_PROVIDERS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS
+import fi.paytrail.paymentsdk.typography.poppinsFontFamily
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
@@ -22,7 +26,7 @@ import fi.paytrail.sdk.apiclient.models.PaymentRequest
 fun PaytrailPayment(
     modifier: Modifier = Modifier,
     paymentRequest: PaymentRequest,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit, // TODO: Replace with functional interface! for java compatibility
+    onPaymentStateChanged: (PaytrailPaymentState) -> Unit, // TODO: Replace with functional interface for java compatibility
     merchantAccount: MerchantAccount,
     apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
 ) {
@@ -30,12 +34,17 @@ fun PaytrailPayment(
         factory = PaymentViewModelFactory(paymentRequest, apiClient),
     )
 
-    PaytrailPayment(
-        modifier = modifier,
-        viewModel = viewModel,
-        onPaymentStateChanged = onPaymentStateChanged,
-        merchantAccount = merchantAccount,
-    )
+    // TODO: get the font family from current theme?
+    CompositionLocalProvider(LocalTextStyle provides TextStyle(fontFamily = poppinsFontFamily)) {
+
+        PaytrailPayment(
+            modifier = modifier,
+            viewModel = viewModel,
+            onPaymentStateChanged = onPaymentStateChanged,
+            merchantAccount = merchantAccount,
+        )
+
+    }
 }
 
 @Composable

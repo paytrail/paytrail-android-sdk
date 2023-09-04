@@ -338,7 +338,6 @@ private fun ShoppingCartItem(
                             text = "+",
                         )
                     }
-
                 }
             }
         }
@@ -376,7 +375,7 @@ fun PreviewShoppingCartItem() {
 
 @Composable
 @Preview(showBackground = true, backgroundColor = 0xff0000, widthDp = 330, heightDp = 128)
-fun PreviewShoppingCartItemLongName() {
+fun PreviewShoppingCartItem_LongName() {
     ShoppingCartItem(
         modifier = Modifier.padding(16.dp),
         item = ShoppingCartRow(
