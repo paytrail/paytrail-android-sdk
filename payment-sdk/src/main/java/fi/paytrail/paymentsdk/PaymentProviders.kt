@@ -71,8 +71,8 @@ private fun PaymentProviderListing(
         modifier = modifier
             .semantics { testTag = "PaymentProvidersListing" }
             .fillMaxWidth()
-            .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 32.dp)
-            .verticalScroll(rememberScrollState()),
+            .verticalScroll(rememberScrollState())
+            .padding(start = 8.dp, end = 8.dp, top = 16.dp, bottom = 32.dp),
     ) {
         if (terms != null) {
             PaytrailTerms(terms)
