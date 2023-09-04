@@ -2,10 +2,9 @@ package fi.paytrail.demo.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
+val Grey01 = Color(0xFF23232A)
+val Grey02 = Color(0xFF59595C)
+val PinkElement = Color(0xFFE60094)
+val PinkText = Color(0xFFAA0066)
 
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+val LightGrey = Color(0xFFF7F7F8)

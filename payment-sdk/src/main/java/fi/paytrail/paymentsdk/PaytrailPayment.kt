@@ -17,7 +17,7 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_PROVIDERS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS
-import fi.paytrail.paymentsdk.typography.poppinsFontFamily
+import fi.paytrail.paymentsdk.typography.Poppins
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
@@ -35,7 +35,7 @@ fun PaytrailPayment(
     )
 
     // TODO: get the font family from current theme?
-    CompositionLocalProvider(LocalTextStyle provides TextStyle(fontFamily = poppinsFontFamily)) {
+    CompositionLocalProvider(LocalTextStyle provides TextStyle(fontFamily = Poppins)) {
 
         PaytrailPayment(
             modifier = modifier,

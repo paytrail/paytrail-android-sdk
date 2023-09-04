@@ -15,20 +15,22 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DividerDefaults
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,12 +38,16 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight.Companion.W700
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import fi.paytrail.demo.R
+import fi.paytrail.demo.ui.theme.Grey02
 import java.math.BigDecimal
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -57,7 +63,7 @@ private val currencyFormatter = java.text.DecimalFormat(
 // TODO: Styling
 
 @Composable
-fun ShoppingCart(
+fun ShoppingCartScreen(
     modifier: Modifier = Modifier,
     viewModel: ShoppingCartViewModel,
     payAction: () -> Unit,
@@ -69,10 +75,9 @@ fun ShoppingCart(
     val total = viewModel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
     val rowCount = viewModel.rowCount.collectAsState(initial = 0).value
 
-    ShoppingCart(
+    ShoppingCartScreen(
         modifier = modifier,
         items = items,
-        rowCount = rowCount,
         total = total,
         payAction = payAction,
         payAndAddCardAction = payAndAddCardAction,
@@ -82,10 +87,9 @@ fun ShoppingCart(
 }
 
 @Composable
-private fun ShoppingCart(
+private fun ShoppingCartScreen(
     modifier: Modifier,
     items: List<ShoppingCartRow>,
-    rowCount: Int,
     total: BigDecimal,
     payAction: () -> Unit = {},
     payAndAddCardAction: () -> Unit = {},
@@ -95,8 +99,6 @@ private fun ShoppingCart(
     Column(
         modifier = modifier.fillMaxWidth(),
     ) {
-        ShoppingCartTopBar(rowCount)
-
         ShoppingCartListing(
             modifier = Modifier
                 .fillMaxWidth()
@@ -116,26 +118,6 @@ private fun ShoppingCart(
 }
 
 @Composable
-private fun ShoppingCartTopBar(rowCount: Int) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(min = 64.dp)
-            .height(intrinsicSize = IntrinsicSize.Min),
-        horizontalAlignment = Alignment.CenterHorizontally,
-    ) {
-        Text(
-            modifier = Modifier.weight(1f),
-            text = stringResource(R.string.shopping_cart_title),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleLarge,
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Divider()
-    }
-}
-
-@Composable
 private fun ShoppingCartListing(
     modifier: Modifier,
     items: List<ShoppingCartRow>,
@@ -151,27 +133,46 @@ private fun ShoppingCartListing(
         ),
     ) {
         item {
-            Text(stringResource(id = R.string.shopping_cart_title))
+            Text(
+                text = stringResource(id = R.string.shopping_cart_title),
+                style = MaterialTheme.typography.titleLarge,
+            )
         }
 
-        itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
+        items(items, key = { item -> item.id }) { item ->
             ShoppingCartItem(
-                modifier = Modifier.padding(vertical = 8.dp),
+                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
                 item = item,
             )
         }
 
         item {
-            Column {
-                Spacer(modifier = Modifier.height(16.dp))
-                Divider()
-                Spacer(modifier = Modifier.height(16.dp))
-                Row {
-                    Text(stringResource(R.string.shopping_cart_total))
-                    Spacer(modifier = Modifier.weight(1f))
-                    Text("${currencyFormatter.format(total)} €")
-                }
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Divider(
+                    modifier = Modifier.padding(vertical = 16.dp),
+                    color = Grey02,
+                )
+                ShoppingCartTotalPrice(
+                    modifier = Modifier.fillMaxWidth(),
+                    totalPrice = total,
+                )
             }
+        }
+    }
+}
+
+@Composable
+private fun ShoppingCartTotalPrice(modifier: Modifier, totalPrice: BigDecimal) {
+    CompositionLocalProvider(
+        LocalTextStyle provides TextStyle(
+            fontSize = 20.sp,
+            fontWeight = W700,
+        ),
+    ) {
+        Row(modifier = modifier) {
+            Text(stringResource(R.string.shopping_cart_total))
+            Spacer(modifier = Modifier.weight(1f))
+            Text("${currencyFormatter.format(totalPrice)} €")
         }
     }
 }
@@ -275,6 +276,7 @@ private fun ShoppingCartItem(
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Image(
+                modifier = Modifier.size(64.dp),
                 painter = painterResource(id = R.drawable.image_placeholder),
                 contentDescription = null,
             )
@@ -289,6 +291,7 @@ private fun ShoppingCartItem(
 
                 Text(
                     modifier = Modifier,
+                    fontWeight = W700,
                     text = "${currencyFormatter.format(item.totalPrice)} €",
                 )
 

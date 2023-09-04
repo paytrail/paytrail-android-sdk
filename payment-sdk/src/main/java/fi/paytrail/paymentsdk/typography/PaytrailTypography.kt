@@ -7,7 +7,7 @@ import androidx.compose.ui.text.font.FontWeight
 import fi.paytrail.paymentsdk.R
 
 // TODO: Remove unused fonts from definition here & corresponding files from res
-val poppinsFontFamily = FontFamily(
+val Poppins = FontFamily(
     listOf(
 
         Font(R.font.poppins_extralight, FontWeight.ExtraLight),

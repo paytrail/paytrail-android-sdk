@@ -27,11 +27,11 @@ import dagger.hilt.android.AndroidEntryPoint
 import fi.paytrail.demo.payments.PaymentDetails
 import fi.paytrail.demo.payments.PaymentListing
 import fi.paytrail.demo.payments.PaymentRepository
-import fi.paytrail.demo.shoppingcart.ShoppingCart
+import fi.paytrail.demo.shoppingcart.ShoppingCartScreen
 import fi.paytrail.demo.shoppingcart.ShoppingCartRepository
 import fi.paytrail.demo.tokenization.TokenizedCardsRepository
 import fi.paytrail.demo.tokenization.TokenizedCreditCards
-import fi.paytrail.demo.ui.theme.PaytrailSDKTheme
+import fi.paytrail.demo.ui.theme.PaytrailDemoTheme
 import fi.paytrail.paymentsdk.PayAndAddCard
 import fi.paytrail.paymentsdk.PaytrailPayment
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity() {
         var paymentState: Pair<UUID, PaytrailPaymentState>? by mutableStateOf(null)
 
         setContent {
-            PaytrailSDKTheme {
+            PaytrailDemoTheme(dynamicColor = false) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
@@ -154,7 +154,7 @@ class MainActivity : ComponentActivity() {
             startDestination = NAV_SHOPPING_CART,
         ) {
             composable(NAV_SHOPPING_CART) {
-                ShoppingCart(
+                ShoppingCartScreen(
                     modifier = Modifier.fillMaxSize(),
                     viewModel = hiltViewModel(),
                     payAction = { navController.navigate(NAV_CREATE_PAYMENT) },
