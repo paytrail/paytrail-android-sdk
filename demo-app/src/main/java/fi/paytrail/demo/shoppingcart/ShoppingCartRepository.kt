@@ -20,6 +20,7 @@ import javax.inject.Singleton
 
 // TODO: Extract to model package
 data class ShoppingCartRow(
+    val name: String,
     val id: UUID,
     val amount: Long,
     val price: BigDecimal,
@@ -41,21 +42,17 @@ data class ShoppingCart(
 val fakeCart = ShoppingCart(
     items = listOf(
         ShoppingCartRow(
-            id = UUID.fromString("6391f2df-0dae-4fa3-ba1d-037273b27a4b"),
-            amount = 1,
-            price = BigDecimal.valueOf(30),
-            vatPercentage = 24,
-        ),
-        ShoppingCartRow(
+            name = "Paytrail Umbrella",
             id = UUID.fromString("2e3f6d5a-c33b-46c9-9942-98bf02651e23"),
             amount = 1,
-            price = BigDecimal.valueOf(20),
+            price = BigDecimal.valueOf(15),
             vatPercentage = 24,
         ),
         ShoppingCartRow(
+            name = "Paytrail Drinking Bottle",
             id = UUID.fromString("c739864b-0307-4cba-9101-60990c449da0"),
             amount = 2,
-            price = BigDecimal.valueOf(40),
+            price = BigDecimal.valueOf(20),
             vatPercentage = 24,
         ),
     ).associateBy { it.id },

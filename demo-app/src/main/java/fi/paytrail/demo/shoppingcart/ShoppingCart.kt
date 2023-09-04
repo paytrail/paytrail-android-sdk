@@ -1,31 +1,45 @@
 package fi.paytrail.demo.shoppingcart
 
+import android.util.Log
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import fi.paytrail.demo.R
 import java.math.BigDecimal
@@ -88,10 +102,10 @@ private fun ShoppingCart(
                 .fillMaxWidth()
                 .weight(1f),
             items = items,
+            total = total,
         )
 
         ShoppingCartBottomBar(
-            total = total,
             items = items,
             payAction = payAction,
             payAndAddCardAction = payAndAddCardAction,
@@ -112,7 +126,7 @@ private fun ShoppingCartTopBar(rowCount: Int) {
     ) {
         Text(
             modifier = Modifier.weight(1f),
-            text = stringResource(R.string.shopping_cart_screen_title, rowCount),
+            text = stringResource(R.string.shopping_cart_title),
             textAlign = TextAlign.Center,
             style = MaterialTheme.typography.titleLarge,
         )
@@ -122,12 +136,39 @@ private fun ShoppingCartTopBar(rowCount: Int) {
 }
 
 @Composable
-private fun ShoppingCartListing(modifier: Modifier, items: List<ShoppingCartRow>) {
-    LazyColumn(modifier = modifier.fillMaxWidth()) {
+private fun ShoppingCartListing(
+    modifier: Modifier,
+    items: List<ShoppingCartRow>,
+    total: BigDecimal,
+) {
+    LazyColumn(
+        modifier = modifier.fillMaxWidth(),
+        contentPadding = PaddingValues(
+            top = 24.dp,
+            bottom = 32.dp,
+            start = 16.dp,
+            end = 16.dp,
+        ),
+    ) {
+        item {
+            Text(stringResource(id = R.string.shopping_cart_title))
+        }
+
         itemsIndexed(items, key = { _, item -> item.id }) { index, item ->
-            ShoppingCartItem(item)
-            if (index < items.lastIndex) {
-                Divider(modifier = Modifier.padding(vertical = 4.dp))
+            ShoppingCartItem(
+                modifier = Modifier.padding(vertical = 8.dp),
+                item = item,
+            )
+        }
+
+        item {
+            Row {
+                Spacer(modifier = Modifier.height(16.dp))
+                Divider()
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(stringResource(R.string.shopping_cart_total))
+                Spacer(modifier = Modifier.weight(1f))
+                Text("${currencyFormatter.format(total)} €")
             }
         }
     }
@@ -135,7 +176,6 @@ private fun ShoppingCartListing(modifier: Modifier, items: List<ShoppingCartRow>
 
 @Composable
 private fun ShoppingCartBottomBar(
-    total: BigDecimal,
     items: List<ShoppingCartRow>,
     payAction: () -> Unit,
     cardsAction: () -> Unit,
@@ -148,7 +188,6 @@ private fun ShoppingCartBottomBar(
     ) {
         Divider()
         Spacer(modifier = Modifier.height(4.dp))
-        Text("Total: ${currencyFormatter.format(total)} €")
         Row {
             PayButton(enabled = items.isNotEmpty(), onClick = payAction)
             Spacer(modifier = Modifier.width(8.dp))
@@ -218,11 +257,19 @@ private fun PayAndAddCardButton(
 }
 
 @Composable
-private fun ShoppingCartItem(item: ShoppingCartRow) {
+private fun ShoppingCartItem(
+    modifier: Modifier = Modifier,
+    item: ShoppingCartRow,
+) {
     Column(
-        modifier = Modifier
+        modifier = modifier
+            .shadow(
+                elevation = 4.dp,
+                shape = RoundedCornerShape(7.dp),
+            )
+            .background(color = Color.White)
             .fillMaxWidth()
-            .padding(horizontal = 8.dp),
+            .padding(16.dp),
     ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Image(
@@ -230,37 +277,113 @@ private fun ShoppingCartItem(item: ShoppingCartRow) {
                 contentDescription = null,
             )
             Spacer(modifier = Modifier.width(8.dp))
-            Text(
-                modifier = Modifier.weight(1.0f),
-                text = item.id.toString(),
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Column {
+            Column(modifier = Modifier.weight(1.0f)) {
                 Text(
-                    modifier = Modifier.align(Alignment.End),
-                    text = "${item.amount} kpl",
+                    modifier = Modifier,
+                    text = item.name,
+                    maxLines = 2,
+                    overflow = TextOverflow.Ellipsis,
                 )
+
                 Text(
-                    modifier = Modifier.align(Alignment.End),
+                    modifier = Modifier,
                     text = "${currencyFormatter.format(item.totalPrice)} €",
                 )
+
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .widthIn(min = 138.dp)
+                        .width(IntrinsicSize.Min)
+                        .height(IntrinsicSize.Min)
+                        .border(
+                            border = BorderStroke(1.dp, Color.Gray),
+                            shape = RoundedCornerShape(3.dp),
+                        ),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    // TODO: Adjust amounts on click
+                    Box(
+                        modifier = Modifier
+                            .sizeIn(minWidth = 38.dp, minHeight = 38.dp)
+                            .clickable { Log.i("ShoppingCart", "TODO: Decrement amount") },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        // TODO: replace text with icon
+                        Text(
+                            modifier = Modifier,
+                            text = "-",
+                        )
+                    }
+
+                    HorizontalDivider()
+
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = "${item.amount}",
+                        textAlign = TextAlign.Center,
+                    )
+                    HorizontalDivider()
+
+                    // TODO: Adjust amounts on click
+                    Box(
+                        modifier = Modifier
+                            .sizeIn(minWidth = 38.dp, minHeight = 38.dp)
+                            .clickable { Log.i("ShoppingCart", "TODO: Decrement amount") },
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        // TODO: replace text with icon
+                        Text(
+                            modifier = Modifier,
+                            text = "+",
+                        )
+                    }
+
+                }
             }
         }
     }
 }
 
-// TODO: More previews
+@Composable
+private fun HorizontalDivider(
+    thickness: Dp = DividerDefaults.Thickness,
+    color: Color = DividerDefaults.color,
+) {
+    Divider(
+        modifier = Modifier
+            .fillMaxHeight()
+            .width(1.dp),
+        thickness = thickness,
+        color = color,
+    )
+}
 
 @Composable
-@Preview(showBackground = true, backgroundColor = 0xFFFFFF)
+@Preview(showBackground = true, backgroundColor = 0xff0000, widthDp = 330, heightDp = 128)
 fun PreviewShoppingCartItem() {
     ShoppingCartItem(
-        ShoppingCartRow(
+        modifier = Modifier.padding(16.dp),
+        item = ShoppingCartRow(
+            name = "Preview Item",
             id = UUID.fromString("6427e0c2-382d-4f03-99e5-413fff4d0afb"),
             amount = 2,
             price = BigDecimal("2.99"),
+            vatPercentage = 24,
+        ),
+    )
+}
+
+@Composable
+@Preview(showBackground = true, backgroundColor = 0xff0000, widthDp = 330, heightDp = 128)
+fun PreviewShoppingCartItemLongName() {
+    ShoppingCartItem(
+        modifier = Modifier.padding(16.dp),
+        item = ShoppingCartRow(
+            name = "Preview Item with a reasonably long name",
+            id = UUID.fromString("6427e0c2-382d-4f03-99e5-413fff4d0afb"),
+            amount = 2,
+            price = BigDecimal("2345.67"),
             vatPercentage = 24,
         ),
     )
