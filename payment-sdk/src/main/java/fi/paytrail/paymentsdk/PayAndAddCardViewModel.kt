@@ -46,7 +46,11 @@ class PayAndAddCardViewModel(
         } catch (e: Exception) {
             emit(RequestStatus.error(exception = e))
         }
-    }
+    }.shareIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        replay = 1,
+    )
 
     private val payAndAddCardResponse: Flow<PayAndAddCardResponse?> = payAndAddCardRequestStatus
         .flatMapLatest {
