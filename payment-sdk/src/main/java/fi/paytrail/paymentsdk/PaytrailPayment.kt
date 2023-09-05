@@ -31,6 +31,8 @@ fun PaytrailPayment(
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit, // TODO: Replace with functional interface for java compatibility
     merchantAccount: MerchantAccount,
     apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
+    header: @Composable () -> Unit = {},
+    footer: @Composable () -> Unit = {},
 ) {
     val viewModel: PaymentViewModel = viewModel(
         factory = PaymentViewModelFactory(paymentRequest, apiClient),
@@ -44,6 +46,8 @@ fun PaytrailPayment(
             viewModel = viewModel,
             onPaymentStateChanged = onPaymentStateChanged,
             merchantAccount = merchantAccount,
+            header = header,
+            footer = footer,
         )
     }
 }
@@ -54,6 +58,8 @@ internal fun PaytrailPayment(
     viewModel: PaymentViewModel,
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
     merchantAccount: MerchantAccount,
+    header: @Composable () -> Unit = {},
+    footer: @Composable () -> Unit = {},
 ) {
     val paymentStatus =
         viewModel.paymentState.observeAsState(
@@ -70,14 +76,18 @@ internal fun PaytrailPayment(
 
     Box(modifier = modifier) {
         when (paymentStatus.state) {
-            LOADING_PAYMENT_PROVIDERS -> LoadingIndicator(
-                modifier = Modifier.fillMaxSize()
-                    .semantics { testTag = "PaymentProvidersLoadingIndicator" },
-            )
+            LOADING_PAYMENT_PROVIDERS -> {
+                LoadingIndicator(
+                    modifier = Modifier.fillMaxSize()
+                        .semantics { testTag = "PaymentProvidersLoadingIndicator" },
+                )
+            }
 
             SHOW_PAYMENT_PROVIDERS -> PaymentProviders(
                 modifier = Modifier.fillMaxSize(),
                 viewModel = viewModel,
+                header = header,
+                footer = footer,
             )
 
             PAYMENT_IN_PROGRESS -> PayWithPaymentMethod(

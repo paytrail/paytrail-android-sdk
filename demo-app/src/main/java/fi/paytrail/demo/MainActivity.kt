@@ -4,18 +4,32 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Divider
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -29,6 +43,8 @@ import fi.paytrail.demo.payments.PaymentListing
 import fi.paytrail.demo.payments.PaymentRepository
 import fi.paytrail.demo.shoppingcart.ShoppingCartRepository
 import fi.paytrail.demo.shoppingcart.ShoppingCartScreen
+import fi.paytrail.demo.shoppingcart.ShoppingCartViewModel
+import fi.paytrail.demo.shoppingcart.currencyFormatter
 import fi.paytrail.demo.tokenization.TokenizedCardsRepository
 import fi.paytrail.demo.tokenization.TokenizedCreditCards
 import fi.paytrail.demo.ui.theme.PaytrailDemoTheme
@@ -46,7 +62,9 @@ import fi.paytrail.paymentsdk.tokenization.TokenPaymentType
 import fi.paytrail.paymentsdk.tokenization.model.AddCardRequest
 import fi.paytrail.paymentsdk.tokenization.model.AddCardResult
 import fi.paytrail.sdk.apiclient.models.Callbacks
+import fi.paytrail.sdk.apiclient.models.PaymentRequest
 import kotlinx.coroutines.launch
+import java.math.BigDecimal
 import java.util.UUID
 import javax.inject.Inject
 
@@ -252,11 +270,10 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(paymentId, paymentRequest) {
                     paymentRepository.store(paymentId, paymentRequest)
                 }
-                PaytrailPayment(
+                PaymentScreen(
                     modifier = Modifier.fillMaxSize(),
                     paymentRequest = paymentRequest,
                     onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
-                    merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
                 )
             }
 
@@ -294,6 +311,70 @@ class MainActivity : ComponentActivity() {
             ) {
                 PaymentDetails(modifier = Modifier.fillMaxSize(), viewModel = hiltViewModel())
             }
+        }
+    }
+
+    @Composable
+    private fun PaymentScreen(
+        modifier: Modifier,
+        paymentRequest: PaymentRequest,
+        onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    ) {
+        PaytrailPayment(
+            modifier = Modifier,
+            paymentRequest = paymentRequest,
+            onPaymentStateChanged = onPaymentStateChanged,
+            merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
+            header = {
+                PaymentSummaryHeader(hiltViewModel())
+            },
+        )
+    }
+
+    @Composable
+    private fun PaymentSummaryHeader(viewmodel: ShoppingCartViewModel) {
+        val totalCartPrice = viewmodel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
+        val items = viewmodel.items.collectAsState(initial = emptyList()).value
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxWidth()
+                .padding(24.dp),
+        ) {
+            Text(
+                text = "Cart summary",
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            Spacer(modifier = Modifier.height(26.dp))
+
+            items.forEach {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "${it.amount} x ${it.name}",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text("${currencyFormatter.format(it.totalPrice)} €")
+                }
+            }
+
+            Divider(modifier = Modifier.padding(vertical = 16.dp))
+
+            CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.titleMedium) {
+                Row(modifier = Modifier.fillMaxWidth()) {
+                    Text(
+                        text = "Total price",
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text("${currencyFormatter.format(totalCartPrice)} €")
+                }
+            }
+
+            Divider(modifier = Modifier.padding(vertical = 16.dp))
         }
     }
 }

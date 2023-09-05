@@ -23,10 +23,10 @@ data class ShoppingCartRow(
     val name: String,
     val id: UUID,
     val amount: Long,
-    val price: BigDecimal,
+    val unitPrice: BigDecimal,
     val vatPercentage: Long,
 ) {
-    val totalPrice by lazy { amount * price }
+    val totalPrice by lazy { amount * unitPrice }
 }
 
 // TODO: Extract to model package
@@ -45,14 +45,14 @@ val fakeCart = ShoppingCart(
             name = "Paytrail Umbrella",
             id = UUID.fromString("2e3f6d5a-c33b-46c9-9942-98bf02651e23"),
             amount = 1,
-            price = BigDecimal.valueOf(15),
+            unitPrice = BigDecimal.valueOf(15),
             vatPercentage = 24,
         ),
         ShoppingCartRow(
             name = "Paytrail Drinking Bottle",
             id = UUID.fromString("c739864b-0307-4cba-9101-60990c449da0"),
             amount = 2,
-            price = BigDecimal.valueOf(20),
+            unitPrice = BigDecimal.valueOf(20),
             vatPercentage = 24,
         ),
     ).associateBy { it.id },
@@ -95,7 +95,7 @@ class ShoppingCartRepository @Inject constructor() {
             customer = Customer(email = "erkki.esimerkki@example.com"),
             items = cart.items.values.map {
                 Item(
-                    unitPrice = (it.price * 100).toLong(),
+                    unitPrice = (it.unitPrice * 100).toLong(),
                     units = it.amount,
                     vatPercentage = it.vatPercentage,
                     productCode = it.id.toString(),

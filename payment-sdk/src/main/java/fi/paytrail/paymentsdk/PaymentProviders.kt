@@ -73,19 +73,29 @@ val PaytrailTextTermsAndConditions = TextStyle(
 fun PaymentProviders(
     modifier: Modifier = Modifier,
     viewModel: PaymentViewModel,
+    header: @Composable () -> Unit = {},
+    footer: @Composable () -> Unit = {},
 ) {
     val providers = viewModel.paymentMethodGroups.observeAsState(emptyList()).value
     val terms = viewModel.paymentTerms.observeAsState("").value
 
-    if (providers.isNotEmpty()) {
-        PaymentProviderListing(
-            modifier = modifier,
-            terms = terms,
-            groups = providers,
-            onPaymentMethodSelected = viewModel::startPayment,
-        )
-    } else {
-        NoPaymentProvidersAvailable(modifier)
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState()),
+    ) {
+        header()
+        if (providers.isNotEmpty()) {
+            PaymentProviderListing(
+                modifier = Modifier,
+                terms = terms,
+                groups = providers,
+                onPaymentMethodSelected = viewModel::startPayment,
+            )
+        } else {
+            NoPaymentProvidersAvailable(modifier)
+        }
+        footer()
     }
 }
 
@@ -100,7 +110,6 @@ private fun PaymentProviderListing(
         modifier = modifier
             .semantics { testTag = "PaymentProvidersListing" }
             .fillMaxWidth()
-            .verticalScroll(rememberScrollState())
             .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 32.dp),
     ) {
         Text(
@@ -160,7 +169,9 @@ fun PaytrailTerms(terms: String) {
     // TODO: Consider adding a composition-local LocalUriHandler to open
     //       the terms in a WebView instead of platform default browser.
     HtmlText(
-        modifier = Modifier.fillMaxWidth().padding(top = 8.dp, bottom = 16.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 8.dp, bottom = 16.dp),
         text = terms,
         style = PaytrailTextTermsAndConditions,
     )
@@ -184,7 +195,8 @@ private fun PaymentProvider(
     onClick: () -> Unit = {},
 ) {
     Surface(
-        modifier = modifier.size(width = 100.dp, height = 64.dp)
+        modifier = modifier
+            .size(width = 100.dp, height = 64.dp)
             .background(color = Color.White)
             .semantics {
                 testTag = "PaymentProvider"

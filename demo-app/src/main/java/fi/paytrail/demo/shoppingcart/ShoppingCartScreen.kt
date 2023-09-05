@@ -55,7 +55,7 @@ import java.text.DecimalFormatSymbols
 import java.util.Locale
 import java.util.UUID
 
-private val currencyFormatter = java.text.DecimalFormat(
+val currencyFormatter = java.text.DecimalFormat(
     "0.00",
     DecimalFormatSymbols(Locale("fi", "FI")),
 )
@@ -375,7 +375,7 @@ fun PreviewShoppingCartItem() {
             name = "Preview Item",
             id = UUID.fromString("6427e0c2-382d-4f03-99e5-413fff4d0afb"),
             amount = 2,
-            price = BigDecimal("2.99"),
+            unitPrice = BigDecimal("2.99"),
             vatPercentage = 24,
         ),
     )
@@ -390,7 +390,7 @@ fun PreviewShoppingCartItem_LongName() {
             name = "Preview Item with a reasonably long name",
             id = UUID.fromString("6427e0c2-382d-4f03-99e5-413fff4d0afb"),
             amount = 2,
-            price = BigDecimal("2345.67"),
+            unitPrice = BigDecimal("2345.67"),
             vatPercentage = 24,
         ),
     )
