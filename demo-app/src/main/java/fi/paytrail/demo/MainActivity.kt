@@ -27,8 +27,8 @@ import dagger.hilt.android.AndroidEntryPoint
 import fi.paytrail.demo.payments.PaymentDetails
 import fi.paytrail.demo.payments.PaymentListing
 import fi.paytrail.demo.payments.PaymentRepository
-import fi.paytrail.demo.shoppingcart.ShoppingCartScreen
 import fi.paytrail.demo.shoppingcart.ShoppingCartRepository
+import fi.paytrail.demo.shoppingcart.ShoppingCartScreen
 import fi.paytrail.demo.tokenization.TokenizedCardsRepository
 import fi.paytrail.demo.tokenization.TokenizedCreditCards
 import fi.paytrail.demo.ui.theme.PaytrailDemoTheme

@@ -61,22 +61,22 @@ val fakeCart = ShoppingCart(
 @Singleton
 class ShoppingCartRepository @Inject constructor() {
 
-    private val sf = MutableStateFlow(fakeCart)
+    private val shoppingCartState = MutableStateFlow(fakeCart)
 
     fun cart(): Flow<ShoppingCart> {
-        return sf
+        return shoppingCartState
     }
 
     fun addItem(item: ShoppingCartRow) {
-        sf.update { it.copy(items = it.items + (item.id to item)) }
+        shoppingCartState.update { it.copy(items = it.items + (item.id to item)) }
     }
 
     fun removeItem(id: UUID) {
-        sf.update { it.copy(items = it.items - id) }
+        shoppingCartState.update { it.copy(items = it.items - id) }
     }
 
     fun clear() {
-        sf.value = ShoppingCart(items = emptyMap())
+        shoppingCartState.value = ShoppingCart(items = emptyMap())
     }
 
     /**
@@ -84,7 +84,7 @@ class ShoppingCartRepository @Inject constructor() {
      * Each call creates [PaymentRequest] with new reference & stamps.
      */
     fun cartAsPaymentRequest(): PaymentRequest {
-        val cart = sf.value
+        val cart = shoppingCartState.value
 
         return PaymentRequest(
             stamp = "PO-stamp-${UUID.randomUUID()}",

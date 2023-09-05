@@ -75,7 +75,6 @@ fun ShoppingCartScreen(
 ) {
     val items = viewModel.items.collectAsState(initial = emptyList()).value
     val total = viewModel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
-    val rowCount = viewModel.rowCount.collectAsState(initial = 0).value
 
     ShoppingCartScreen(
         modifier = modifier,
@@ -130,8 +129,8 @@ private fun ShoppingCartListing(
         contentPadding = PaddingValues(
             top = 24.dp,
             bottom = 32.dp,
-            start = 16.dp,
-            end = 16.dp,
+            start = 24.dp,
+            end = 24.dp,
         ),
     ) {
         item {
@@ -151,7 +150,7 @@ private fun ShoppingCartListing(
         item {
             Column(modifier = Modifier.fillMaxWidth()) {
                 Divider(
-                    modifier = Modifier.padding(vertical = 16.dp),
+                    modifier = Modifier.padding(top = 32.dp, bottom = 16.dp),
                     color = PaytrailColors.Grey02,
                 )
                 ShoppingCartTotalPrice(
@@ -189,7 +188,7 @@ private fun ShoppingCartBottomBar(
     showPaymentHistory: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier.background(Color.White).fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Divider()

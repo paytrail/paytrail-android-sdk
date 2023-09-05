@@ -131,7 +131,7 @@ fun PaymentProviderGroup(
         FlowRow(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(22.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp),
         ) {
             for (method in group.paymentMethods) {
                 PaymentProvider(
