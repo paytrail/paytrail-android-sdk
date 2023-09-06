@@ -72,6 +72,7 @@ interface PaymentsApi {
      * @return [GroupedPaymentProvidersResponse]
      */
     @GET("merchants/grouped-payment-providers")
+    @JvmSuppressWildcards
     suspend fun getGroupedPaymentProviders(
         @Query("amount") amount: Long? = null,
         @Query("groups") groups: List<Groups>? = null,

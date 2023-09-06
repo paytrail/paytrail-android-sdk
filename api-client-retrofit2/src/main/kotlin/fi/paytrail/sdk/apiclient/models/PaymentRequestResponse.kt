@@ -45,9 +45,9 @@ data class PaymentRequestResponse(
 
     /* Contains data about the payment method groups. Contains only the groups found in the response's providers. */
     @SerialName(value = "groups")
-    val groups: kotlin.collections.List<PaymentMethodGroupData>? = null,
+    val groups: kotlin.collections.List<PaymentMethodGroupData> = emptyList(),
 
     @SerialName(value = "providers")
-    val providers: kotlin.collections.List<PaymentMethodProvider>? = null,
+    val providers: kotlin.collections.List<PaymentMethodProvider> = emptyList(),
 
-)
+    )

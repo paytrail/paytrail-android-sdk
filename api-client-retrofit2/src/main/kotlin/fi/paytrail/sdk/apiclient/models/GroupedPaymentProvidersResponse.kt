@@ -38,6 +38,6 @@ data class GroupedPaymentProvidersResponse(
 
     /* A flat list of payment method providers */
     @SerialName(value = "providers")
-    val providers: kotlin.collections.List<PaymentMethodProvider>,
+    val providers: kotlin.collections.List<PaymentMethodProviderInfo>,
 
 )

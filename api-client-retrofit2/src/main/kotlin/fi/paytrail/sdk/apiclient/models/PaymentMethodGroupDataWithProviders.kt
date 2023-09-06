@@ -32,7 +32,7 @@ data class PaymentMethodGroupDataWithProviders(
 
     /* ID of the group */
     @SerialName(value = "id")
-    val id: PaymentMethodGroupDataWithProviders.Id,
+    val id: PaymentMethodGroupData.Id,
 
     /* Localized name of the group */
     @SerialName(value = "name")
@@ -47,17 +47,52 @@ data class PaymentMethodGroupDataWithProviders(
     val svg: kotlin.String,
 
     @SerialName(value = "providers")
-    val providers: kotlin.collections.List<PaymentMethodProvider>,
+    val providers: kotlin.collections.List<PaymentMethodProviderInfo>,
+
+)
+
+/**
+ * Payment provider information.
+ * Similar to [PaymentMethodProvider] in [PaymentRequestResponse.providers], but the responses from
+ * listing payment method providers do not contain the payment URL or form parameters.
+ *
+ * @param id ID of the provider
+ * @param name Display name of the payment method
+ * @param svg URL to payment method SVG icon (recommended to be used instead if PNG)
+ * @param icon URL to payment method PNG icon
+ * @param group
+ */
+@Serializable
+data class PaymentMethodProviderInfo(
+
+    /* ID of the provider */
+    @SerialName(value = "id")
+    val id: kotlin.String,
+
+    /* Display name of the payment method */
+    @SerialName(value = "name")
+    val name: kotlin.String,
+
+    /* URL to payment method SVG icon (recommended to be used instead of PNG) */
+    @SerialName(value = "svg")
+    val svg: kotlin.String,
+
+    /* URL to payment method PNG icon */
+    @SerialName(value = "icon")
+    val icon: kotlin.String,
+
+    @SerialName(value = "group")
+    val group: PaymentMethodProvider.Group,
 
 ) {
 
     /**
-     * ID of the group
+     *
      *
      * Values: Mobile,Bank,Creditcard,Credit
      */
     @Serializable
-    enum class Id(val value: kotlin.String) {
+    enum class Group(val value: kotlin.String) {
         @SerialName(value = "mobile")
         Mobile("mobile"),
 
