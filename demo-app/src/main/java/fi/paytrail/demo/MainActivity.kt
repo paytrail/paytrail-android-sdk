@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,10 +16,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -29,10 +33,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -113,8 +120,10 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background,
                 ) {
-                    val navController = rememberNavController()
                     Column(modifier = Modifier.fillMaxSize()) {
+                        val navController = rememberNavController()
+                        PaytrailDemoAppTopBar()
+
                         val currentState = paymentState?.second
                         AnimatedVisibility(visible = shouldShowStatus(currentState)) {
                             PaymentResultView(
@@ -161,6 +170,24 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3Api::class)
+    @Composable
+    private fun PaytrailDemoAppTopBar() {
+        TopAppBar(
+            modifier = Modifier.shadow(4.dp).zIndex(1f),
+            colors = TopAppBarDefaults.topAppBarColors(),
+            title = { /* no title content */ },
+            navigationIcon = {
+                Image(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    painter = painterResource(id = fi.paytrail.paymentsdk.R.drawable.paytrail_logo),
+                    contentDescription = null,
+                )
+            },
+        )
+
+    }
+
     private fun shouldShowStatus(paymentResult: PaytrailPaymentState?): Boolean =
         paymentResult?.state in setOf(PAYMENT_OK, PAYMENT_FAIL, PAYMENT_ERROR)
 
@@ -180,7 +207,9 @@ class MainActivity : ComponentActivity() {
         ) {
             composable(NAV_SHOPPING_CART) {
                 ShoppingCartScreen(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(LightGrey),
                     viewModel = hiltViewModel(),
                     payAction = { navController.navigate(NAV_CREATE_PAYMENT) },
                     payAndAddCardAction = { navController.navigate(NAV_PAY_AND_ADD_CARD) },
@@ -278,7 +307,6 @@ class MainActivity : ComponentActivity() {
                     paymentRepository.store(paymentId, paymentRequest)
                 }
                 PaymentScreen(
-                    modifier = Modifier.fillMaxSize(),
                     paymentRequest = paymentRequest,
                     paymentState = paymentState,
                     onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
@@ -324,7 +352,6 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     private fun PaymentScreen(
-        modifier: Modifier,
         paymentRequest: PaymentRequest,
         paymentState: PaytrailPaymentState?,
         onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
@@ -343,7 +370,12 @@ class MainActivity : ComponentActivity() {
                 ShoppingCartSummaryHeader(hiltViewModel())
             }
 
-            Column(modifier = Modifier.fillMaxWidth().background(color = LightGrey).padding(top = 16.dp)) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(color = LightGrey)
+                    .padding(top = 16.dp),
+            ) {
                 if (paymentState?.state == SHOW_PAYMENT_PROVIDERS) {
                     Text(
                         modifier = Modifier.padding(horizontal = 24.dp),
@@ -352,7 +384,9 @@ class MainActivity : ComponentActivity() {
                     )
                 }
                 PaytrailPayment(
-                    modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp),
                     paymentRequest = paymentRequest,
                     onPaymentStateChanged = onPaymentStateChanged,
                     merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
