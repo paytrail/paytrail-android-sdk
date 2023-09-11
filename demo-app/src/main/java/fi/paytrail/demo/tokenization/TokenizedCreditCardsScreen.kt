@@ -1,10 +1,9 @@
 package fi.paytrail.demo.tokenization
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,7 +11,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
@@ -26,6 +24,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.key
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,8 +44,8 @@ import kotlinx.coroutines.flow.Flow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TokenizedCreditCards(
-    modifier: Modifier,
+fun TokenizedCreditCardsScreen(
+    modifier: Modifier = Modifier,
     viewModel: TokenizedCreditCardsViewModel,
     payWithCardAction: (String, TokenPaymentType, TokenPaymentChargeType) -> Unit,
     addCardAction: () -> Unit,
@@ -71,7 +70,7 @@ fun TokenizedCreditCards(
                 .weight(1f),
         ) {
             if (cards.isNotEmpty()) {
-                CreditCardListing(
+                TokenizedCreditCardListing(
                     cards = cards,
                     onCardClick = { tokenizationId, _ ->
                         viewModel.showCardActions(
@@ -195,44 +194,33 @@ fun BottomSheetAction(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun CreditCardListing(
+fun TokenizedCreditCardListing(
+    modifier: Modifier = Modifier,
     cards: List<Pair<String, Flow<RequestStatus<TokenizedCreditCard>>>>,
     onCardClick: (String, TokenizationRequestResponse?) -> Unit = { _, _ -> },
 ) {
-    LazyColumn(
-        modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(
-            top = 16.dp,
-            bottom = 32.dp,
-            start = 16.dp,
-            end = 16.dp,
-        ),
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(
+                top = 16.dp,
+                bottom = 16.dp,
+                start = 16.dp,
+                end = 16.dp,
+            )
+            .height(intrinsicSize = IntrinsicSize.Min),
     ) {
-        item("card-header-prompt") {
-            Text(stringResource(R.string.manage_cards_prompt))
-            Spacer(modifier = Modifier.height(16.dp))
-        }
-
         cards.forEachIndexed { index, cardRequestFlow ->
             val (tokenizationId, requestStatusFlow) = cardRequestFlow
-            item(tokenizationId) {
+            key(tokenizationId) {
                 val requestStatus =
                     requestStatusFlow.collectAsState(initial = RequestStatus.loading()).value
                 Column {
                     val viewSizeModifier = Modifier
                         .fillMaxWidth()
                         .heightIn(min = 64.dp)
-                        .clickable(
-                            enabled = requestStatus.value?.response != null,
-                            onClick = {
-                                onCardClick(
-                                    tokenizationId,
-                                    requestStatus.value?.response,
-                                )
-                            },
-                        )
+                        .height(intrinsicSize = IntrinsicSize.Min)
 
                     when {
                         requestStatus.isLoading -> {
@@ -241,7 +229,15 @@ private fun CreditCardListing(
 
                         requestStatus.isSuccess -> {
                             CreditCard(
-                                modifier = viewSizeModifier,
+                                modifier = viewSizeModifier.clickable(
+                                    enabled = requestStatus.value?.response != null,
+                                    onClick = {
+                                        onCardClick(
+                                            tokenizationId,
+                                            requestStatus.value?.response,
+                                        )
+                                    },
+                                ),
                                 card = requireNotNull(requestStatus.value?.response?.card),
                             )
                         }

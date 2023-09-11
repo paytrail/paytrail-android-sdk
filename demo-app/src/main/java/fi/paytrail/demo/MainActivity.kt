@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Button
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.LocalTextStyle
@@ -32,6 +34,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
@@ -41,6 +44,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -56,10 +60,14 @@ import fi.paytrail.demo.shoppingcart.ShoppingCartScreen
 import fi.paytrail.demo.shoppingcart.ShoppingCartViewModel
 import fi.paytrail.demo.shoppingcart.currencyFormatter
 import fi.paytrail.demo.tokenization.TokenizedCardsRepository
-import fi.paytrail.demo.tokenization.TokenizedCreditCards
+import fi.paytrail.demo.tokenization.TokenizedCreditCard
+import fi.paytrail.demo.tokenization.TokenizedCreditCardListing
+import fi.paytrail.demo.tokenization.TokenizedCreditCardsScreen
+import fi.paytrail.demo.tokenization.TokenizedCreditCardsViewModel
 import fi.paytrail.demo.ui.theme.PaytrailDemoTheme
 import fi.paytrail.paymentsdk.PayAndAddCard
 import fi.paytrail.paymentsdk.PaytrailPayment
+import fi.paytrail.paymentsdk.RequestStatus
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_CANCELED
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_ERROR
@@ -75,6 +83,7 @@ import fi.paytrail.paymentsdk.tokenization.model.AddCardRequest
 import fi.paytrail.paymentsdk.tokenization.model.AddCardResult
 import fi.paytrail.sdk.apiclient.models.Callbacks
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import java.math.BigDecimal
 import java.util.UUID
@@ -87,7 +96,7 @@ private const val NAV_ARG_PAYMENT_TYPE = "paymentType"
 private const val NAV_ARG_CHARGE_TYPE = "chargeType"
 
 private const val NAV_SHOPPING_CART = "shopping_cart"
-private const val NAV_CREATE_PAYMENT = "payment/creatge"
+private const val NAV_CREATE_PAYMENT = "payment/create"
 private const val NAV_CARDS = "cards"
 private const val NAV_ADD_CARD = "cards/tokenize"
 private const val NAV_PAY_AND_ADD_CARD = "payment/pay_and_add_card"
@@ -174,7 +183,9 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun PaytrailDemoAppTopBar() {
         TopAppBar(
-            modifier = Modifier.shadow(4.dp).zIndex(1f),
+            modifier = Modifier
+                .shadow(4.dp)
+                .zIndex(1f),
             colors = TopAppBarDefaults.topAppBarColors(),
             title = { /* no title content */ },
             navigationIcon = {
@@ -185,7 +196,6 @@ class MainActivity : ComponentActivity() {
                 )
             },
         )
-
     }
 
     private fun shouldShowStatus(paymentResult: PaytrailPaymentState?): Boolean =
@@ -219,7 +229,7 @@ class MainActivity : ComponentActivity() {
             }
 
             composable(NAV_CARDS) {
-                TokenizedCreditCards(
+                TokenizedCreditCardsScreen(
                     modifier = Modifier.fillMaxSize(),
                     viewModel = hiltViewModel(),
                     payWithCardAction = { tokenizationId: String, paymentType: TokenPaymentType, chargeType: TokenPaymentChargeType ->
@@ -301,6 +311,7 @@ class MainActivity : ComponentActivity() {
             }
 
             composable(NAV_CREATE_PAYMENT) {
+                val cardsViewModel: TokenizedCreditCardsViewModel = hiltViewModel()
                 val paymentId = remember { UUID.randomUUID() }
                 val paymentRequest = remember { shoppingCartRepository.cartAsPaymentRequest() }
                 LaunchedEffect(paymentId, paymentRequest) {
@@ -310,6 +321,8 @@ class MainActivity : ComponentActivity() {
                     paymentRequest = paymentRequest,
                     paymentState = paymentState,
                     onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
+                    navController = navController,
+                    cards = cardsViewModel.cards.collectAsState(initial = emptyList()).value,
                 )
             }
 
@@ -355,6 +368,8 @@ class MainActivity : ComponentActivity() {
         paymentRequest: PaymentRequest,
         paymentState: PaytrailPaymentState?,
         onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+        navController: NavController,
+        cards: List<Pair<String, Flow<RequestStatus<TokenizedCreditCard>>>>,
     ) {
         Column(
             modifier = Modifier
@@ -379,10 +394,42 @@ class MainActivity : ComponentActivity() {
                 if (paymentState?.state == SHOW_PAYMENT_PROVIDERS) {
                     Text(
                         modifier = Modifier.padding(horizontal = 24.dp),
+                        text = "Saved cards",
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                    TokenizedCreditCardListing(
+                        modifier = Modifier.fillMaxSize(),
+                        cards = cards,
+                        onCardClick = { tokenizationId, _ ->
+                            navController.navigate(
+                                NAV_PAY_WITH_TOKENIZATION_ID
+                                    .replace("{$NAV_ARG_TOKENIZATION_ID}", tokenizationId)
+                                    .replace("{$NAV_ARG_PAYMENT_TYPE}", TokenPaymentType.CIT.name)
+                                    .replace(
+                                        "{$NAV_ARG_CHARGE_TYPE}",
+                                        TokenPaymentChargeType.CHARGE.name,
+                                    ),
+                            )
+                        },
+                    )
+
+                    Button(
+                        modifier = Modifier
+                            .widthIn(min = 80.dp)
+                            .padding(top = 8.dp, bottom = 16.dp)
+                            .align(CenterHorizontally),
+                        onClick = { navController.navigate(NAV_ADD_CARD) },
+                    ) {
+                        Text(stringResource(R.string.manage_cards_button_add_card))
+                    }
+
+                    Text(
+                        modifier = Modifier.padding(horizontal = 24.dp),
                         text = stringResource(R.string.choose_payment_provider),
                         style = MaterialTheme.typography.titleLarge,
                     )
                 }
+
                 PaytrailPayment(
                     modifier = Modifier
                         .fillMaxSize()

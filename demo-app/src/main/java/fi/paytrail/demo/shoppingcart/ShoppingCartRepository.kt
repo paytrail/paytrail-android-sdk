@@ -92,7 +92,7 @@ class ShoppingCartRepository @Inject constructor() {
             amount = (cart.totalAmount * 100).toLong(),
             currency = Currency.EUR,
             language = Language.EN,
-            customer = Customer(email = "erkki.esimerkki@example.com"),
+            customer = Customer(email = ""),
             items = cart.items.values.map {
                 Item(
                     unitPrice = (it.unitPrice * 100).toLong(),

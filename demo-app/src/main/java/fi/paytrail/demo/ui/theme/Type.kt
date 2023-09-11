@@ -16,6 +16,13 @@ val PaytrailTypography = Typography(
         lineHeight = 24.sp,
     ),
 
+    bodyMedium = TextStyle(
+        fontFamily = Poppins,
+        fontWeight = FontWeight.W400,
+        fontSize = 14.sp,
+        lineHeight = 16.sp,
+    ),
+
     titleLarge = TextStyle(
         fontFamily = Poppins,
         fontWeight = W700,
