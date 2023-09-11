@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Divider
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -129,9 +131,10 @@ class MainActivity : ComponentActivity() {
                         MainContent(
                             modifier = Modifier.weight(1f),
                             navController = navController,
-                            onPaymentStateChanged = { id: UUID, state: PaytrailPaymentState ->
-                                paymentState = id to state
-                                paymentRepository.store(id, state)
+                            paymentState = paymentState?.second,
+                            onPaymentStateChanged = { transactionId: UUID, state: PaytrailPaymentState ->
+                                paymentState = transactionId to state
+                                paymentRepository.store(transactionId, state)
                                 when (state.state) {
                                     // When handling payment results, application should navigate
                                     // out of payment when a success or error state has been
@@ -162,6 +165,7 @@ class MainActivity : ComponentActivity() {
     private fun MainContent(
         modifier: Modifier = Modifier,
         navController: NavHostController,
+        paymentState: PaytrailPaymentState?,
         onPaymentStateChanged: (UUID, PaytrailPaymentState) -> Unit,
     ) {
         val coroutineScope = rememberCoroutineScope()
@@ -273,6 +277,7 @@ class MainActivity : ComponentActivity() {
                 PaymentScreen(
                     modifier = Modifier.fillMaxSize(),
                     paymentRequest = paymentRequest,
+                    paymentState = paymentState,
                     onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
                 )
             }
@@ -318,22 +323,35 @@ class MainActivity : ComponentActivity() {
     private fun PaymentScreen(
         modifier: Modifier,
         paymentRequest: PaymentRequest,
+        paymentState: PaytrailPaymentState?,
         onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
     ) {
-        PaytrailPayment(
-            modifier = Modifier,
-            paymentRequest = paymentRequest,
-            onPaymentStateChanged = onPaymentStateChanged,
-            merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
-            header = {
+        Column(
+            modifier = Modifier
+                .background(Color.White)
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState()),
+        ) {
+            if (paymentState?.state in setOf(
+                    PaytrailPaymentState.State.LOADING_PAYMENT_PROVIDERS,
+                    PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS,
+                )
+            ) {
                 PaymentSummaryHeader(hiltViewModel())
-            },
-        )
+            }
+            PaytrailPayment(
+                modifier = Modifier.fillMaxSize(),
+                paymentRequest = paymentRequest,
+                onPaymentStateChanged = onPaymentStateChanged,
+                merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
+            )
+        }
     }
 
     @Composable
     private fun PaymentSummaryHeader(viewmodel: ShoppingCartViewModel) {
-        val totalCartPrice = viewmodel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
+        val totalCartPrice =
+            viewmodel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
         val items = viewmodel.items.collectAsState(initial = emptyList()).value
         Column(
             modifier = Modifier

@@ -3,7 +3,9 @@ package fi.paytrail.paymentsdk
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -31,8 +33,6 @@ fun PaytrailPayment(
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit, // TODO: Replace with functional interface for java compatibility
     merchantAccount: MerchantAccount,
     apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
-    header: @Composable () -> Unit = {},
-    footer: @Composable () -> Unit = {},
 ) {
     val viewModel: PaymentViewModel = viewModel(
         factory = PaymentViewModelFactory(paymentRequest, apiClient),
@@ -46,8 +46,6 @@ fun PaytrailPayment(
             viewModel = viewModel,
             onPaymentStateChanged = onPaymentStateChanged,
             merchantAccount = merchantAccount,
-            header = header,
-            footer = footer,
         )
     }
 }
@@ -58,8 +56,6 @@ internal fun PaytrailPayment(
     viewModel: PaymentViewModel,
     onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
     merchantAccount: MerchantAccount,
-    header: @Composable () -> Unit = {},
-    footer: @Composable () -> Unit = {},
 ) {
     val paymentStatus =
         viewModel.paymentState.observeAsState(
@@ -84,10 +80,8 @@ internal fun PaytrailPayment(
             }
 
             SHOW_PAYMENT_PROVIDERS -> PaymentProviders(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier.fillMaxSize().height(IntrinsicSize.Min),
                 viewModel = viewModel,
-                header = header,
-                footer = footer,
             )
 
             PAYMENT_IN_PROGRESS -> PayWithPaymentMethod(

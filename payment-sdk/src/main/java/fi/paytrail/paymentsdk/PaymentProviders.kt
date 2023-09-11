@@ -13,9 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,13 +45,6 @@ import fi.paytrail.paymentsdk.theme.PaytrailColors.Grey02
 import fi.paytrail.paymentsdk.theme.Poppins
 import fi.paytrail.sdk.apiclient.models.PaymentMethodProvider
 
-val PaytrailTextChoosePaymentMethodHeading = TextStyle(
-    fontFamily = Poppins,
-    fontWeight = W700,
-    fontSize = 24.sp,
-    lineHeight = 36.sp,
-)
-
 val PaytrailTextPaymentGroupHeading = TextStyle(
     fontFamily = Poppins,
     fontWeight = W700,
@@ -73,29 +64,19 @@ val PaytrailTextTermsAndConditions = TextStyle(
 fun PaymentProviders(
     modifier: Modifier = Modifier,
     viewModel: PaymentViewModel,
-    header: @Composable () -> Unit = {},
-    footer: @Composable () -> Unit = {},
 ) {
     val providers = viewModel.paymentMethodGroups.observeAsState(emptyList()).value
     val terms = viewModel.paymentTerms.observeAsState("").value
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState()),
-    ) {
-        header()
-        if (providers.isNotEmpty()) {
-            PaymentProviderListing(
-                modifier = Modifier,
-                terms = terms,
-                groups = providers,
-                onPaymentMethodSelected = viewModel::startPayment,
-            )
-        } else {
-            NoPaymentProvidersAvailable(modifier)
-        }
-        footer()
+    if (providers.isNotEmpty()) {
+        PaymentProviderListing(
+            modifier = modifier,
+            terms = terms,
+            groups = providers,
+            onPaymentMethodSelected = viewModel::startPayment,
+        )
+    } else {
+        NoPaymentProvidersAvailable(modifier)
     }
 }
 
@@ -112,10 +93,6 @@ private fun PaymentProviderListing(
             .fillMaxWidth()
             .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 32.dp),
     ) {
-        Text(
-            text = "Choose payment method",
-            style = PaytrailTextChoosePaymentMethodHeading,
-        )
         if (terms != null) {
             PaytrailTerms(terms)
         }

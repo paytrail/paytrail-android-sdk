@@ -50,4 +50,4 @@ data class PaymentRequestResponse(
     @SerialName(value = "providers")
     val providers: kotlin.collections.List<PaymentMethodProvider> = emptyList(),
 
-    )
+)
