@@ -1,7 +1,6 @@
 package fi.paytrail.paymentsdk
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,7 +19,6 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.LOADING_PAYMENT_PROVIDERS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_IN_PROGRESS
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS
-import fi.paytrail.paymentsdk.theme.PaytrailColors.LightGrey
 import fi.paytrail.paymentsdk.theme.Poppins
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
@@ -42,7 +40,7 @@ fun PaytrailPayment(
     // TODO: Make font family themable?
     CompositionLocalProvider(LocalTextStyle provides TextStyle(fontFamily = Poppins)) {
         PaytrailPayment(
-            modifier = modifier.background(color = LightGrey),
+            modifier = modifier,
             viewModel = viewModel,
             onPaymentStateChanged = onPaymentStateChanged,
             merchantAccount = merchantAccount,

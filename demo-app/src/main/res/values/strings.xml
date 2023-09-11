@@ -16,4 +16,5 @@
     <string name="card_action_remove_card">Remove Card</string>
     <string name="payment_list_no_payments_prompt">No payment history available</string>
     <string name="shopping_cart_total">Total price</string>
+    <string name="choose_payment_provider">Choose payment provider</string>
 </resources>

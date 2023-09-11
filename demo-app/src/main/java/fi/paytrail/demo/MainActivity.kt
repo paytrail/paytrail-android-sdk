@@ -30,6 +30,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,6 +58,8 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_CANCELED
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_ERROR
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_FAIL
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
+import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS
+import fi.paytrail.paymentsdk.theme.PaytrailColors.LightGrey
 import fi.paytrail.paymentsdk.tokenization.AddCardForm
 import fi.paytrail.paymentsdk.tokenization.PayWithTokenizationId
 import fi.paytrail.paymentsdk.tokenization.TokenPaymentChargeType
@@ -77,7 +80,7 @@ private const val NAV_ARG_PAYMENT_TYPE = "paymentType"
 private const val NAV_ARG_CHARGE_TYPE = "chargeType"
 
 private const val NAV_SHOPPING_CART = "shopping_cart"
-private const val NAV_CREATE_PAYMENT = "payment/create"
+private const val NAV_CREATE_PAYMENT = "payment/creatge"
 private const val NAV_CARDS = "cards"
 private const val NAV_ADD_CARD = "cards/tokenize"
 private const val NAV_PAY_AND_ADD_CARD = "payment/pay_and_add_card"
@@ -337,19 +340,29 @@ class MainActivity : ComponentActivity() {
                     PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS,
                 )
             ) {
-                PaymentSummaryHeader(hiltViewModel())
+                ShoppingCartSummaryHeader(hiltViewModel())
             }
-            PaytrailPayment(
-                modifier = Modifier.fillMaxSize(),
-                paymentRequest = paymentRequest,
-                onPaymentStateChanged = onPaymentStateChanged,
-                merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
-            )
+
+            Column(modifier = Modifier.fillMaxWidth().background(color = LightGrey).padding(top = 16.dp)) {
+                if (paymentState?.state == SHOW_PAYMENT_PROVIDERS) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 24.dp),
+                        text = stringResource(R.string.choose_payment_provider),
+                        style = MaterialTheme.typography.titleLarge,
+                    )
+                }
+                PaytrailPayment(
+                    modifier = Modifier.fillMaxSize().padding(horizontal = 24.dp),
+                    paymentRequest = paymentRequest,
+                    onPaymentStateChanged = onPaymentStateChanged,
+                    merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
+                )
+            }
         }
     }
 
     @Composable
-    private fun PaymentSummaryHeader(viewmodel: ShoppingCartViewModel) {
+    private fun ShoppingCartSummaryHeader(viewmodel: ShoppingCartViewModel) {
         val totalCartPrice =
             viewmodel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
         val items = viewmodel.items.collectAsState(initial = emptyList()).value

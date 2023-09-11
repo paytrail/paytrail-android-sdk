@@ -91,7 +91,7 @@ private fun PaymentProviderListing(
         modifier = modifier
             .semantics { testTag = "PaymentProvidersListing" }
             .fillMaxWidth()
-            .padding(start = 24.dp, end = 24.dp, top = 16.dp, bottom = 32.dp),
+            .padding(top = 16.dp, bottom = 32.dp),
     ) {
         if (terms != null) {
             PaytrailTerms(terms)
