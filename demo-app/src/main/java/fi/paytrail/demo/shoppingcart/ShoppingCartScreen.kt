@@ -1,6 +1,5 @@
 package fi.paytrail.demo.shoppingcart
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -84,6 +83,12 @@ fun ShoppingCartScreen(
         payAndAddCardAction = payAndAddCardAction,
         cardsAction = cardsAction,
         showPaymentHistory = showPaymentHistory,
+        onIncrement = {
+            viewModel.incrementAmount(it)
+        },
+        onDecrement = {
+            viewModel.decrementAmount(it)
+        }
     )
 }
 
@@ -96,6 +101,8 @@ private fun ShoppingCartScreen(
     payAndAddCardAction: () -> Unit = {},
     cardsAction: () -> Unit = {},
     showPaymentHistory: () -> Unit = {},
+    onIncrement: (UUID) -> Unit = {},
+    onDecrement: (UUID) -> Unit = {}
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -106,6 +113,8 @@ private fun ShoppingCartScreen(
                 .weight(1f),
             items = items,
             total = total,
+            onIncrement,
+            onDecrement
         )
 
         ShoppingCartBottomBar(
@@ -123,6 +132,8 @@ private fun ShoppingCartListing(
     modifier: Modifier,
     items: List<ShoppingCartRow>,
     total: BigDecimal,
+    onIncrement: (UUID) -> Unit,
+    onDecrement: (UUID) -> Unit
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -142,8 +153,12 @@ private fun ShoppingCartListing(
 
         items(items, key = { item -> item.id }) { item ->
             ShoppingCartItem(
-                modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
                 item = item,
+                onIncrement,
+                onDecrement
             )
         }
 
@@ -188,7 +203,9 @@ private fun ShoppingCartBottomBar(
     showPaymentHistory: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.background(Color.White).fillMaxWidth(),
+        modifier = Modifier
+            .background(Color.White)
+            .fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Divider()
@@ -266,6 +283,8 @@ private fun PayAndAddCardButton(
 private fun ShoppingCartItem(
     modifier: Modifier = Modifier,
     item: ShoppingCartRow,
+    onIncrement: (UUID) -> Unit = {},
+    onDecrement: (UUID) -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -280,7 +299,7 @@ private fun ShoppingCartItem(
         Row(modifier = Modifier.fillMaxWidth()) {
             Image(
                 modifier = Modifier.size(64.dp),
-                painter = painterResource(id = R.drawable.image_placeholder),
+                painter = painterResource(id = item.fakeImage),
                 contentDescription = null,
             )
             Spacer(modifier = Modifier.width(8.dp))
@@ -295,7 +314,7 @@ private fun ShoppingCartItem(
                 Text(
                     modifier = Modifier,
                     fontWeight = W700,
-                    text = "${currencyFormatter.format(item.totalPrice)} €",
+                    text = "${currencyFormatter.format(item.unitPrice)} €"
                 )
 
                 Row(
@@ -310,11 +329,11 @@ private fun ShoppingCartItem(
                         ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    // TODO: Adjust amounts on click
                     Box(
                         modifier = Modifier
                             .sizeIn(minWidth = 38.dp, minHeight = 38.dp)
-                            .clickable { Log.i("ShoppingCart", "TODO: Decrement amount") },
+                            .clickable { onDecrement(item.id) },
+
                         contentAlignment = Alignment.Center,
                     ) {
                         // TODO: replace text with icon
@@ -324,20 +343,19 @@ private fun ShoppingCartItem(
                         )
                     }
 
-                    HorizontalDivider()
+                    VerticalDivider()
 
                     Text(
                         modifier = Modifier.weight(1f),
                         text = "${item.amount}",
                         textAlign = TextAlign.Center,
                     )
-                    HorizontalDivider()
+                    VerticalDivider()
 
-                    // TODO: Adjust amounts on click
                     Box(
                         modifier = Modifier
                             .sizeIn(minWidth = 38.dp, minHeight = 38.dp)
-                            .clickable { Log.i("ShoppingCart", "TODO: Decrement amount") },
+                            .clickable { onIncrement(item.id) },
                         contentAlignment = Alignment.Center,
                     ) {
                         // TODO: replace text with icon
@@ -353,7 +371,7 @@ private fun ShoppingCartItem(
 }
 
 @Composable
-private fun HorizontalDivider(
+private fun VerticalDivider(
     thickness: Dp = DividerDefaults.Thickness,
     color: Color = DividerDefaults.color,
 ) {
@@ -377,6 +395,7 @@ fun PreviewShoppingCartItem() {
             amount = 2,
             unitPrice = BigDecimal("2.99"),
             vatPercentage = 24,
+            fakeImage = R.drawable.image_placeholder
         ),
     )
 }
@@ -392,6 +411,7 @@ fun PreviewShoppingCartItem_LongName() {
             amount = 2,
             unitPrice = BigDecimal("2345.67"),
             vatPercentage = 24,
+            fakeImage = R.drawable.image_placeholder
         ),
     )
 }

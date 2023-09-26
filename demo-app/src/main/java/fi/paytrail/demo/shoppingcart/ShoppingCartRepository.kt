@@ -1,5 +1,6 @@
 package fi.paytrail.demo.shoppingcart
 
+import fi.paytrail.demo.R
 import fi.paytrail.demo.util.times
 import fi.paytrail.sdk.apiclient.models.Callbacks
 import fi.paytrail.sdk.apiclient.models.Currency
@@ -18,27 +19,6 @@ import javax.inject.Singleton
 // TODO: Replace ShoppingCartRepository by handling state completely
 //       in the ShoppingCartViewModel?
 
-// TODO: Extract to model package
-data class ShoppingCartRow(
-    val name: String,
-    val id: UUID,
-    val amount: Long,
-    val unitPrice: BigDecimal,
-    val vatPercentage: Long,
-) {
-    val totalPrice by lazy { amount * unitPrice }
-}
-
-// TODO: Extract to model package
-data class ShoppingCart(
-    val items: Map<UUID, ShoppingCartRow>,
-) {
-    val numberOfRows: Int by lazy { items.size }
-    val totalAmount: BigDecimal by lazy {
-        items.values.sumOf { it.totalPrice }
-    }
-}
-
 val fakeCart = ShoppingCart(
     items = listOf(
         ShoppingCartRow(
@@ -46,13 +26,15 @@ val fakeCart = ShoppingCart(
             id = UUID.fromString("2e3f6d5a-c33b-46c9-9942-98bf02651e23"),
             amount = 1,
             unitPrice = BigDecimal.valueOf(15),
-            vatPercentage = 24,
+            fakeImage= R.drawable.product_img2,
+            vatPercentage = 24
         ),
         ShoppingCartRow(
             name = "Paytrail Drinking Bottle",
             id = UUID.fromString("c739864b-0307-4cba-9101-60990c449da0"),
             amount = 2,
             unitPrice = BigDecimal.valueOf(20),
+            fakeImage = R.drawable.product_img1,
             vatPercentage = 24,
         ),
     ).associateBy { it.id },
@@ -65,6 +47,23 @@ class ShoppingCartRepository @Inject constructor() {
 
     fun cart(): Flow<ShoppingCart> {
         return shoppingCartState
+    }
+
+    fun incrementItemAmount(id : UUID) {
+        shoppingCartState.value.items[id]?.let {
+            shoppingCartState.value = ShoppingCart(
+                items = shoppingCartState.value.items + (id to it.copy(amount = it.amount+1))
+            )
+        }
+    }
+    fun decrementItemAmount(id: UUID) {
+        shoppingCartState.value.items[id]?.let {
+            if (it.amount > 1) {
+                shoppingCartState.value = ShoppingCart(
+                    items = shoppingCartState.value.items + (id to it.copy(amount = it.amount-1))
+                )
+            }
+        }
     }
 
     fun addItem(item: ShoppingCartRow) {
