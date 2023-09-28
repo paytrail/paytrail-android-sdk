@@ -5,6 +5,7 @@
     <string name="shopping_cart_button_history">History</string>
     <string name="shopping_cart_button_pay">Pay</string>
     <string name="shopping_cart_button_pay_and_add">Pay+Add</string>
+    <string name="shopping_cart_button_continue">Continue</string>
     <string name="payment_status_view_status">Payment status: %1$s</string>
     <string name="payment_status_view_transaction_id">Transaction id: %1$s</string>
     <string name="manage_cards_button_add_card">Add card</string>

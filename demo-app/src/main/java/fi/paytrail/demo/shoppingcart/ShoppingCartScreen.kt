@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fi.paytrail.demo.R
+import fi.paytrail.demo.ui.theme.FilledButton
 import fi.paytrail.demo.ui.theme.MyColors.Grey02
 import java.math.BigDecimal
 import java.text.DecimalFormatSymbols
@@ -59,10 +60,8 @@ val currencyFormatter = java.text.DecimalFormat(
     DecimalFormatSymbols(Locale("fi", "FI")),
 )
 
-// TODO: Allow adding items to cart
-// TODO: Allow removing items from cart
 // TODO: Styling
-
+// TODO: Removed unused button
 @Composable
 fun ShoppingCartScreen(
     modifier: Modifier = Modifier,
@@ -71,6 +70,7 @@ fun ShoppingCartScreen(
     payAndAddCardAction: () -> Unit,
     cardsAction: () -> Unit,
     showPaymentHistory: () -> Unit,
+    continueAction: () -> Unit
 ) {
     val items = viewModel.items.collectAsState(initial = emptyList()).value
     val total = viewModel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
@@ -83,6 +83,7 @@ fun ShoppingCartScreen(
         payAndAddCardAction = payAndAddCardAction,
         cardsAction = cardsAction,
         showPaymentHistory = showPaymentHistory,
+        continueAction = continueAction,
         onIncrement = {
             viewModel.incrementAmount(it)
         },
@@ -101,6 +102,7 @@ private fun ShoppingCartScreen(
     payAndAddCardAction: () -> Unit = {},
     cardsAction: () -> Unit = {},
     showPaymentHistory: () -> Unit = {},
+    continueAction: () -> Unit = {},
     onIncrement: (UUID) -> Unit = {},
     onDecrement: (UUID) -> Unit = {}
 ) {
@@ -116,14 +118,12 @@ private fun ShoppingCartScreen(
             onIncrement,
             onDecrement
         )
-
-        ShoppingCartBottomBar(
-            items = items,
-            payAction = payAction,
-            payAndAddCardAction = payAndAddCardAction,
-            cardsAction = cardsAction,
-            showPaymentHistory = showPaymentHistory,
-        )
+        FilledButton(
+            modifier = Modifier.align(Alignment.End),
+            text = stringResource(id = R.string.shopping_cart_button_continue)
+        ) {
+            continueAction.invoke()
+        }
     }
 }
 
@@ -166,6 +166,7 @@ private fun ShoppingCartListing(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Divider(
                     modifier = Modifier.padding(top = 32.dp, bottom = 16.dp),
+                    thickness = 2.dp,
                     color = Grey02,
                 )
                 ShoppingCartTotalPrice(

@@ -36,9 +36,9 @@ fun OutLineButton(text: String, onClick: () -> Unit) {
 }
 
 @Composable
-fun FilledButton(text: String, isEnabled:Boolean = true, onClick: () -> Unit) {
+fun FilledButton(modifier: Modifier = Modifier, text: String, isEnabled:Boolean = true, onClick: () -> Unit) {
     Button(
-        modifier = Modifier
+        modifier = modifier
             .widthIn(min = 80.dp)
             .padding(top = 8.dp, end = 16.dp, start = 16.dp, bottom = 8.dp),
         onClick = { onClick.invoke() },
@@ -58,8 +58,8 @@ fun PreviewButtons() {
     Column {
         OutLineButton("Cancel") {}
         Spacer(modifier = Modifier.height(16.dp))
-        FilledButton("To Payment") {}
+        FilledButton(text = "To Payment") {}
         Spacer(modifier = Modifier.height(16.dp))
-        FilledButton("To Payment", isEnabled = false) {}
+        FilledButton(text = "To Payment", isEnabled = false) {}
     }
 }

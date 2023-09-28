@@ -64,6 +64,7 @@ import fi.paytrail.demo.tokenization.TokenizedCreditCard
 import fi.paytrail.demo.tokenization.TokenizedCreditCardListing
 import fi.paytrail.demo.tokenization.TokenizedCreditCardsScreen
 import fi.paytrail.demo.tokenization.TokenizedCreditCardsViewModel
+import fi.paytrail.demo.ui.theme.MyColors.LightGrey
 import fi.paytrail.demo.ui.theme.PaytrailDemoTheme
 import fi.paytrail.paymentsdk.PayAndAddCard
 import fi.paytrail.paymentsdk.PaytrailPayment
@@ -74,7 +75,6 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_ERROR
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_FAIL
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS
-import fi.paytrail.paymentsdk.theme.PaytrailColors.LightGrey
 import fi.paytrail.paymentsdk.tokenization.AddCardForm
 import fi.paytrail.paymentsdk.tokenization.PayWithTokenizationId
 import fi.paytrail.paymentsdk.tokenization.TokenPaymentChargeType
@@ -104,6 +104,7 @@ private const val NAV_PAY_WITH_TOKENIZATION_ID =
     "cards/{$NAV_ARG_TOKENIZATION_ID}/{$NAV_ARG_PAYMENT_TYPE}/{$NAV_ARG_CHARGE_TYPE}"
 private const val NAV_PAYMENT_LISTING = "payments"
 private const val NAV_PAYMENT_DETAILS = "payment/{$NAV_ARG_PAYMENT_ID}"
+private const val NAV_CUSTOMER_DETAIL = "customer_detail"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -225,9 +226,17 @@ class MainActivity : ComponentActivity() {
                     payAndAddCardAction = { navController.navigate(NAV_PAY_AND_ADD_CARD) },
                     cardsAction = { navController.navigate(NAV_CARDS) },
                     showPaymentHistory = { navController.navigate(NAV_PAYMENT_LISTING) },
+                    continueAction = { navController.navigate(NAV_CUSTOMER_DETAIL)}
                 )
             }
-
+            composable(NAV_CUSTOMER_DETAIL) {
+                CustomerDetailScreen(cancelAction = {
+                    navController.popBackStack()
+                },
+                    toPayAction = {
+                        navController.navigate(NAV_CREATE_PAYMENT)
+                    })
+            }
             composable(NAV_CARDS) {
                 TokenizedCreditCardsScreen(
                     modifier = Modifier.fillMaxSize(),
