@@ -23,8 +23,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import fi.paytrail.demo.R
-import fi.paytrail.paymentsdk.theme.PaytrailColors
-import fi.paytrail.paymentsdk.theme.PaytrailColors.PinkElement
+import fi.paytrail.demo.ui.theme.MyColors.PinkElement
+import fi.paytrail.demo.ui.theme.MyColors.TextDisabledGrey
 import fi.paytrail.sdk.apiclient.models.Card
 import java.util.Locale
 
@@ -65,7 +65,7 @@ fun CreditCard(modifier: Modifier = Modifier, type: String, number: String) {
                 Text(
                     text = number,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = PaytrailColors.TextDisabledGrey,
+                    color = TextDisabledGrey,
                 )
             }
         }

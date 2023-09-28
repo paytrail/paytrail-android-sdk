@@ -17,4 +17,6 @@
     <string name="payment_list_no_payments_prompt">No payment history available</string>
     <string name="shopping_cart_total">Total price</string>
     <string name="choose_payment_provider">Choose payment provider</string>
+    <string name="payment_button_cancel">Cancel</string>
+    <string name="payment_button_payment">To payment</string>
 </resources>

@@ -15,9 +15,9 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import fi.paytrail.paymentsdk.theme.PaytrailColors.LightGrey
-import fi.paytrail.paymentsdk.theme.PaytrailColors.PinkElement
-import fi.paytrail.paymentsdk.theme.PaytrailColors.PinkText
+import fi.paytrail.demo.ui.theme.MyColors.LightGrey
+import fi.paytrail.demo.ui.theme.MyColors.PinkElement
+import fi.paytrail.demo.ui.theme.MyColors.PinkText
 
 private val DarkColorScheme = darkColorScheme(
     primary = PinkElement,

@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import fi.paytrail.demo.R
-import fi.paytrail.paymentsdk.theme.PaytrailColors
+import fi.paytrail.demo.ui.theme.MyColors.Grey02
 import java.math.BigDecimal
 import java.text.DecimalFormatSymbols
 import java.util.Locale
@@ -166,7 +166,7 @@ private fun ShoppingCartListing(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Divider(
                     modifier = Modifier.padding(top = 32.dp, bottom = 16.dp),
-                    color = PaytrailColors.Grey02,
+                    color = Grey02,
                 )
                 ShoppingCartTotalPrice(
                     modifier = Modifier.fillMaxWidth(),
