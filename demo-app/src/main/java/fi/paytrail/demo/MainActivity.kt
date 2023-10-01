@@ -124,7 +124,8 @@ class MainActivity : ComponentActivity() {
         var paymentState: Pair<UUID, PaytrailPaymentState>? by mutableStateOf(null)
 
         setContent {
-            PaytrailDemoTheme(dynamicColor = false) {
+            //For demo purpose, we forced light theme
+            PaytrailDemoTheme(dynamicColor = false, darkTheme = false) {
                 // A surface container using the 'background' color from the theme
                 Surface(
                     modifier = Modifier.fillMaxSize(),
