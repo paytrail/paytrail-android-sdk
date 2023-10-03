@@ -45,6 +45,10 @@ For an in-depth guide on the capabilities of the Paytrail SDK, refer to our [off
 ## 📥 Get the Demo APK
 Download our demo APK to see the SDK in action on your device!
 👉 [Download Demo APK](https://github.com/paytrail/paytrail-android-sdk/raw/main/demo-app/release/myapp.apk)
+   - Navigate to your file manager app (like "Files" or any other manager you might have installed).
+   - Locate the `myapp.apk` in your Downloads folder.
+   - Tap on the file. If prompted about installing from an unknown source, go to your device's settings and grant permission for the file manager to install apps.
+   - If you see another Alert about Google play protect, expand the alert and you will see small text "Install Anyway" this is because Google doesn't like installation outside of Google play.
 
 ## 📜 License
 ```
