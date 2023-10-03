@@ -1,4 +1,4 @@
-package fi.paytrail.demo
+package fi.paytrail.demo.shoppingcart
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,11 +31,19 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import fi.paytrail.demo.R
 import fi.paytrail.demo.ui.theme.FilledButton
 import fi.paytrail.demo.ui.theme.MyColors.Grey03
 import fi.paytrail.demo.ui.theme.MyColors.Grey04
 import fi.paytrail.demo.ui.theme.OutLineButton
+import fi.paytrail.sdk.apiclient.models.Customer
 
+/**
+ * For this demo purpose, customer detail is static. In real scenario you would need to get real user data
+ * that you will pass to [Customer] in order to create Payment request
+ * Also the state would be coming outside this compose from ViewModel for example
+ *
+ */
 @Composable
 fun CustomerDetailScreen(
     modifier: Modifier = Modifier,
@@ -60,6 +68,18 @@ fun CustomerDetailScreen(
         }
         val phoneNumbere = remember {
             mutableStateOf("044231122")
+        }
+        val email = remember {
+            mutableStateOf("m.m@demo.fi")
+        }
+        val address = remember {
+            mutableStateOf("Loremipsunkuja 1b")
+        }
+        val postalCode = remember {
+            mutableStateOf("00100")
+        }
+        val postalAddress = remember {
+            mutableStateOf("Helsinki")
         }
         val checkBoxState = remember {
             mutableStateOf(false)
@@ -109,7 +129,7 @@ fun CustomerDetailScreen(
             keyBoardActions = KeyboardActions(
                 onNext = { focusManager.moveFocus(FocusDirection.Down) }
             ),
-            text = phoneNumbere.value
+            text = email.value
         )
         Spacer(modifier = Modifier.height(26.dp))
 
@@ -118,7 +138,7 @@ fun CustomerDetailScreen(
             keyBoardActions = KeyboardActions(
                 onNext = { focusManager.moveFocus(FocusDirection.Down) }
             ),
-            text = phoneNumbere.value
+            text = address.value
         )
         Spacer(modifier = Modifier.height(26.dp))
 
@@ -132,7 +152,7 @@ fun CustomerDetailScreen(
                 keyBoardActions = KeyboardActions(
                     onNext = { focusManager.moveFocus(FocusDirection.Down) }
                 ),
-                text = phoneNumbere.value
+                text = postalCode.value
             )
             FormInputField(placeholder = "Postal address",
                 modifier = modifier.weight(1f),
@@ -140,7 +160,7 @@ fun CustomerDetailScreen(
                 keyBoardActions = KeyboardActions(
                     onNext = { focusManager.moveFocus(FocusDirection.Down) }
                 ),
-                text = phoneNumbere.value
+                text = postalAddress.value
             )
         }
         Spacer(modifier = Modifier.height(26.dp))

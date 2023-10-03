@@ -81,6 +81,7 @@ class ShoppingCartRepository @Inject constructor() {
     /**
      * Convert the current shopping cart contents into a [PaymentRequest].
      * Each call creates [PaymentRequest] with new reference & stamps.
+     * For this demo purpose we are creating an empty customer
      */
     fun cartAsPaymentRequest(): PaymentRequest {
         val cart = shoppingCartState.value

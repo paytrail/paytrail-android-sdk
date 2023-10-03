@@ -3,7 +3,6 @@ package fi.paytrail.demo
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -52,8 +51,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
+import fi.paytrail.demo.shoppingcart.CustomerDetailScreen
 import fi.paytrail.demo.payments.PaymentConfirmation
-import fi.paytrail.demo.payments.PaymentConfirmationFailed
 import fi.paytrail.demo.payments.PaymentDetails
 import fi.paytrail.demo.payments.PaymentListing
 import fi.paytrail.demo.payments.PaymentRepository
@@ -321,7 +320,7 @@ class MainActivity : ComponentActivity() {
                     cards = cardsViewModel.cards.collectAsState(initial = emptyList()).value,
                 )
             }
-
+            //TODO this may come in the v2 of this demo
             composable(NAV_PAY_AND_ADD_CARD) {
                 val paymentId = remember { UUID.randomUUID() }
                 val paymentRequest = remember { shoppingCartRepository.cartAsPaymentRequest() }
