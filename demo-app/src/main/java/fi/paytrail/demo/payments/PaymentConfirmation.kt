@@ -54,7 +54,7 @@ fun PaymentConfirmation(
                 PaymentConfirmationSuccess(onClick)
             }
 
-            PaytrailPaymentState.State.PAYMENT_FAIL, PaytrailPaymentState.State.PAYMENT_ERROR -> {
+            PaytrailPaymentState.State.PAYMENT_FAIL, PaytrailPaymentState.State.PAYMENT_ERROR, PaytrailPaymentState.State.PAYMENT_CANCELED -> {
                 PaymentConfirmationFailed(failureMessage = errorMessage, onClick)
             }
 
