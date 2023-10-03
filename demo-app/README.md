@@ -40,7 +40,11 @@ This repository hosts a simple shopping demo app developed using Kotlin and Jetp
 3. ▶️ Select `demo-app` from the Run configuration menu.
 
 ## 📖 Documentation
-For an in-depth guide on the capabilities of the Paytrail SDK, refer to our [official documentation](https://docs.paytrail.com//) .
+For an in-depth guide on the capabilities of the Paytrail SDK, refer to our [official documentation](https://docs.paytrail.com/#/) .
+
+## 📥 Get the Demo APK
+Download our demo APK to see the SDK in action on your device!
+👉 [Download Demo APK](https://github.com/paytrail/paytrail-android-sdk/release/demo-app-release.apk)
 
 ## 📜 License
 ```
