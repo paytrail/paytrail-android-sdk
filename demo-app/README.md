@@ -44,7 +44,7 @@ For an in-depth guide on the capabilities of the Paytrail SDK, refer to our [off
 
 ## 📥 Get the Demo APK
 Download our demo APK to see the SDK in action on your device!
-👉 [Download Demo APK](https://github.com/paytrail/paytrail-android-sdk/release/demo-app-release.apk)
+👉 [Download Demo APK](https://github.com/paytrail/paytrail-android-sdk/raw/main/demo-app/release/myapp.apk)
 
 ## 📜 License
 ```
