@@ -52,6 +52,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
+import fi.paytrail.demo.payments.PaymentConfirmation
+import fi.paytrail.demo.payments.PaymentConfirmationFailed
 import fi.paytrail.demo.payments.PaymentDetails
 import fi.paytrail.demo.payments.PaymentListing
 import fi.paytrail.demo.payments.PaymentRepository
@@ -105,6 +107,7 @@ private const val NAV_PAY_WITH_TOKENIZATION_ID =
 private const val NAV_PAYMENT_LISTING = "payments"
 private const val NAV_PAYMENT_DETAILS = "payment/{$NAV_ARG_PAYMENT_ID}"
 private const val NAV_CUSTOMER_DETAIL = "customer_detail"
+private const val NAV_PAYMENT_CONFIRMATION = "payment_confirmation"
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -135,22 +138,6 @@ class MainActivity : ComponentActivity() {
                         val navController = rememberNavController()
                         PaytrailDemoAppTopBar()
 
-                        val currentState = paymentState?.second
-                        AnimatedVisibility(visible = shouldShowStatus(currentState)) {
-                            PaymentResultView(
-                                paymentState = currentState,
-                                onClick = {
-                                    navController.navigate(
-                                        NAV_PAYMENT_DETAILS.replace(
-                                            "{$NAV_ARG_PAYMENT_ID}",
-                                            paymentState?.first.toString(),
-                                        ),
-                                    )
-                                },
-                                onHide = { paymentState = null },
-                            )
-                        }
-
                         MainContent(
                             modifier = Modifier.weight(1f),
                             navController = navController,
@@ -163,10 +150,9 @@ class MainActivity : ComponentActivity() {
                                     // out of payment when a success or error state has been
                                     // reached.
                                     PAYMENT_OK, PAYMENT_FAIL, PAYMENT_ERROR, PAYMENT_CANCELED -> {
-                                        navController.popBackStack(
-                                            route = NAV_SHOPPING_CART,
-                                            inclusive = false,
-                                        )
+                                        navController.navigate(NAV_PAYMENT_CONFIRMATION) {
+                                            popUpTo(navController.graph.startDestinationId) { inclusive = true}
+                                        }
                                     }
 
                                     else -> {
@@ -369,6 +355,14 @@ class MainActivity : ComponentActivity() {
                 ),
             ) {
                 PaymentDetails(modifier = Modifier.fillMaxSize(), viewModel = hiltViewModel())
+            }
+
+            composable(
+                NAV_PAYMENT_CONFIRMATION
+            ) {
+                PaymentConfirmation(paymentState = paymentState){
+                    navController.navigate(NAV_SHOPPING_CART)
+                }
             }
         }
     }

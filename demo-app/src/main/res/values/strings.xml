@@ -20,4 +20,10 @@
     <string name="choose_payment_provider">Choose payment provider</string>
     <string name="payment_button_cancel">Cancel</string>
     <string name="payment_button_payment">To payment</string>
+    <string name="payment_confirmation_success">Your payment was done succefully ! \n Go back to the shop.</string>
+    <string name="payment_confirmation_error">Your payment has failed </string>
+    <string name="payment_confirmation_success_title">Great!</string>
+    <string name="payment_confirmation_success_button">Continue shopping</string>
+    <string name="payment_confirmation_failed_title">Sorry …</string>
+    <string name="payment_confirmation_failed_button">Try again</string>
 </resources>

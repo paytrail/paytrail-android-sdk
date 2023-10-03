@@ -28,6 +28,30 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_FAIL
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
 import java.io.IOException
 
+/**
+ * The 'Compose' [PaymentResultView] provides an alternative to the conventional [PaymentConfirmation] style.
+ * It can be utilized to display an alert message based on the payment's outcome: either successful or failed.
+ *
+ * You will have to include in your parent surface view for example, so the state is visible across your entire screen
+ *
+ * ```kotlin
+ * var currentState = paymentState?.second
+ * AnimatedVisibility(visible = shouldShowStatus(currentState)) {
+ *     PaymentResultView(
+ *         paymentState = currentState,
+ *         onClick = {
+ *             navController.navigate(
+ *                 NAV_PAYMENT_DETAILS.replace(
+ *                     "{$NAV_ARG_PAYMENT_ID}",
+ *                     paymentState?.first.toString()
+ *                 )
+ *             )
+ *         },
+ *         onHide = { paymentState = null }
+ *     )
+ * }
+ * ```
+ */
 @Composable
 fun PaymentResultView(
     paymentState: PaytrailPaymentState?,
