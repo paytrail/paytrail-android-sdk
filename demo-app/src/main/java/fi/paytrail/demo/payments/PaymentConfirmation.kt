@@ -32,13 +32,13 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 fun PaymentConfirmation(
     modifier: Modifier = Modifier,
     paymentState: PaytrailPaymentState?,
-    onClick: () -> Unit = {}
+    onClick: () -> Unit = {},
 ) {
     var resultToShow by remember { mutableStateOf(paymentState) }
     if (paymentState != null) resultToShow = paymentState
 
     val status = resultToShow?.state
-    //Unused for this demo purpose
+    // Unused for this demo purpose
     val transactionId = resultToShow?.finalRedirectRequest?.transactionId
         ?: resultToShow?.tokenPaymentResponse?.transactionId?.toString()
     val errorMessage = resultToShow?.exception?.toString()
@@ -47,7 +47,7 @@ fun PaymentConfirmation(
         modifier = modifier
             .fillMaxSize()
             .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         when (status) {
             PaytrailPaymentState.State.PAYMENT_OK -> {
@@ -67,7 +67,7 @@ fun PaymentConfirmation(
 fun PaymentConfirmationSuccess(onClick: () -> Unit) {
     Text(
         text = stringResource(id = R.string.payment_confirmation_success_title),
-        style = PaytrailTypography.titleMedium
+        style = PaytrailTypography.titleMedium,
     )
     Spacer(modifier = Modifier.height(43.dp))
     Column(
@@ -80,12 +80,12 @@ fun PaymentConfirmationSuccess(onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(25.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = stringResource(id = R.string.payment_confirmation_success),
             style = PaytrailTypography.bodyMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         FilledButton(text = stringResource(id = R.string.payment_confirmation_success_button)) {
             onClick()
@@ -97,7 +97,7 @@ fun PaymentConfirmationSuccess(onClick: () -> Unit) {
 fun PaymentConfirmationFailed(failureMessage: String?, onClick: () -> Unit) {
     Text(
         text = stringResource(id = R.string.payment_confirmation_failed_title),
-        style = PaytrailTypography.titleMedium
+        style = PaytrailTypography.titleMedium,
     )
     Spacer(modifier = Modifier.height(43.dp))
     Column(
@@ -108,12 +108,12 @@ fun PaymentConfirmationFailed(failureMessage: String?, onClick: () -> Unit) {
                 shape = RoundedCornerShape(7.dp),
             ).fillMaxWidth().padding(25.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween
+        verticalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = failureMessage ?: stringResource(id = R.string.payment_confirmation_error),
             style = PaytrailTypography.bodyMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
         FilledButton(text = stringResource(id = R.string.payment_confirmation_failed_button)) {
             onClick()

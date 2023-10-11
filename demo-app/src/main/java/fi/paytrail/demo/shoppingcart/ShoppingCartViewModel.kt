@@ -13,12 +13,7 @@ class ShoppingCartViewModel @Inject constructor(
 ) : ViewModel() {
     val items = repository.cart().map { it.items.values.toList() }
     val totalAmount = repository.cart().map { it.totalAmount }
-    val rowCount = repository.cart().map { it.items.size }
 
-    fun incrementAmount(id: UUID) {
-        repository.incrementItemAmount(id)
-    }
-    fun decrementAmount(id: UUID){
-        repository.decrementItemAmount(id)
-    }
+    fun incrementAmount(id: UUID) = repository.incrementItemAmount(id)
+    fun decrementAmount(id: UUID) = repository.decrementItemAmount(id)
 }

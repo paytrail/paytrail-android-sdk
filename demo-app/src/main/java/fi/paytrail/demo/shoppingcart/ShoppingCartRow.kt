@@ -10,7 +10,7 @@ data class ShoppingCartRow(
     val amount: Long,
     val unitPrice: BigDecimal,
     val vatPercentage: Long,
-    val fakeImage: Int,// You can replace it with a string that contain url of the image
+    val fakeImage: Int, // You can replace it with a string that contain url of the image
 ) {
     val totalPrice by lazy { amount * unitPrice }
 }

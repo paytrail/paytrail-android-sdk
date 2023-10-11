@@ -3,7 +3,6 @@ package fi.paytrail.demo.ui.theme
 import androidx.compose.ui.graphics.Color
 
 object MyColors {
-    val Grey01 = Color(0xFF23232A)
     val Grey02 = Color(0xFF59595C)
     val Grey03 = Color(0xFFE4E4E5)
     val Grey04 = Color(0xFF76767A)

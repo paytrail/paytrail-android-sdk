@@ -26,8 +26,8 @@ val fakeCart = ShoppingCart(
             id = UUID.fromString("2e3f6d5a-c33b-46c9-9942-98bf02651e23"),
             amount = 1,
             unitPrice = BigDecimal.valueOf(15),
-            fakeImage= R.drawable.product_img2,
-            vatPercentage = 24
+            fakeImage = R.drawable.product_img2,
+            vatPercentage = 24,
         ),
         ShoppingCartRow(
             name = "Paytrail Drinking Bottle",
@@ -49,10 +49,10 @@ class ShoppingCartRepository @Inject constructor() {
         return shoppingCartState
     }
 
-    fun incrementItemAmount(id : UUID) {
+    fun incrementItemAmount(id: UUID) {
         shoppingCartState.value.items[id]?.let {
             shoppingCartState.value = ShoppingCart(
-                items = shoppingCartState.value.items + (id to it.copy(amount = it.amount+1))
+                items = shoppingCartState.value.items + (id to it.copy(amount = it.amount + 1)),
             )
         }
     }
@@ -60,7 +60,7 @@ class ShoppingCartRepository @Inject constructor() {
         shoppingCartState.value.items[id]?.let {
             if (it.amount > 1) {
                 shoppingCartState.value = ShoppingCart(
-                    items = shoppingCartState.value.items + (id to it.copy(amount = it.amount-1))
+                    items = shoppingCartState.value.items + (id to it.copy(amount = it.amount - 1)),
                 )
             }
         }

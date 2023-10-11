@@ -27,16 +27,16 @@ fun OutLineButton(text: String, onClick: () -> Unit) {
         onClick = { onClick.invoke() },
         colors = ButtonDefaults.buttonColors(
             containerColor = Color.White,
-            contentColor = Grey02
+            contentColor = Grey02,
         ),
-        border = BorderStroke(1.dp, PinkElement)
+        border = BorderStroke(1.dp, PinkElement),
     ) {
         Text(text)
     }
 }
 
 @Composable
-fun FilledButton(modifier: Modifier = Modifier, text: String, isEnabled:Boolean = true, onClick: () -> Unit) {
+fun FilledButton(modifier: Modifier = Modifier, text: String, isEnabled: Boolean = true, onClick: () -> Unit) {
     Button(
         modifier = modifier
             .widthIn(min = 80.dp)
@@ -44,9 +44,9 @@ fun FilledButton(modifier: Modifier = Modifier, text: String, isEnabled:Boolean 
         onClick = { onClick.invoke() },
         colors = ButtonDefaults.buttonColors(
             containerColor = PinkElement,
-            contentColor = Color.White
+            contentColor = Color.White,
         ),
-        enabled = isEnabled
+        enabled = isEnabled,
     ) {
         Text(text)
     }

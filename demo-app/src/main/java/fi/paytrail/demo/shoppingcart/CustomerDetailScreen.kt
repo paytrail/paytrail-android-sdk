@@ -48,7 +48,7 @@ import fi.paytrail.sdk.apiclient.models.Customer
 fun CustomerDetailScreen(
     modifier: Modifier = Modifier,
     cancelAction: () -> Unit,
-    toPayAction: () -> Unit
+    toPayAction: () -> Unit,
 ) {
     Column(
         modifier = modifier
@@ -56,7 +56,7 @@ fun CustomerDetailScreen(
             .verticalScroll(rememberScrollState())
             .padding(24.dp),
         horizontalAlignment = Alignment.Start,
-        verticalArrangement = Arrangement.Top
+        verticalArrangement = Arrangement.Top,
     ) {
         val focusManager = LocalFocusManager.current
 
@@ -93,52 +93,57 @@ fun CustomerDetailScreen(
         )
         Spacer(modifier = Modifier.height(26.dp))
 
-        FormInputField(placeholder = "First name",
+        FormInputField(
+            placeholder = "First name",
             imeAction = ImeAction.Next,
             keyBoardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
             ),
             text = firstName.value,
             onChange = {
                 firstName.value = it
-            }
+            },
         )
         Spacer(modifier = Modifier.height(26.dp))
 
-        FormInputField(placeholder = "Last name",
+        FormInputField(
+            placeholder = "Last name",
             imeAction = ImeAction.Next,
             keyBoardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
             ),
-            text = lastName.value
+            text = lastName.value,
         )
         Spacer(modifier = Modifier.height(26.dp))
 
-        FormInputField(placeholder = "Phone number",
+        FormInputField(
+            placeholder = "Phone number",
             imeAction = ImeAction.Next,
             keyBoardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
             ),
-            text = phoneNumbere.value
+            text = phoneNumbere.value,
         )
 
         Spacer(modifier = Modifier.height(26.dp))
 
-        FormInputField(placeholder = "Email",
+        FormInputField(
+            placeholder = "Email",
             imeAction = ImeAction.Next,
             keyBoardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
             ),
-            text = email.value
+            text = email.value,
         )
         Spacer(modifier = Modifier.height(26.dp))
 
-        FormInputField(placeholder = "Address",
+        FormInputField(
+            placeholder = "Address",
             imeAction = ImeAction.Next,
             keyBoardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
             ),
-            text = address.value
+            text = address.value,
         )
         Spacer(modifier = Modifier.height(26.dp))
 
@@ -150,17 +155,18 @@ fun CustomerDetailScreen(
                 placeholder = "Zip code",
                 imeAction = ImeAction.Next,
                 keyBoardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
                 ),
-                text = postalCode.value
+                text = postalCode.value,
             )
-            FormInputField(placeholder = "Postal address",
+            FormInputField(
+                placeholder = "Postal address",
                 modifier = modifier.weight(1f),
                 imeAction = ImeAction.Next,
                 keyBoardActions = KeyboardActions(
-                    onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                    onNext = { focusManager.moveFocus(FocusDirection.Down) },
                 ),
-                text = postalAddress.value
+                text = postalAddress.value,
             )
         }
         Spacer(modifier = Modifier.height(26.dp))
@@ -172,12 +178,13 @@ fun CustomerDetailScreen(
             Text(text = "I have read and accept the order and contract terms *")
         }
         Spacer(modifier = Modifier.height(26.dp))
-        FormInputField(placeholder = "Country",
+        FormInputField(
+            placeholder = "Country",
             imeAction = ImeAction.Next,
             keyBoardActions = KeyboardActions(
-                onNext = { focusManager.moveFocus(FocusDirection.Down) }
+                onNext = { focusManager.moveFocus(FocusDirection.Down) },
             ),
-            text = country.value
+            text = country.value,
         )
         Spacer(modifier = Modifier.height(26.dp))
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
@@ -186,7 +193,7 @@ fun CustomerDetailScreen(
             }
             FilledButton(
                 text = stringResource(id = R.string.payment_button_payment),
-                isEnabled = checkBoxState.value
+                isEnabled = checkBoxState.value,
             ) {
                 toPayAction.invoke()
             }
@@ -204,7 +211,7 @@ fun FormInputField(
     imeAction: ImeAction = ImeAction.Next,
     keyboardType: KeyboardType = KeyboardType.Text,
     keyBoardActions: KeyboardActions = KeyboardActions(),
-    isEnabled: Boolean = true
+    isEnabled: Boolean = true,
 ) {
     TextField(
         modifier = modifier.fillMaxWidth(),
@@ -219,10 +226,10 @@ fun FormInputField(
             unfocusedContainerColor = Color.White,
             focusedContainerColor = Color.White,
             unfocusedIndicatorColor = Grey03,
-            unfocusedLabelColor = Grey04
+            unfocusedLabelColor = Grey04,
         ),
         label = {
             Text(text = placeholder)
-        }
+        },
     )
 }

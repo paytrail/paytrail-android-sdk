@@ -51,11 +51,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
-import fi.paytrail.demo.shoppingcart.CustomerDetailScreen
 import fi.paytrail.demo.payments.PaymentConfirmation
 import fi.paytrail.demo.payments.PaymentDetails
 import fi.paytrail.demo.payments.PaymentListing
 import fi.paytrail.demo.payments.PaymentRepository
+import fi.paytrail.demo.shoppingcart.CustomerDetailScreen
 import fi.paytrail.demo.shoppingcart.ShoppingCartRepository
 import fi.paytrail.demo.shoppingcart.ShoppingCartScreen
 import fi.paytrail.demo.shoppingcart.ShoppingCartViewModel
@@ -126,7 +126,7 @@ class MainActivity : ComponentActivity() {
         var paymentState: Pair<UUID, PaytrailPaymentState>? by mutableStateOf(null)
 
         setContent {
-            //For demo purpose, we forced light theme
+            // For demo purpose, we forced light theme
             PaytrailDemoTheme(dynamicColor = false, darkTheme = false) {
                 // A surface container using the 'background' color from the theme
                 Surface(
@@ -150,7 +150,7 @@ class MainActivity : ComponentActivity() {
                                     // reached.
                                     PAYMENT_OK, PAYMENT_FAIL, PAYMENT_ERROR, PAYMENT_CANCELED -> {
                                         navController.navigate(NAV_PAYMENT_CONFIRMATION) {
-                                            popUpTo(navController.graph.startDestinationId) { inclusive = true}
+                                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
                                         }
                                     }
 
@@ -212,16 +212,18 @@ class MainActivity : ComponentActivity() {
                     payAndAddCardAction = { navController.navigate(NAV_PAY_AND_ADD_CARD) },
                     cardsAction = { navController.navigate(NAV_CARDS) },
                     showPaymentHistory = { navController.navigate(NAV_PAYMENT_LISTING) },
-                    continueAction = { navController.navigate(NAV_CUSTOMER_DETAIL)}
+                    continueAction = { navController.navigate(NAV_CUSTOMER_DETAIL) },
                 )
             }
             composable(NAV_CUSTOMER_DETAIL) {
-                CustomerDetailScreen(cancelAction = {
-                    navController.popBackStack()
-                },
+                CustomerDetailScreen(
+                    cancelAction = {
+                        navController.popBackStack()
+                    },
                     toPayAction = {
                         navController.navigate(NAV_CREATE_PAYMENT)
-                    })
+                    },
+                )
             }
             composable(NAV_CARDS) {
                 TokenizedCreditCardsScreen(
@@ -320,7 +322,7 @@ class MainActivity : ComponentActivity() {
                     cards = cardsViewModel.cards.collectAsState(initial = emptyList()).value,
                 )
             }
-            //TODO this may come in the v2 of this demo
+            // TODO this may come in the v2 of this demo
             composable(NAV_PAY_AND_ADD_CARD) {
                 val paymentId = remember { UUID.randomUUID() }
                 val paymentRequest = remember { shoppingCartRepository.cartAsPaymentRequest() }
@@ -357,9 +359,9 @@ class MainActivity : ComponentActivity() {
             }
 
             composable(
-                NAV_PAYMENT_CONFIRMATION
+                NAV_PAYMENT_CONFIRMATION,
             ) {
-                PaymentConfirmation(paymentState = paymentState){
+                PaymentConfirmation(paymentState = paymentState) {
                     navController.navigate(NAV_SHOPPING_CART)
                 }
             }

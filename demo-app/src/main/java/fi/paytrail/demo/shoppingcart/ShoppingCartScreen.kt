@@ -70,7 +70,7 @@ fun ShoppingCartScreen(
     payAndAddCardAction: () -> Unit,
     cardsAction: () -> Unit,
     showPaymentHistory: () -> Unit,
-    continueAction: () -> Unit
+    continueAction: () -> Unit,
 ) {
     val items = viewModel.items.collectAsState(initial = emptyList()).value
     val total = viewModel.totalAmount.collectAsState(initial = BigDecimal.ZERO).value
@@ -89,7 +89,7 @@ fun ShoppingCartScreen(
         },
         onDecrement = {
             viewModel.decrementAmount(it)
-        }
+        },
     )
 }
 
@@ -104,7 +104,7 @@ private fun ShoppingCartScreen(
     showPaymentHistory: () -> Unit = {},
     continueAction: () -> Unit = {},
     onIncrement: (UUID) -> Unit = {},
-    onDecrement: (UUID) -> Unit = {}
+    onDecrement: (UUID) -> Unit = {},
 ) {
     Column(
         modifier = modifier.fillMaxWidth(),
@@ -116,11 +116,11 @@ private fun ShoppingCartScreen(
             items = items,
             total = total,
             onIncrement,
-            onDecrement
+            onDecrement,
         )
         FilledButton(
             modifier = Modifier.align(Alignment.End),
-            text = stringResource(id = R.string.shopping_cart_button_continue)
+            text = stringResource(id = R.string.shopping_cart_button_continue),
         ) {
             continueAction.invoke()
         }
@@ -133,7 +133,7 @@ private fun ShoppingCartListing(
     items: List<ShoppingCartRow>,
     total: BigDecimal,
     onIncrement: (UUID) -> Unit,
-    onDecrement: (UUID) -> Unit
+    onDecrement: (UUID) -> Unit,
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth(),
@@ -158,7 +158,7 @@ private fun ShoppingCartListing(
                     .padding(vertical = 8.dp),
                 item = item,
                 onIncrement,
-                onDecrement
+                onDecrement,
             )
         }
 
@@ -285,7 +285,7 @@ private fun ShoppingCartItem(
     modifier: Modifier = Modifier,
     item: ShoppingCartRow,
     onIncrement: (UUID) -> Unit = {},
-    onDecrement: (UUID) -> Unit = {}
+    onDecrement: (UUID) -> Unit = {},
 ) {
     Column(
         modifier = modifier
@@ -315,7 +315,7 @@ private fun ShoppingCartItem(
                 Text(
                     modifier = Modifier,
                     fontWeight = W700,
-                    text = "${currencyFormatter.format(item.unitPrice)} €"
+                    text = "${currencyFormatter.format(item.unitPrice)} €",
                 )
 
                 Row(
@@ -396,7 +396,7 @@ fun PreviewShoppingCartItem() {
             amount = 2,
             unitPrice = BigDecimal("2.99"),
             vatPercentage = 24,
-            fakeImage = R.drawable.image_placeholder
+            fakeImage = R.drawable.image_placeholder,
         ),
     )
 }
@@ -412,7 +412,7 @@ fun PreviewShoppingCartItem_LongName() {
             amount = 2,
             unitPrice = BigDecimal("2345.67"),
             vatPercentage = 24,
-            fakeImage = R.drawable.image_placeholder
+            fakeImage = R.drawable.image_placeholder,
         ),
     )
 }
