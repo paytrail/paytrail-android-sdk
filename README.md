@@ -1,2 +1,2 @@
-# paytrail-android-sdk
-Paytrail Android SDK
+# Paytrail Android SDK
+Please note: **SDK is still work in progress**.
