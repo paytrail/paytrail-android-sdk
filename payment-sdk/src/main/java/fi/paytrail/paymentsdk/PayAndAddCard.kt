@@ -12,6 +12,17 @@ import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 
+/**
+ * A compose view that streamlines the payment process by integrating both the payment and card tokenization in a single step.
+ *
+ * This component is designed to enhance the user experience by allowing them to perform a payment while simultaneously saving their card details for future transactions. It simplifies the two-step process of paying and then saving card information into a single, seamless step.
+ *
+ * @param modifier The modifier to be applied to the Composable for adjusting layout behavior.
+ * @param paymentRequest Contains details of the payment like amount, reference, etc.
+ * @param onPaymentStateChanged Callback invoked when there's any change in the payment state.
+ * @param merchantAccount Contains merchant's account details.
+ * @param apiClient Client for connecting to the Paytrail API. Defaults to a new instance if not provided.
+ */
 @Composable
 fun PayAndAddCard(
     modifier: Modifier = Modifier,

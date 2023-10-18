@@ -8,7 +8,6 @@ import okhttp3.OkHttpClient
  * endpoints with [ApiClient]
  */
 object PaytrailBaseOkHttpClient {
-    // TODO: Move this functionality directly into ApiClient?
     var baseClient: OkHttpClient? = null
         internal set
 

@@ -23,7 +23,17 @@ import fi.paytrail.paymentsdk.theme.Poppins
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
-
+/**
+ * A Composable function representing the Paytrail payment view.
+ * This view displays a list of available payment providers. Upon selecting a provider,
+ * the user is redirected to a WebView where the actual payment process takes place
+ * using the chosen payment provider.
+ * @param modifier Optional [Modifier] for adjusting the layout of this composable.
+ * @param paymentRequest Contains details of the payment like amount, reference, etc.
+ * @param onPaymentStateChanged Callback triggered when there's a change in the payment process state.
+ * @param merchantAccount Merchant's Paytrail account details.
+ * @param apiClient the http client for making API calls to Paytrail servers. By default, we use our internal one with the provided merchant account.
+ */
 @Composable
 fun PaytrailPayment(
     modifier: Modifier = Modifier,

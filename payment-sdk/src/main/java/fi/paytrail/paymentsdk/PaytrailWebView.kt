@@ -30,7 +30,26 @@ import fi.paytrail.sdk.apiclient.models.Callbacks
 import java.net.URLEncoder
 
 enum class PaytrailWebViewCallMethod { GET, POST }
-
+/**
+ * Base WebView.
+ *
+ * The `PaytrailWebView` Composable provides a seamless integration for loading the Paytrail payment gateway
+ * within a Compose application. This WebView is designed to handle the different scenarios of Paytrail's
+ * payment flow, including success, cancellation, errors, and form resubmissions.
+ *
+ * It also supports both POST and GET methods for initiating the payment, and is equipped with built-in security
+ * measures like signature verification for the redirect URLs.
+ *
+ * @param modifier The modifier to be applied to the WebView for adjusting layout behavior.
+ * @param url The initial URL to load within the WebView.
+ * @param method The HTTP method to use. Defaults to GET. Use POST when you need to pass parameters in the request body.
+ * @param postParameters The parameters to be sent in the request body if the method is POST. Ignored if method is GET.
+ * @param redirectUrls Contains the success and cancellation URLs to detect the end of the payment flow.
+ * @param signatureVerificationSecret The merchant's secret key to validate the signature of redirect URLs.
+ * @param onFinalRedirect Callback triggered once the payment gateway redirects to either the success or cancel URL.
+ * @param onError Callback triggered when there's an error, such as an invalid URL signature.
+ * @param allowBackNavigation Whether the WebView should handle back navigation. Defaults to true.
+ */
 @Composable
 fun PaytrailWebView(
     modifier: Modifier = Modifier,

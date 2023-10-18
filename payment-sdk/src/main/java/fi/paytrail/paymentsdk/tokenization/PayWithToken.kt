@@ -13,17 +13,36 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
-
+/**
+ * Represents the type of payment charge when dealing with tokens.
+ */
 enum class TokenPaymentChargeType {
     AUTH_HOLD,
     CHARGE,
 }
-
+/**
+ * Represents the type of token payment in compliance with the European PSD2 directive.
+ */
 enum class TokenPaymentType {
     MIT,
     CIT,
 }
-
+/**
+ * A Composable function for processing payments using a saved tokenization ID.
+ *
+ * This function facilitates the payment process using a previously obtained tokenization ID.
+ * This is particularly useful for executing transactions without repeatedly prompting the user for card details.
+ *
+ * @param modifier The modifier to be applied to the Composable.
+ * @param paymentRequest Contains details of the payment like amount, reference, etc.
+ * @param tokenizationId The previously saved ID from the card tokenization process.
+ * @param paymentType Type of token payment - can be either CIT (default) or MIT.
+ * @param chargeType Type of payment charge - can either be CHARGE (default) or AUTH_HOLD.
+ * @param onTokenAvailable Callback invoked when a token becomes available.
+ * @param onPaymentStateChanged Callback invoked when there's any change in the payment state.
+ * @param merchantAccount Contains merchant's account details.
+ * @param apiClient Client for connecting to the Paytrail API.
+ */
 @Composable
 fun PayWithTokenizationId(
     modifier: Modifier = Modifier,

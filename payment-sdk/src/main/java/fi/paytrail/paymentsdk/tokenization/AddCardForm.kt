@@ -14,7 +14,11 @@ import fi.paytrail.sdk.apiclient.models.Callbacks
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 import java.util.UUID
-
+/**
+ * Represents the redirected URL data after the card has been added.
+ *
+ * @param url The redirected URL after card tokenization.
+ */
 data class AddCardRedirect(val url: Uri) {
     val account = url.getQueryParameter("checkout-account")
     val algorithm = url.getQueryParameter("checkout-algorithm")
@@ -23,7 +27,17 @@ data class AddCardRedirect(val url: Uri) {
     val tokenizationId = url.getQueryParameter("checkout-tokenization-id")
     val signature = url.getQueryParameter("signature")
 }
-
+/**
+ * A Compose view that provides a webview-based form for users to add their payment card information.
+ *
+ * This form focuses on card tokenization without initiating a payment. It's a user-friendly method for developers
+ * to tokenize a user's card information.
+ *
+ * @param modifier Compose UI modifier.
+ * @param request The request details required to set up the card form.
+ * @param merchantAccount The merchant's Paytrail account details.
+ * @param onAddCardResult Callback for the result after a card has been added.
+ */
 @Composable
 fun AddCardForm(
     modifier: Modifier = Modifier,

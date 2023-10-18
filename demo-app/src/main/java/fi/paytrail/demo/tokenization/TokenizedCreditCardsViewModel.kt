@@ -12,7 +12,16 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-
+/**
+ * Represents a tokenized credit card.
+ *
+ * This data class holds the necessary details of a credit card that has been tokenized,
+ * including the tokenization ID and the response that provides additional information
+ * about the tokenization process.
+ *
+ * @param tokenizationId The unique identifier of the tokenization process.
+ * @param response The response that provides additional details about the tokenization.
+ */
 data class TokenizedCreditCard(
     val tokenizationId: String,
     val response: TokenizationRequestResponse?,

@@ -6,6 +6,19 @@ import java.util.UUID
 
 // TODO: Include transaction id in the state when it is known
 // TODO: Should other payment request info be included in the state?
+/**
+ * Represents the state of the payment process in the Paytrail system.
+ * This data class provides insights and updates regarding the various stages and outcomes
+ * of the payment process. It can be used by the consumer of the SDK to handle UI changes,
+ * error handling, and other relevant operations based on the payment state.
+ *
+ * @param state Current state of the payment process.
+ * @param timestamp Timestamp marking the time of state initialization.
+ * @param finalRedirectRequest Contains parameters derived from the checkout redirect link.
+ * @param tokenPaymentResponse Response received when a tokenized payment is initiated.
+ * @param apiErrorResponse Represents any error response when interfacing with the Paytrail API.
+ * @param exception Any exception that might emerge during the payment operations.
+ */
 data class PaytrailPaymentState internal constructor(
     val state: State,
     val timestamp: LocalDateTime = LocalDateTime.now(),
@@ -20,6 +33,10 @@ data class PaytrailPaymentState internal constructor(
 
     enum class State {
         LOADING_PAYMENT_PROVIDERS,
+
+        /**
+         * This state will trigger PaymentProviders to show available payment providers.
+         */
         SHOW_PAYMENT_PROVIDERS,
 
         /**

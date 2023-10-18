@@ -5,7 +5,18 @@ import fi.paytrail.paymentsdk.model.createErrorResponse
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
-
+/**
+ * Represents the status of a request made to the backend.
+ *
+ * This data class helps in wrapping the result of an API call or any other request,
+ * providing a unified way to represent the success, loading, or error state.
+ *
+ * @param T The type of the data to be returned in case of a successful request.
+ * @param status The current status of the request (e.g., LOADING, SUCCESS, ERROR).
+ * @param value The actual data in case the request was successful.
+ * @param error The error response from the API if any.
+ * @param exception Any exception that might have occurred during the request.
+ */
 data class RequestStatus<T> constructor(
     val status: Status,
     val value: T? = null,
