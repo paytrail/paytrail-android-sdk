@@ -4,6 +4,7 @@ plugins {
     alias(libs.plugins.org.jetbrains.kotlin.android)
     alias(libs.plugins.org.jetbrains.kotlin.parcelize)
     alias(libs.plugins.jlleitschuh.ktlint)
+    id("maven-publish")
 }
 
 ktlint {
@@ -38,7 +39,7 @@ android {
         // Flag to enable support for the new language APIs
         isCoreLibraryDesugaringEnabled = true
 
-        // Sets Java compatibility to Java 8
+        // Sets Java compatibility to Java 17
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
@@ -56,6 +57,26 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1,LICENSE.md,LICENSE-notice.md}"
+        }
+    }
+    android {
+        publishing {
+            singleVariant("release") {
+                withSourcesJar()
+            }
+        }
+    }
+}
+publishing {
+    publications {
+        register<MavenPublication>("release") {
+            groupId = "com.github.paytrail"
+            artifactId = "paytrail-android-sdk"
+            version = "v0.1.0-alpha"
+
+            afterEvaluate {
+                from(components["release"])
+            }
         }
     }
 }
