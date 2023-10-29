@@ -38,7 +38,7 @@ import fi.paytrail.sdk.apiclient.models.PaymentRequest
 fun PaytrailPayment(
     modifier: Modifier = Modifier,
     paymentRequest: PaymentRequest,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit, // TODO: Replace with functional interface for java compatibility
+    onPaymentStateChanged: PaymentStateChangeListener,
     merchantAccount: MerchantAccount,
     apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
 ) {
@@ -62,7 +62,7 @@ fun PaytrailPayment(
 internal fun PaytrailPayment(
     modifier: Modifier = Modifier,
     viewModel: PaymentViewModel,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    onPaymentStateChanged: PaymentStateChangeListener,
     merchantAccount: MerchantAccount,
 ) {
     val paymentStatus =
@@ -73,7 +73,7 @@ internal fun PaytrailPayment(
         ).value
 
     LaunchedEffect(paymentStatus) {
-        onPaymentStateChanged(paymentStatus)
+        onPaymentStateChanged.onPaymentStateChanged(paymentStatus)
     }
 
     // TODO: Set up & apply custom theming to relevant components

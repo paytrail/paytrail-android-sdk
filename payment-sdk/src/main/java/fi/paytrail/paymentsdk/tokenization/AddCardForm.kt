@@ -27,6 +27,9 @@ data class AddCardRedirect(val url: Uri) {
     val tokenizationId = url.getQueryParameter("checkout-tokenization-id")
     val signature = url.getQueryParameter("signature")
 }
+interface AddCardStatusChangedListener {
+    fun onAddCardResult(addCardResult : AddCardResult)
+}
 /**
  * A Compose view that provides a webview-based form for users to add their payment card information.
  *
@@ -43,7 +46,7 @@ fun AddCardForm(
     modifier: Modifier = Modifier,
     request: AddCardRequest,
     merchantAccount: MerchantAccount,
-    onAddCardResult: (AddCardResult) -> Unit,
+    onAddCardResult:AddCardStatusChangedListener,
 ) {
     val addCardFormRequest =
         AddCardFormRequest(
@@ -71,7 +74,7 @@ fun AddCardForm(
 private fun AddCardForm(
     modifier: Modifier = Modifier,
     request: AddCardFormRequest,
-    onAddCardStatusChanged: (AddCardResult) -> Unit,
+    onAddCardStatusChanged: AddCardStatusChangedListener,
     merchantAccount: MerchantAccount,
 ) {
     PaytrailWebView(
@@ -90,7 +93,7 @@ private fun AddCardForm(
             } else {
                 AddCardResult.Result.FAILURE
             }
-            onAddCardStatusChanged(
+            onAddCardStatusChanged.onAddCardResult(
                 AddCardResult(
                     result = state,
                     redirect = redirect,
@@ -98,7 +101,7 @@ private fun AddCardForm(
             )
         },
         onError = {
-            onAddCardStatusChanged(
+            onAddCardStatusChanged.onAddCardResult(
                 AddCardResult(
                     result = AddCardResult.Result.ERROR,
                     exception = it,

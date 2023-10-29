@@ -8,10 +8,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import fi.paytrail.paymentsdk.LoadingIndicator
+import fi.paytrail.paymentsdk.PaymentStateChangeListener
 import fi.paytrail.paymentsdk.PaytrailWebView
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
+import fi.paytrail.sdk.apiclient.models.Payment
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
 /**
  * Represents the type of payment charge when dealing with tokens.
@@ -51,7 +53,7 @@ fun PayWithTokenizationId(
     paymentType: TokenPaymentType = TokenPaymentType.CIT,
     chargeType: TokenPaymentChargeType = TokenPaymentChargeType.CHARGE,
     onTokenAvailable: (String) -> Unit,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    onPaymentStateChanged: PaymentStateChangeListener,
     merchantAccount: MerchantAccount,
     apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
 ) {
@@ -85,7 +87,7 @@ fun PayWithToken(
     token: String,
     paymentType: TokenPaymentType = TokenPaymentType.CIT,
     chargeType: TokenPaymentChargeType = TokenPaymentChargeType.CHARGE,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    onPaymentStateChanged: PaymentStateChangeListener,
     merchantAccount: MerchantAccount,
     apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
 ) {
@@ -109,11 +111,11 @@ fun PayWithToken(
 }
 
 @Composable
-fun PayWithToken(
+internal fun PayWithToken(
     modifier: Modifier = Modifier,
     viewModel: PayWithTokenViewModel,
     merchantAccount: MerchantAccount,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    onPaymentStateChanged: PaymentStateChangeListener,
 ) {
     val paymentStatus =
         viewModel.paymentState.collectAsState(
@@ -121,7 +123,7 @@ fun PayWithToken(
         ).value
 
     LaunchedEffect(paymentStatus) {
-        onPaymentStateChanged(paymentStatus)
+        onPaymentStateChanged.onPaymentStateChanged(paymentStatus)
     }
 
     val url = viewModel.payment3DSRedirectUrl.collectAsState(initial = null).value

@@ -10,8 +10,10 @@ class PaytrailLaunchPaymentMethodTest : BasePaytrailUiTest() {
     fun testLaunchTestPayment() {
         val callbacks: MutableList<PaytrailPaymentState> = mutableListOf()
 
-        val callback: (PaytrailPaymentState) -> Unit = {
-            callbacks.add(it)
+        val callback = object : PaymentStateChangeListener {
+            override fun onPaymentStateChanged(state: PaytrailPaymentState) {
+                callbacks.add(state)
+            }
         }
 
         with(composeTestRule) {

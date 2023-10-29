@@ -25,7 +25,10 @@ fun ComposeContentTestRule.startPaymentMethodSelection(
     paymentRequest: PaymentRequest,
     port: Int,
     merchantAccount: MerchantAccount = defaultMerchantAccount,
-    callback: (PaytrailPaymentState) -> Unit = { },
+    callback: PaymentStateChangeListener = object : PaymentStateChangeListener {
+        override fun onPaymentStateChanged(state: PaytrailPaymentState) {
+        }
+    },
 ) {
     setContent {
         PaytrailPayment(

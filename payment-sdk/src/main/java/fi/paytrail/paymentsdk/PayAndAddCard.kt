@@ -27,7 +27,7 @@ import fi.paytrail.sdk.apiclient.models.PaymentRequest
 fun PayAndAddCard(
     modifier: Modifier = Modifier,
     paymentRequest: PaymentRequest,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit, // TODO: Replace with functional interface! for java compatibility
+    onPaymentStateChanged: PaymentStateChangeListener,
     merchantAccount: MerchantAccount,
     apiClient: PaytrailApiClient = PaytrailApiClient(merchantAccount = merchantAccount),
 ) {
@@ -44,10 +44,10 @@ fun PayAndAddCard(
 }
 
 @Composable
-fun PayAndAddCard(
+internal fun PayAndAddCard(
     modifier: Modifier,
     viewModel: PayAndAddCardViewModel,
-    onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+    onPaymentStateChanged: PaymentStateChangeListener,
     merchantAccount: MerchantAccount,
 ) {
     val paymentStatus =
@@ -56,7 +56,7 @@ fun PayAndAddCard(
         ).value
 
     LaunchedEffect(paymentStatus) {
-        onPaymentStateChanged(paymentStatus)
+        onPaymentStateChanged.onPaymentStateChanged(paymentStatus)
     }
 
     val url: String? = viewModel.paymentRedirectUrl.collectAsState(initial = null).value

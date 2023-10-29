@@ -68,6 +68,7 @@ import fi.paytrail.demo.tokenization.TokenizedCreditCardsViewModel
 import fi.paytrail.demo.ui.theme.MyColors.LightGrey
 import fi.paytrail.demo.ui.theme.PaytrailDemoTheme
 import fi.paytrail.paymentsdk.PayAndAddCard
+import fi.paytrail.paymentsdk.PaymentStateChangeListener
 import fi.paytrail.paymentsdk.PaytrailPayment
 import fi.paytrail.paymentsdk.RequestStatus
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
@@ -77,6 +78,7 @@ import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_FAIL
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.PAYMENT_OK
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState.State.SHOW_PAYMENT_PROVIDERS
 import fi.paytrail.paymentsdk.tokenization.AddCardForm
+import fi.paytrail.paymentsdk.tokenization.AddCardStatusChangedListener
 import fi.paytrail.paymentsdk.tokenization.PayWithTokenizationId
 import fi.paytrail.paymentsdk.tokenization.TokenPaymentChargeType
 import fi.paytrail.paymentsdk.tokenization.TokenPaymentType
@@ -150,7 +152,9 @@ class MainActivity : ComponentActivity() {
                                     // reached.
                                     PAYMENT_OK, PAYMENT_FAIL, PAYMENT_ERROR, PAYMENT_CANCELED -> {
                                         navController.navigate(NAV_PAYMENT_CONFIRMATION) {
-                                            popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                                            popUpTo(navController.graph.startDestinationId) {
+                                                inclusive = true
+                                            }
                                         }
                                     }
 
@@ -266,7 +270,11 @@ class MainActivity : ComponentActivity() {
                     tokenizationId = tokenizationId,
                     paymentType = paymentType,
                     chargeType = chargeType,
-                    onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
+                    onPaymentStateChanged = object : PaymentStateChangeListener {
+                        override fun onPaymentStateChanged(state: PaytrailPaymentState) {
+                            onPaymentStateChanged(paymentId, state)
+                        }
+                    },
                     onTokenAvailable = { token -> paymentRepository.storeToken(paymentId, token) },
                     merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
                 )
@@ -280,27 +288,29 @@ class MainActivity : ComponentActivity() {
                             cancel = "https://ecom.example.org/cancel",
                         ),
                     ),
-                    onAddCardResult = {
-                        // Call state.redirectRequest.url if necessary.
-                        //
-                        // The WebView in SDK for adding card does not follow the final HTTP
-                        // redirect to AddCardRequest.redirectUrls.success/cancel URLs. If your
-                        // system depends on call to these URLs happening, application needs to
-                        // make this call. This can be done either by opening a WebView to the URL,
-                        // or using a HTTP client (e.g. OkHttp) to call the URL.
+                    onAddCardResult = object : AddCardStatusChangedListener {
+                        override fun onAddCardResult(addCardResult: AddCardResult) {
+                            // Call state.redirectRequest.url if necessary.
+                            //
+                            // The WebView in SDK for adding card does not follow the final HTTP
+                            // redirect to AddCardRequest.redirectUrls.success/cancel URLs. If your
+                            // system depends on call to these URLs happening, application needs to
+                            // make this call. This can be done either by opening a WebView to the URL,
+                            // or using a HTTP client (e.g. OkHttp) to call the URL.
 
-                        coroutineScope.launch {
-                            if (it.result == AddCardResult.Result.SUCCESS) {
-                                // Store the tokenization ID securely for later use. The tokenization ID
-                                // can be used for retrieving the actual payment token, and masked card
-                                // details.
+                            coroutineScope.launch {
+                                if (addCardResult.result == AddCardResult.Result.SUCCESS) {
+                                    // Store the tokenization ID securely for later use. The tokenization ID
+                                    // can be used for retrieving the actual payment token, and masked card
+                                    // details.
 
-                                tokenizedCardsRepository.saveTokenizationId(it.redirect!!.tokenizationId!!)
+                                    tokenizedCardsRepository.saveTokenizationId(addCardResult.redirect!!.tokenizationId!!)
+                                }
+
+                                // Once tokenization result is available, remove the view from
+                                // composition / view tree.
+                                navController.navigateUp()
                             }
-
-                            // Once tokenization result is available, remove the view from
-                            // composition / view tree.
-                            navController.navigateUp()
                         }
                     },
                     merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
@@ -317,7 +327,11 @@ class MainActivity : ComponentActivity() {
                 PaymentScreen(
                     paymentRequest = paymentRequest,
                     paymentState = paymentState,
-                    onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
+                    onPaymentStateChanged = object : PaymentStateChangeListener {
+                        override fun onPaymentStateChanged(state: PaytrailPaymentState) {
+                            onPaymentStateChanged(paymentId, state)
+                        }
+                    },
                     navController = navController,
                     cards = cardsViewModel.cards.collectAsState(initial = emptyList()).value,
                 )
@@ -332,7 +346,11 @@ class MainActivity : ComponentActivity() {
                 PayAndAddCard(
                     modifier = Modifier.fillMaxSize(),
                     paymentRequest = paymentRequest,
-                    onPaymentStateChanged = { state -> onPaymentStateChanged(paymentId, state) },
+                    onPaymentStateChanged = object : PaymentStateChangeListener {
+                        override fun onPaymentStateChanged(state: PaytrailPaymentState) {
+                            onPaymentStateChanged(paymentId, state)
+                        }
+                    },
                     merchantAccount = SAMPLE_MERCHANT_ACCOUNT,
                 )
             }
@@ -372,7 +390,7 @@ class MainActivity : ComponentActivity() {
     private fun PaymentScreen(
         paymentRequest: PaymentRequest,
         paymentState: PaytrailPaymentState?,
-        onPaymentStateChanged: (PaytrailPaymentState) -> Unit,
+        onPaymentStateChanged: PaymentStateChangeListener,
         navController: NavController,
         cards: List<Pair<String, Flow<RequestStatus<TokenizedCreditCard>>>>,
     ) {
