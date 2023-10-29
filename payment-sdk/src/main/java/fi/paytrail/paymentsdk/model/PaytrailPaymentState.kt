@@ -3,9 +3,6 @@ package fi.paytrail.paymentsdk.model
 import fi.paytrail.sdk.apiclient.models.TokenPaymentResponse
 import java.time.LocalDateTime
 import java.util.UUID
-
-// TODO: Include transaction id in the state when it is known
-// TODO: Should other payment request info be included in the state?
 /**
  * Represents the state of the payment process in the Paytrail system.
  * This data class provides insights and updates regarding the various stages and outcomes
