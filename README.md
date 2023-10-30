@@ -1,25 +1,53 @@
-# paytrail-android-sdk
+# Paytrail Android SDK
 
-🚧 **Work in Progress!** 🚧
+## Introduction
 
-The Paytrail Android SDK will be available soon. Stay tuned!
+Welcome to the Paytrail Android SDK — your one-stop solution for seamless integration with the Paytrail payment service's [Web APIs](https://docs.paytrail.com/#/?id=paytrail-payment-api) on native Android projects. This SDK provides you with key functionalities such as:
 
-## Examples
+- Creating a regular payment
+- Saving a payment card token
+- Combining payment and card addition into a single step.
 
-For a sneak peek and some detailed examples of the SDK's capabilities, visit our [Paytrail SDK Examples](https://github.com/paytrail/paytrail-android-sdk/tree/main/demo-app) app.
+For a deep dive into the SDK's APIs, consult our [Paytrail Android SDK Wiki](https://github.com/paytrail/paytrail-android-sdk/wiki).
 
-## Requirements
+## Prerequisites
 
-*Details will be added once finalized.*
+- Android 5.0 (API level 21) or higher.
+- It's recommended to use the [Android Gradle Plugin](https://developer.android.com/studio/releases/gradle-plugin) version 7.4.0 or above.
+- Ensure [Gradle](https://gradle.org/releases/) version is 7.6.3 or higher.
 
 ## Installation
 
-Details on installation will be provided soon.
+1. **Add Jitpack Repository**:
+
+   ```groovy
+   repositories {  
+       maven(url = "https://jitpack.io")
+       google()  
+       mavenCentral()
+   }
+   ```
+
+2. **Integrate the SDK**:
+
+   ```groovy
+   dependencies {
+       implementation("com.github.paytrail:paytrail-android-sdk:Tag")
+   }
+   ```
 
 ## Getting Started
 
 Dive into our 📚 [integration guides](https://github.com/paytrail/paytrail-android-sdk/tree/main/wiki/paytrail_android_guide.md) to get a head start.
 
+## Demo Project
+
+Curious to see the SDK in action? Explore our [Paytrail SDK Examples](https://github.com/paytrail/paytrail-android-sdk/tree/main/demo-app) for a comprehensive overview.
+
+## Issues and Feedback
+
+Your feedback is invaluable to us! If you come across any issues or have suggestions for improvements, please [report them here](https://github.com/paytrail/paytrail-android-sdk/issues). We appreciate your contributions and will do our best to address them promptly.
+
 ## License
 
-Paytrail Android SDK is licensed under the [MIT License](https://github.com/paytrail/paytrail-android-sdk/blob/main/LICENSE).
+The Paytrail Android SDK is licensed under the [MIT License](https://github.com/paytrail/paytrail-android-sdk/blob/main/LICENSE).
