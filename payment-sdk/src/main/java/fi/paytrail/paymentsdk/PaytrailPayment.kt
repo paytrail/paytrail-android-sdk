@@ -45,9 +45,6 @@ fun PaytrailPayment(
     val viewModel: PaymentViewModel = viewModel(
         factory = PaymentViewModelFactory(paymentRequest, apiClient),
     )
-
-    // TODO: Get colors from current theme
-    // TODO: Make font family themable?
     CompositionLocalProvider(LocalTextStyle provides TextStyle(fontFamily = Poppins)) {
         PaytrailPayment(
             modifier = modifier,
@@ -75,8 +72,6 @@ internal fun PaytrailPayment(
     LaunchedEffect(paymentStatus) {
         onPaymentStateChanged.onPaymentStateChanged(paymentStatus)
     }
-
-    // TODO: Set up & apply custom theming to relevant components
 
     Box(modifier = modifier) {
         when (paymentStatus.state) {

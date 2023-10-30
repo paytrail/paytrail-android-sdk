@@ -41,7 +41,7 @@ import coil.request.ImageRequest
 import de.charlex.compose.HtmlText
 import fi.paytrail.paymentsdk.model.PaymentMethod
 import fi.paytrail.paymentsdk.model.PaymentMethodGroup
-import fi.paytrail.paymentsdk.theme.PaytrailColors.Grey02
+import fi.paytrail.paymentsdk.theme.PaytrailColors
 import fi.paytrail.paymentsdk.theme.Poppins
 import fi.paytrail.sdk.apiclient.models.PaymentMethodProvider
 
@@ -50,6 +50,7 @@ val PaytrailTextPaymentGroupHeading = TextStyle(
     fontWeight = W700,
     fontSize = 16.sp,
     lineHeight = 24.sp,
+    color = PaytrailColors.titleColor
 )
 
 val PaytrailTextTermsAndConditions = TextStyle(
@@ -57,7 +58,7 @@ val PaytrailTextTermsAndConditions = TextStyle(
     fontWeight = W300,
     fontSize = 12.sp,
     lineHeight = 17.sp,
-    color = Grey02,
+    color = PaytrailColors.subTitleColor,
 )
 
 @Composable
@@ -143,8 +144,6 @@ fun PreviewPaytrailTerms() {
 
 @Composable
 fun PaytrailTerms(terms: String) {
-    // TODO: Consider adding a composition-local LocalUriHandler to open
-    //       the terms in a WebView instead of platform default browser.
     HtmlText(
         modifier = Modifier
             .fillMaxWidth()
@@ -174,7 +173,7 @@ private fun PaymentProvider(
     Surface(
         modifier = modifier
             .size(width = 100.dp, height = 64.dp)
-            .background(color = Color.White)
+            .background(color = PaytrailColors.backgroundColor)
             .semantics {
                 testTag = "PaymentProvider"
                 contentDescription = item.name
@@ -185,6 +184,7 @@ private fun PaymentProvider(
     ) {
         Column(
             modifier = Modifier
+                .background(color = PaytrailColors.backgroundColor)
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
