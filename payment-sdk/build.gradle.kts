@@ -72,8 +72,9 @@ publishing {
         register<MavenPublication>("release") {
             groupId = "com.github.paytrail"
             artifactId = "paytrail-android-sdk"
-            version = "v0.1.0-alpha"
-
+            val versionFile = rootProject.file("VERSION")
+            var versionName = versionFile.readText().trim()
+            version = versionName
             afterEvaluate {
                 from(components["release"])
             }

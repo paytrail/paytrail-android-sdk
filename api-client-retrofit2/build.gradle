@@ -50,11 +50,14 @@ tasks.withType(KotlinCompile).configureEach {
 
 publishing {
     publications {
+        def versionFile = rootProject.file("VERSION")
+        def versionName = versionFile.text.trim()
+
         apiClientRetrofit2(MavenPublication) {
             from components.kotlin
             groupId "com.github.paytrail"
             artifactId "api-client-retrofit2"
-            version "v0.1.0-alpha"
+            version versionName
         }
     }
 }
