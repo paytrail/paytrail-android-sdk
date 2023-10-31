@@ -32,7 +32,7 @@ For a deep dive into the SDK's APIs, consult our [Paytrail Android SDK Wiki](htt
 
    ```groovy
    dependencies {
-       implementation("com.github.paytrail:paytrail-android-sdk:Tag")
+       implementation("com.github.paytrail:paytrail-android-sdk:v0.2.0-beta")
    }
    ```
 
