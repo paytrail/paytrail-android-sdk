@@ -41,7 +41,7 @@ For a deep dive into the SDK's APIs, consult our [Paytrail Android SDK Wiki](htt
 
 ## Getting Started
 
-Dive into our 📚 [integration guides](https://github.com/paytrail/paytrail-android-sdk/tree/main/wiki/paytrail_android_guide.md) to get a head start.
+Dive into our 📚 [integration guides](https://github.com/paytrail/paytrail-android-sdk/wiki/Let's-start) to get a head start.
 
 ## Demo Project
 
