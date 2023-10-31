@@ -1,5 +1,8 @@
 # Paytrail Android SDK
 
+[![](https://jitpack.io/v/paytrail/paytrail-android-sdk.svg)](https://jitpack.io/#paytrail/paytrail-android-sdk)
+[![GitHub tag (with filter)](https://img.shields.io/github/v/tag/paytrail/paytrail-android-sdk)](https://github.com/paytrail/paytrail-android-sdk/releases)
+[![GitHub](https://img.shields.io/github/license/paytrail/paytrail-android-sdk)]((https://github.com/paytrail/paytrail-android-sdk/blob/main/LICENSE))
 ## Introduction
 
 Welcome to the Paytrail Android SDK — your one-stop solution for seamless integration with the Paytrail payment service's [Web APIs](https://docs.paytrail.com/#/?id=paytrail-payment-api) on native Android projects. This SDK provides you with key functionalities such as:
