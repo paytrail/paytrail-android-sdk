@@ -37,7 +37,7 @@ class DemoApp : Application() {
         // SDK will use this client as basis for the OkHttpClient it uses to call API
         // endpoints.
         PaytrailBaseOkHttpClient.install(okHttpClientBuilder.build())
-        //Enabling logs
+        // Enabling logs
         PaytrailLogger.isLoggingEnabled = true
         // Allow debugging webview content for debug builds
         @SuppressLint("ObsoleteSdkInt")

@@ -49,7 +49,7 @@ val PaytrailTextPaymentGroupHeading = TextStyle(
     fontWeight = W700,
     fontSize = 16.sp,
     lineHeight = 24.sp,
-    color = PaytrailColors.titleColor
+    color = PaytrailColors.titleColor,
 )
 
 val PaytrailTextTermsAndConditions = TextStyle(

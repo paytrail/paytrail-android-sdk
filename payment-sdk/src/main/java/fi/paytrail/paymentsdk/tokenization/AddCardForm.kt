@@ -28,8 +28,9 @@ data class AddCardRedirect(val url: Uri) {
     val signature = url.getQueryParameter("signature")
 }
 interface AddCardStatusChangedListener {
-    fun onAddCardResult(addCardResult : AddCardResult)
+    fun onAddCardResult(addCardResult: AddCardResult)
 }
+
 /**
  * A Compose view that provides a webview-based form for users to add their payment card information.
  *
@@ -46,7 +47,7 @@ fun AddCardForm(
     modifier: Modifier = Modifier,
     request: AddCardRequest,
     merchantAccount: MerchantAccount,
-    onAddCardResult:AddCardStatusChangedListener,
+    onAddCardResult: AddCardStatusChangedListener,
 ) {
     val addCardFormRequest =
         AddCardFormRequest(

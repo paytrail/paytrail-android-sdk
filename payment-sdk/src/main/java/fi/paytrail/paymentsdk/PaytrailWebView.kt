@@ -28,6 +28,7 @@ import fi.paytrail.sdk.apiclient.models.Callbacks
 import java.net.URLEncoder
 
 enum class PaytrailWebViewCallMethod { GET, POST }
+
 /**
  * Base WebView.
  *

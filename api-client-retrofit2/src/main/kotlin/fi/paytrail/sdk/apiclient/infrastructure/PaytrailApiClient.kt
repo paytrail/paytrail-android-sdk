@@ -44,6 +44,7 @@ class PaytrailApiClient(
     init {
         normalizeBaseUrl()
     }
+
     /**
      * Creates a Retrofit service instance for the given service class.
      *
@@ -74,6 +75,7 @@ class PaytrailApiClient(
 
         return retrofitBuilder.callFactory(clientBuilder.build()).build().create(serviceClass)
     }
+
     /**
      * Normalizes the base URL by ensuring it ends with a slash.
      */

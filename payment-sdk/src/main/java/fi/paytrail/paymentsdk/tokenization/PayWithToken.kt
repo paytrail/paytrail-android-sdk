@@ -22,6 +22,7 @@ enum class TokenPaymentChargeType {
     AUTH_HOLD,
     CHARGE,
 }
+
 /**
  * Represents the type of token payment in compliance with the European PSD2 directive.
  */
@@ -29,6 +30,7 @@ enum class TokenPaymentType {
     MIT,
     CIT,
 }
+
 /**
  * A Composable function for processing payments using a saved tokenization ID.
  *

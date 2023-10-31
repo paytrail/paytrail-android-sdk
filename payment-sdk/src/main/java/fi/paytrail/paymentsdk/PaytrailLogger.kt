@@ -3,7 +3,7 @@ package fi.paytrail.paymentsdk
 import android.util.Log
 
 object PaytrailLogger {
-    var isLoggingEnabled = false  // Turn this on/off to enable/disable logs
+    var isLoggingEnabled = false // Turn this on/off to enable/disable logs
     val tag = "MSDK"
     fun d(message: String) {
         if (isLoggingEnabled) {
