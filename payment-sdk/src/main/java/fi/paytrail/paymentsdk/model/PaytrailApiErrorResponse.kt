@@ -1,6 +1,6 @@
 package fi.paytrail.paymentsdk.model
 
-import android.util.Log
+import fi.paytrail.paymentsdk.PaytrailLogger
 import fi.paytrail.sdk.apiclient.models.ErrorResponse
 import retrofit2.Response
 
@@ -16,7 +16,7 @@ fun <T> createErrorResponse(result: Response<T>): PaytrailApiErrorResponse {
         try {
             ErrorResponse.deserialize(it)
         } catch (e: IllegalArgumentException) {
-            Log.w("PaymentViewModel", "Failed deserializing error body: $errorBody")
+            PaytrailLogger.w("Failed deserializing error body: $errorBody")
             null
         }
     }

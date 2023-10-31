@@ -1,6 +1,5 @@
 package fi.paytrail.paymentsdk
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
@@ -39,7 +38,7 @@ class PaymentViewModel(
         try {
             emit(api.createPayment(paymentRequest = paymentRequest))
         } catch (e: Exception) {
-            Log.i("PaymentViewModel", "Error in loading payment providers", e)
+            PaytrailLogger.i("Error in loading payment providers ${e.message}")
             paymentError.postValue(e)
         }
     }
@@ -73,7 +72,7 @@ class PaymentViewModel(
                     emptyList()
                 }
             } catch (e: Exception) {
-                Log.i("PaymentViewModel", "Error in loading payment providers", e)
+                PaytrailLogger.i("Error in loading payment providers ${e.message}")
                 paymentError.postValue(e)
                 emptyList()
             }
@@ -91,7 +90,7 @@ class PaymentViewModel(
                     try {
                         deserialize(it)
                     } catch (e: IllegalArgumentException) {
-                        Log.w("PaymentViewModel", "Failed deserializing error body: $errorBody")
+                        PaytrailLogger.w("Failed deserializing error body: $errorBody")
                         null
                     }
                 }
@@ -126,14 +125,6 @@ class PaymentViewModel(
     fun onPaymentError(exception: Exception) {
         this.paymentError.postValue(exception)
     }
-
-    // TODO: This probably should be a MediatorLiveData, observing other request statuses,
-    //  and showing result accordingly. Rough idea:
-    //    * if payment is complete, PAYMENT_COMPLETE
-    //    * if payment failed, PAYMENT_ERROR
-    //    * if payment provider has been selected, status is PAYMENT_IN_PROGRESS
-    //    * if payment providers are loaded, status is SHOW_PAYMENT_PROVIDERS
-    //    * until payment providers are loaded, status is LOADING_PAYMENT_PROVIDERS
     val paymentState: LiveData<PaytrailPaymentState> =
         MediatorLiveData(PaytrailPaymentState(LOADING_PAYMENT_PROVIDERS)).apply {
             var paymentProvidersLoaded = false
@@ -166,8 +157,6 @@ class PaymentViewModel(
             }
 
             addSource(paymentMethodGroups) {
-                // TODO: This needs improving; we need to be looking at the create_payment
-                //       request & response, and set state accordingly (loading/ok/error)
                 paymentProvidersLoaded = true
                 refreshState()
             }

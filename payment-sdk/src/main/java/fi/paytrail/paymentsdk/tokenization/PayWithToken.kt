@@ -13,8 +13,8 @@ import fi.paytrail.paymentsdk.PaytrailWebView
 import fi.paytrail.paymentsdk.model.PaytrailPaymentState
 import fi.paytrail.sdk.apiclient.MerchantAccount
 import fi.paytrail.sdk.apiclient.infrastructure.PaytrailApiClient
-import fi.paytrail.sdk.apiclient.models.Payment
 import fi.paytrail.sdk.apiclient.models.PaymentRequest
+
 /**
  * Represents the type of payment charge when dealing with tokens.
  */

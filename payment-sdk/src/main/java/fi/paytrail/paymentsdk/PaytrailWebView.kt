@@ -5,9 +5,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
 import android.os.Message
-import android.util.Log
 import android.view.ViewGroup
-import android.view.ViewGroup.LayoutParams
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
@@ -65,10 +63,6 @@ fun PaytrailWebView(
     var webView: WebView? = null
 
     var canGoBack by remember { mutableStateOf(false) }
-
-    // TODO: Figure out how to persist/restore the WebView state through
-    //       Activity (and process) destruction/recreation.
-    //       Check how Accompanist WebView does this for inspiration.
     val webViewState: State<Bundle> = rememberSaveable { mutableStateOf(Bundle()) }
 
     AndroidView(
@@ -81,27 +75,21 @@ fun PaytrailWebView(
                 )
                 webViewClient = object : WebViewClient() {
                     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-                        Log.i("PaytrailWebView", "onPageStarted ::: $url")
+                        PaytrailLogger.i("onPageStarted ::: $url")
                         canGoBack = view?.canGoBack() ?: false
                         super.onPageStarted(view, url, favicon)
                     }
 
                     override fun onLoadResource(view: WebView?, url: String?) {
-                        Log.v("PaytrailWebView", "onLoadResource ::: $url")
+                        PaytrailLogger.v("onLoadResource ::: $url")
                         super.onLoadResource(view, url)
                     }
-
-                    // TODO: In case of onReceivedError and onReceivedHttpError, expose the error
-                    //       as PaytrailApiErrorResponse or similar. As of now, errors from loaded
-                    //       URLs are not emitted, and users will be shown default error pages.
-
                     override fun onReceivedError(
                         view: WebView?,
                         request: WebResourceRequest?,
                         error: WebResourceError?,
                     ) {
-                        Log.w(
-                            "PaytrailWebView",
+                        PaytrailLogger.w(
                             "onReceivedHttpError ::: ${request?.method} ${request?.url} ::: $error",
                         )
                         super.onReceivedError(view, request, error)
@@ -112,15 +100,14 @@ fun PaytrailWebView(
                         request: WebResourceRequest?,
                         errorResponse: WebResourceResponse?,
                     ) {
-                        Log.w(
-                            "PaytrailWebView",
+                        PaytrailLogger.w(
                             "onReceivedHttpError ::: ${request?.method} ${request?.url} ::: ${errorResponse?.statusCode}",
                         )
                         super.onReceivedHttpError(view, request, errorResponse)
                     }
 
                     override fun onPageFinished(view: WebView?, url: String?) {
-                        Log.i("PaytrailWebView", "onPageFinished $url")
+                        PaytrailLogger.i("onPageFinished $url")
                         canGoBack = view?.canGoBack() ?: false
                         super.onPageFinished(view, url)
                     }
@@ -130,7 +117,7 @@ fun PaytrailWebView(
                         dontResend: Message?,
                         resend: Message?,
                     ) {
-                        Log.i("PaytrailWebView", "onFormResubmission")
+                        PaytrailLogger.i("onFormResubmission")
                         super.onFormResubmission(view, dontResend, resend)
                     }
 
@@ -138,8 +125,7 @@ fun PaytrailWebView(
                         view: WebView,
                         request: WebResourceRequest,
                     ): Boolean {
-                        Log.i(
-                            "PaytrailWebView",
+                        PaytrailLogger.i(
                             "shouldOverrideUrlLoading ::: ${request.method} ${request.url}",
                         )
                         val (requestHost, requestPath) = with(request.url) { host to path }
@@ -195,7 +181,7 @@ fun PaytrailWebView(
             }
         },
         update = {
-            Log.i("PaytrailWebView", "AndroidView::update ::: webview.url=${it.url}")
+            PaytrailLogger.i("AndroidView::update ::: webview.url=${it.url}")
             if (it.url == null) {
                 when (method) {
                     PaytrailWebViewCallMethod.POST -> it.postUrl(

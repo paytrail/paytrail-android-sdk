@@ -35,8 +35,6 @@ class PayAndAddCardViewModel(
         emit(RequestStatus.loading())
         try {
             val response = api.payAndAddCard(paymentRequest = paymentRequest)
-            // TODO: Notify app observer about intermediary response via PaymentState,
-            //       so app can catch the transaction ID if they need it.
             if (response.isSuccessful) {
                 emit(RequestStatus.success(response.body()))
             } else {
