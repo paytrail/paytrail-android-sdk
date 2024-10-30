@@ -15,16 +15,18 @@
 
 package fi.paytrail.sdk.apiclient.models
 
+import fi.paytrail.sdk.apiclient.infrastructure.BigDecimalAsNumberAdapter
 import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import java.math.BigDecimal
 
 /**
  *
  *
  * @param unitPrice Unit price of an item in currency minor unit, eg. EUR cents. VAT should be included in amount unless `usePricesWithoutVat` is set to true.
  * @param units Number of units
- * @param vatPercentage Item VAT percentage
+ * @param vatPercentage Item VAT percentage. Values between 0 and 100 are allowed with one decimal place.
  * @param productCode Merchant specific product code
  * @param deliveryDate Estimated delivery date
  * @param description Merchant specific product description
@@ -46,9 +48,10 @@ data class Item(
     @SerialName(value = "units")
     val units: kotlin.Long,
 
-    /* Item VAT percentage */
+    /* Item VAT percentage. Values between 0 and 100 are allowed with one decimal place. */
     @SerialName(value = "vatPercentage")
-    val vatPercentage: kotlin.Long,
+    @Serializable(with = BigDecimalAsNumberAdapter::class)
+    val vatPercentage: BigDecimal,
 
     /* Merchant specific product code */
     @SerialName(value = "productCode")

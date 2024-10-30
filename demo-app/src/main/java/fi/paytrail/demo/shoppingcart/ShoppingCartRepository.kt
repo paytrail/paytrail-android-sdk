@@ -27,7 +27,7 @@ val fakeCart = ShoppingCart(
             amount = 1,
             unitPrice = BigDecimal.valueOf(15),
             fakeImage = R.drawable.product_img2,
-            vatPercentage = 24,
+            vatPercentage = BigDecimal(25.5),
         ),
         ShoppingCartRow(
             name = "Paytrail Drinking Bottle",
@@ -35,7 +35,7 @@ val fakeCart = ShoppingCart(
             amount = 2,
             unitPrice = BigDecimal.valueOf(20),
             fakeImage = R.drawable.product_img1,
-            vatPercentage = 24,
+            vatPercentage = BigDecimal(14),
         ),
     ).associateBy { it.id },
 )
