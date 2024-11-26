@@ -35,7 +35,7 @@ For a deep dive into the SDK's APIs, consult our [Paytrail Android SDK Wiki](htt
 
    ```groovy
    dependencies {
-       implementation("com.github.paytrail:paytrail-android-sdk:v0.2.0-beta")
+       implementation("com.github.paytrail:paytrail-android-sdk:v0.3.0-beta")
    }
    ```
 

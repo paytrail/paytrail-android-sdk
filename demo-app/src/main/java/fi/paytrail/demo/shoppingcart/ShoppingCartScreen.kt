@@ -395,7 +395,7 @@ fun PreviewShoppingCartItem() {
             id = UUID.fromString("6427e0c2-382d-4f03-99e5-413fff4d0afb"),
             amount = 2,
             unitPrice = BigDecimal("2.99"),
-            vatPercentage = 24,
+            vatPercentage = BigDecimal(14),
             fakeImage = R.drawable.image_placeholder,
         ),
     )
@@ -411,7 +411,7 @@ fun PreviewShoppingCartItem_LongName() {
             id = UUID.fromString("6427e0c2-382d-4f03-99e5-413fff4d0afb"),
             amount = 2,
             unitPrice = BigDecimal("2345.67"),
-            vatPercentage = 24,
+            vatPercentage = BigDecimal(25.5),
             fakeImage = R.drawable.image_placeholder,
         ),
     )
